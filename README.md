@@ -8,6 +8,7 @@ myIssue 是一个 repo-native、agent-neutral 的 Issue/Task 上下文层。它�
 - 实现：尚未开始
 - 仓库：`my-issue`
 - 产品名：`myIssue`
+- 许可证：尚未选择；当前公开可见不代表已经授予开源许可
 
 当前提交只建立项目边界与需求基线，不包含 CLI、GUI、服务端或其他实现代码。
 
