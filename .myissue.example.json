@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "name": { "source": "heading" },
+  "descriptionHeading": "Description",
+  "commentsHeading": "Comments",
+  "statusKey": "status",
+  "parentKey": "parent",
+  "dependenciesKey": "depends_on",
+  "columns": [
+    { "value": "backlog", "label": "待规划", "color": "#8b8b96" },
+    { "value": "todo", "label": "待办", "color": "#6d86a3" },
+    { "value": "in_progress", "label": "进行中", "color": "#d1a34c" },
+    { "value": "in_review", "label": "待验收", "color": "#9975d2" },
+    { "value": "done", "label": "已完成", "color": "#67a38e" },
+    { "value": "blocked", "label": "受阻", "color": "#cf7373" },
+    { "value": "cancelled", "label": "已取消", "color": "#777780" }
+  ],
+  "readyStatuses": ["todo"],
+  "doneStatuses": ["done", "cancelled"]
+}

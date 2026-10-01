@@ -1,0 +1,20 @@
+{
+  "name": "myissue-local",
+  "interface": {
+    "displayName": "myIssue Local"
+  },
+  "plugins": [
+    {
+      "name": "myissue",
+      "source": {
+        "source": "local",
+        "path": "./plugins/myissue"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

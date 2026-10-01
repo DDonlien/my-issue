@@ -1,0 +1,11 @@
+import { spawnSync } from 'node:child_process';
+import { mkdir } from 'node:fs/promises';
+import path from 'node:path';
+const root = path.resolve(import.meta.dirname, '..');
+const output = path.join(root, 'dist/myissue-0.1.0.zip');
+const build = spawnSync(process.execPath, ['scripts/build.mjs'], { cwd: root, stdio: 'inherit' });
+if (build.status !== 0) process.exit(build.status ?? 1);
+await mkdir(path.join(root, 'dist'), { recursive: true });
+const archive = spawnSync('python3', ['-c', `import pathlib,zipfile,sys\nroot=pathlib.Path(sys.argv[1])\nwith zipfile.ZipFile(sys.argv[2], 'w', zipfile.ZIP_DEFLATED) as z:\n for p in sorted(root.rglob('*')):\n  if p.is_file(): z.write(p,p.relative_to(root))`, path.join(root, 'plugins/myissue'), output], { stdio: 'inherit' });
+if (archive.status !== 0) process.exit(archive.status ?? 1);
+console.log(output);

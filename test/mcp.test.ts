@@ -1,0 +1,35 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { mkdtemp, rm, readFile } from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import { UI_URI } from '../src/server.js';
+
+test('built plugin exposes independent UI, real CRUD and dispatch context over MCP', async t => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'myissue-mcp-')); t.after(() => rm(root, { recursive: true, force: true }));
+  const client = new Client({ name: 'myissue-acceptance', version: '1' });
+  const preferencesDir = path.join(root, '.plugin-preferences');
+  const transport = new StdioClientTransport({ command: process.execPath, args: [path.resolve('plugins/myissue/scripts/server.cjs'), '--root', root], env: { ...Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => typeof entry[1] === 'string')), PLUGIN_DATA: preferencesDir } });
+  await client.connect(transport); t.after(() => client.close());
+  const catalog = await client.listTools(); const open = catalog.tools.find(tool => tool.name === 'open_board')!;
+  assert.deepEqual((open._meta?.['openai/ui'] as any).entrypoints, [{ type: 'global' }, { type: 'thread' }]);
+  const resource = await client.readResource({ uri: UI_URI }); assert.ok('text' in resource.contents[0]); assert.match(resource.contents[0].text, /myIssue/); assert.equal(resource.contents[0].mimeType, 'text/html;profile=mcp-app');
+  const invoke = async (name: string, args: any = {}) => (await client.callTool({ name, arguments: args })).structuredContent as any;
+  const created = (await invoke('create_issue', { root, name: '从对话创建', properties: { status: 'todo', future: 'preserved' }, description: '真实上下文' })).issue;
+  const read = (await invoke('get_issue', { root, id: created.id })).issue; assert.equal(read.revision, created.revision);
+  const updated = (await invoke('update_issue', { root, id: created.id, revision: read.revision, properties: { status: 'in_progress' } })).issue;
+  const commented = (await invoke('append_comment', { root, id: created.id, revision: updated.revision, body: '真实评论', author: 'acceptance', actor: 'human' })).issue;
+  const dispatch = await invoke('prepare_dispatch', { root, id: created.id });
+  assert.match(dispatch.prompt, /真实评论/); assert.match(dispatch.prompt, /从对话创建/);
+  const board = await invoke('open_board', { root, issueId: created.id }); assert.equal(board.board.issues[0].comments.length, 1);
+  assert.deepEqual(JSON.parse(await readFile(path.join(preferencesDir, 'projects.json'), 'utf8')), [root]);
+  const mention = await invoke('search_mentions', { query: '从对话' });
+  assert.equal(mention.items.length, 1);
+  const mentionResource = await client.readResource({ uri: mention.items[0].resourceUri });
+  assert.ok('text' in mentionResource.contents[0]); assert.equal(mentionResource.contents[0].text, commented.raw);
+  assert.equal(await readFile(path.join(root, 'issues', created.filename), 'utf8'), commented.raw);
+  const stale = await client.callTool({ name: 'update_issue', arguments: { root, id: created.id, revision: created.revision, name: 'Overwrite' } });
+  assert.equal(stale.isError, true); assert.equal((stale.structuredContent as any).error.code, 'CONFLICT');
+});

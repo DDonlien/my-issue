@@ -4,7 +4,7 @@
 
 - 产品名使用 `myIssue`，仓库名使用 `my-issue`。
 - 本仓库开发 repo-native、agent-neutral 的 Issue/Task 上下文层。
-- 当前阶段只定义需求与协议；在用户明确要求开始实现前，不编写产品代码。
+- 2026-10-01 用户明确授权实现 Codex 插件，当前已进入产品实施；新增行为仍须先记录确认的需求。
 
 ## 每次任务开始前
 
@@ -21,7 +21,7 @@
 4. `Description` 是用户自由编辑的 Markdown；系统不得强制解析其中的业务子标题。
 5. `Comments` 是人类与 Agent 共用的历史线程；已存在的 Comment 不得被结构化操作静默改写。
 6. `parent`、`depends_on` 与其他关系不得形成重复事实来源。
-7. myIssue 不托管 Agent 执行，不负责 Agent Runtime、模型适配、Prompt、Session、Branch 或 Worktree 生命周期。
+7. myIssue 不托管 Agent 执行，不负责 Agent Runtime、模型适配、Prompt、Session、Branch 或 Worktree 生命周期。用户显式分发 Issue 到当前或新对话，只调用宿主能力，不建立 myIssue 托管的执行对象。
 
 ## 需求与文档
 
