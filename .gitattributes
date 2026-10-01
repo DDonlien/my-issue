@@ -1,0 +1,4 @@
+# Generated bundles contain upstream embedded text. Preserve it and vendor licenses verbatim.
+plugins/myissue/assets/board.html whitespace=-blank-at-eol
+plugins/myissue/scripts/server.cjs whitespace=-blank-at-eol
+plugins/myissue/THIRD_PARTY_NOTICES.txt whitespace=-blank-at-eol
