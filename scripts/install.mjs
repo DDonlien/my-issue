@@ -10,3 +10,4 @@ run(process.execPath, ['scripts/build.mjs']);
 run('codex', ['plugin', 'marketplace', 'add', root, '--json']);
 run('codex', ['plugin', 'add', 'myissue@myissue-local', '--json']);
 run('codex', ['plugin', 'list', '--marketplace', 'myissue-local', '--json']);
+console.log('安装/更新完成后，请完全退出并重新启动 ChatGPT / Codex 桌面应用，再打开 myIssue。仅关闭页面不会刷新旧对话保留的 MCP 服务进程。');

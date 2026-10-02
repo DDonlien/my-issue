@@ -16,6 +16,12 @@ test('built plugin exposes independent UI, real CRUD and dispatch context over M
   const catalog = await client.listTools(); const open = catalog.tools.find(tool => tool.name === 'open_board')!;
   assert.deepEqual((open._meta?.['openai/ui'] as any).entrypoints, [{ type: 'global' }, { type: 'thread' }]);
   const resource = await client.readResource({ uri: UI_URI }); assert.ok('text' in resource.contents[0]); assert.match(resource.contents[0].text, /myIssue/); assert.equal(resource.contents[0].mimeType, 'text/html;profile=mcp-app');
+  // Cached entrypoints from a previous release must still resolve in a new server.
+  assert.equal((open._meta?.ui as any).resourceUri, UI_URI);
+  assert.equal(open._meta?.['openai/outputTemplate'], UI_URI);
+  const legacy = await client.readResource({ uri: 'ui://myissue/board-v1.html' });
+  assert.equal(legacy.contents[0].uri, 'ui://myissue/board-v1.html');
+  assert.deepEqual({ ...legacy.contents[0], uri: UI_URI }, resource.contents[0]);
   const invoke = async (name: string, args: any = {}) => (await client.callTool({ name, arguments: args })).structuredContent as any;
   const created = (await invoke('create_issue', { root, name: '从对话创建', properties: { status: 'todo', future: 'preserved' }, description: '真实上下文' })).issue;
   const read = (await invoke('get_issue', { root, id: created.id })).issue; assert.equal(read.revision, created.revision);

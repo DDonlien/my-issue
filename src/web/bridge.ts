@@ -11,7 +11,7 @@ export const preview = window.parent === window;
 export function onResult(callback: typeof handler) { handler = callback; }
 export async function connect() {
   if (preview) return;
-  app = new App({ name: 'myIssue', version: '0.1.1' });
+  app = new App({ name: 'myIssue', version: '0.1.2' });
   extensions = new OpenAIExtensions(app);
   app.ontoolresult = result => { if (result.structuredContent) handler(result.structuredContent); };
   const theme = followHostTheme(app);

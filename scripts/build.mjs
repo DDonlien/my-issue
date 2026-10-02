@@ -2,6 +2,7 @@ import { build } from 'esbuild';
 import { mkdir, writeFile, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 const base = path.resolve(import.meta.dirname, '..');
+const { version } = JSON.parse(await readFile(path.join(base, 'package.json'), 'utf8'));
 const plugin = path.join(base, 'plugins/myissue');
 await mkdir(path.join(plugin, 'scripts'), { recursive: true });
 await mkdir(path.join(plugin, 'assets'), { recursive: true });
@@ -29,7 +30,7 @@ for (const folder of [...packages].sort()) {
 }
 await writeFile(path.join(plugin, 'THIRD_PARTY_NOTICES.txt'), notices.join(''));
 const manifest = {
-  name: 'myissue', version: '0.1.1', description: 'Local Markdown issue boards with editable properties, shared comments and conversation dispatch.',
+  name: 'myissue', version, description: 'Local Markdown issue boards with editable properties, shared comments and conversation dispatch.',
   author: { name: 'DDonlien', url: 'https://github.com/DDonlien' }, repository: 'https://github.com/DDonlien/my-issue',
   keywords: ['issues', 'markdown', 'kanban', 'local'], skills: './skills/', mcpServers: './.mcp.json',
   interface: { displayName: 'myIssue', shortDescription: '项目里的 Issue，对话里的工作', longDescription: '从项目根目录 issues/*.md 读取看板。编辑名称和任意属性、追加人类与 Agent 评论，在宿主支持时发送到当前或新对话。支持全局和对话侧栏入口。', developerName: 'DDonlien', category: 'Productivity', capabilities: ['Interactive', 'Write'], brandColor: '#424242', composerIcon: './assets/icon.svg', logo: './assets/icon.svg', defaultPrompt: ['打开这个项目的 myIssue 看板', '把这段对话整理成一个 Issue', '读取 Issue 和最新评论，开始处理'] },

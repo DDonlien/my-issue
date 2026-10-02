@@ -9,9 +9,11 @@ import { z } from 'zod';
 import { IssueStore, IssueError } from './core.js';
 import { execute, inputs, type Operation } from './service.js';
 
+// This is a persistent entrypoint identity, not a release/cache version. Desktop
+// tool inventories and conversation-specific MCP processes can refresh separately.
 export const UI_URI = 'ui://myissue/board-v2.html';
 export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string) {
-  const server = new McpServer({ name: 'myissue', version: '0.1.1' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
+  const server = new McpServer({ name: 'myissue', version: '0.1.2' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
   const extensions = new OpenAIExtensions(server);
   const knownRoots = new Set<string>(fallbackRoot ? [fallbackRoot] : []);
   async function loadPreferences() {
@@ -50,12 +52,14 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     try { return result(await action(args)); }
     catch (e) { return { content: [{ type: 'text' as const, text: (e as Error).message }], structuredContent: { error: { code: e instanceof IssueError ? e.code : 'INVALID_INPUT', message: (e as Error).message } }, isError: true }; }
   };
-  registerAppResource(server, 'myissue-board', UI_URI, { description: 'myIssue board, issue details, properties and comments' }, async () => ({
-    contents: [{ uri: UI_URI, mimeType: RESOURCE_MIME_TYPE, text: html, _meta: {
-      ui: { prefersBorder: false, csp: { connectDomains: [], resourceDomains: [] } },
-      'openai/ui': { preferredDisplayMode: 'fullscreen', availableDisplayModes: ['inline', 'fullscreen', 'pip'] },
-    } }],
-  }));
+  for (const [name, uri] of [['myissue-board', UI_URI], ['myissue-board-legacy', 'ui://myissue/board-v1.html']]) {
+    registerAppResource(server, name, uri, { description: 'myIssue board, issue details, properties and comments' }, async () => ({
+      contents: [{ uri, mimeType: RESOURCE_MIME_TYPE, text: html, _meta: {
+        ui: { prefersBorder: false, csp: { connectDomains: [], resourceDomains: [] } },
+        'openai/ui': { preferredDisplayMode: 'fullscreen', availableDisplayModes: ['inline', 'fullscreen', 'pip'] },
+      } }],
+    }));
+  }
   registerAppTool(server, 'open_board', {
     title: 'myIssue', description: 'Open the independent myIssue board or an issue beside this conversation. Select the project root that contains issues/*.md.', inputSchema: inputs.open_board,
     annotations: readAnnotations,

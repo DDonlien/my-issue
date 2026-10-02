@@ -17,6 +17,7 @@
 ## Phase - ChatGPT 外观与主题（2026-10-02 确认）
 
 - [x] [CODEX-PLUGIN-010] 项目选择弹窗、输入框、按钮、侧栏和页面使用 ChatGPT 的中性配色、字体与圆角逻辑。优先使用 MCP Apps 宿主语义颜色变量并响应主题变更；宿主明确的浅色/深色优先于系统偏好，未提供时跟随系统。重点色只继承宿主提供的焦点/交互变量，不硬编码用户截图的橙色或读取宿主私有设置。已完成隔离 SDK 宿主与浏览器验证；当前 ChatGPT 用户自定义重点色是否实际下发仍未验收。
+- [x] [CODEX-PLUGIN-011] 修复升级后的对话侧栏启动：页面资源地址保持稳定，兼容已经发布的旧地址；安装更新后明确提示重启桌面应用，以清除旧对话保留的 MCP 进程。工具目录中的入口地址及兼容地址都必须能够通过实际 MCP 读取。2026-10-02 日志确认旧对话请求 board-v2.html，而保留的 0.1.0 进程只提供 board-v1.html。0.1.2 已安装，独立 Codex app-server 实际读取两个地址成功；重启桌面应用后的原生侧栏显示仍按 CODEX-PLUGIN-002 单独验收。
 
 首版工程决定：Node.js 22+ / TypeScript，共用文件核心；默认 YAML frontmatter、H1 名称、可选 `## Description`、追加式 `## Comments`。新评论使用带时区 ISO 8601 时间与 `· author · human/model`；旧评论原文保留。默认状态 backlog/todo/in_progress/in_review/done/blocked/cancelled 可配置；不识别的状态仍独立展示。ID 使用文件名 `issue-<UUID>.md`，不改已有文件名或 ID。`REQUIREMENTS.md` 暂继续独立保存。仅由宿主对话能力执行分发，不托管 Agent Runtime；原“不启动 Agent”边界不限制用户本次确认的对话启动动作。许可证仍待用户选择。
 

@@ -1,8 +1,9 @@
 import { spawnSync } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
-const output = path.join(root, 'dist/myissue-0.1.1.zip');
+const { version } = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+const output = path.join(root, `dist/myissue-${version}.zip`);
 const build = spawnSync(process.execPath, ['scripts/build.mjs'], { cwd: root, stdio: 'inherit' });
 if (build.status !== 0) process.exit(build.status ?? 1);
 await mkdir(path.join(root, 'dist'), { recursive: true });
