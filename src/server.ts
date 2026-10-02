@@ -8,12 +8,13 @@ import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { IssueStore, IssueError } from './core.js';
 import { execute, inputs, type Operation } from './service.js';
+import { desktopProjects, chooseDesktopFolder, type DesktopProject } from './desktop.js';
 
 // This is a persistent entrypoint identity, not a release/cache version. Desktop
 // tool inventories and conversation-specific MCP processes can refresh separately.
 export const UI_URI = 'ui://myissue/board-v2.html';
-export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string) {
-  const server = new McpServer({ name: 'myissue', version: '0.1.2' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
+export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string, desktop: { projects: (refresh?: boolean) => Promise<DesktopProject[]>; chooseFolder: () => Promise<string | undefined> } = { projects: desktopProjects, chooseFolder: chooseDesktopFolder }) {
+  const server = new McpServer({ name: 'myissue', version: '0.1.3' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
   const extensions = new OpenAIExtensions(server);
   const knownRoots = new Set<string>(fallbackRoot ? [fallbackRoot] : []);
   async function loadPreferences() {
@@ -35,14 +36,23 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     } catch { /* Losing a recent-folder preference must never block the board. */ }
     finally { await fs.rm(temp, { force: true }).catch(() => {}); }
   }
-  async function projects() {
+  async function projects(refresh = false) {
     await loadPreferences();
-    try {
-      const roots = await server.server.listRoots();
-      for (const root of roots.roots) if (root.uri.startsWith('file:')) knownRoots.add(fileURLToPath(root.uri));
-    } catch { /* Hosts without roots can select an absolute path in the board. */ }
+    const [saved, shared] = await Promise.allSettled([
+      desktop.projects(refresh),
+      server.server.getClientCapabilities()?.roots ? server.server.listRoots(undefined, { timeout: 1000 }) : Promise.resolve({ roots: [] }),
+    ]);
+    const names = new Map<string, string>();
+    if (shared.status === 'fulfilled') for (const root of shared.value.roots) {
+      try { if (root.uri.startsWith('file:')) { const local = path.resolve(fileURLToPath(root.uri)); knownRoots.add(local); if (root.name) names.set(local, root.name); } } catch { /* Ignore invalid host roots. */ }
+    }
+    const candidates = new Set(knownRoots);
+    if (saved.status === 'fulfilled') for (const project of saved.value) {
+      if (!path.isAbsolute(project.root)) continue;
+      const root = path.resolve(project.root); candidates.add(root); names.set(root, project.name);
+    }
     const available = [];
-    for (const root of knownRoots) { try { if ((await fs.stat(root)).isDirectory()) available.push({ root, name: path.basename(root) }); } catch { /* Hide folders that no longer exist. */ } }
+    for (const root of candidates) { try { if ((await fs.stat(root)).isDirectory()) available.push({ root, name: names.get(root) ?? path.basename(root) }); } catch { /* Hide folders that no longer exist. */ } }
     return available;
   }
   const readAnnotations = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
@@ -66,14 +76,17 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     _meta: { ui: { resourceUri: UI_URI, visibility: ['model', 'app'] }, 'openai/outputTemplate': UI_URI, 'openai/ui': { entrypoints: [{ type: 'global' }, { type: 'thread' }] } },
   }, wrap(async args => {
     const list = await projects();
-    const chosenRoot = args.root ?? list[0]?.root;
+    // Discovering saved projects does not select or open an arbitrary one.
+    const chosenRoot = args.root ?? [...knownRoots].find(root => list.some(project => project.root === root));
     if (!chosenRoot) return { projects: list };
     const data = await execute('open_board', { ...args, root: chosenRoot });
     // Remember only a root that was successfully read. This stores folder paths, not issue data.
     await remember(chosenRoot);
-    return { ...data, projects: await projects() };
+    if (!list.some(project => project.root === chosenRoot)) list.push({ root: chosenRoot, name: path.basename(chosenRoot) });
+    return { ...data, projects: list };
   }));
-  server.registerTool('list_projects', { description: 'List project folders shared by the host. Additional project roots can be entered explicitly in the board.', inputSchema: z.object({}), annotations: readAnnotations }, wrap(async () => ({ projects: await projects() })));
+  server.registerTool('list_projects', { description: 'Read saved local desktop projects, host-shared folders and previously opened roots. Cloud projects without a local directory cannot contain issues/*.md.', inputSchema: z.object({}), annotations: readAnnotations }, wrap(async () => ({ projects: await projects(true) })));
+  server.registerTool('browse_folder', { title: '选择项目文件夹', description: 'Open the local system folder chooser after an explicit user click. Return a path without opening the board or changing issue files. Cancellation returns no path.', inputSchema: z.object({}), annotations: readAnnotations, _meta: { ui: { visibility: ['app'] } } }, wrap(async () => ({ root: await desktop.chooseFolder() })));
   const descriptions: Record<Exclude<Operation, 'open_board'>, string> = {
     list_issues: 'Read the current Markdown files and derive the board, ready state and relation errors. Unknown properties and statuses remain visible.',
     get_issue: 'Read one issue by its filename stem and return the current content and revision.',

@@ -681,7 +681,7 @@ select {
   max-width:100%;
   max-height:90vh;
   overflow:auto;
-  background:var(--elevated);
+  background:linear-gradient(var(--elevated),var(--elevated)),light-dark(#fff,#2f2f2f);
   border:1px solid var(--line);
   border-radius:var(--radius-modal);
   box-shadow:var(--shadow-lg,0 16px 64px #0003);
@@ -1340,7 +1340,7 @@ input:focus, textarea:focus { border-color: var(--focus); outline: 1px solid var
 .project-option:hover { background: var(--hover); }
 .project-option strong { font-size: var(--font-body); }
 .project-option small { font-size: 11px; }
-.project-help {
+.project-browse {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1349,7 +1349,13 @@ input:focus, textarea:focus { border-color: var(--focus); outline: 1px solid var
   background: var(--hover);
   border-radius: var(--radius-control);
   color: var(--muted);
+  width: 100%;
+  text-align: left;
 }
-.project-help p { margin: 0; font-size: var(--font-small); line-height: 1.5; }
+.project-browse span { flex: 1; font-size: var(--font-small); }
+.project-browse:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 12%, transparent); color: var(--text); }
+.project-caption,.project-loading { color: var(--muted); font-size: var(--font-small); line-height: 1.5; }
+.project-caption { margin: 16px 0 0; }
+.dialog-error { color: var(--danger); font-size: var(--font-small); }
 .project-modal .modal-footer { justify-content: flex-end; }
 .project-modal .modal-footer > .primary { margin-left: 0; }

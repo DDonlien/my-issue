@@ -11,7 +11,7 @@ export const preview = window.parent === window;
 export function onResult(callback: typeof handler) { handler = callback; }
 export async function connect() {
   if (preview) return;
-  app = new App({ name: 'myIssue', version: '0.1.2' });
+  app = new App({ name: 'myIssue', version: '0.1.3' });
   extensions = new OpenAIExtensions(app);
   app.ontoolresult = result => { if (result.structuredContent) handler(result.structuredContent); };
   const theme = followHostTheme(app);
@@ -25,7 +25,7 @@ export async function call(name: string, args: ToolData = {}): Promise<ToolData>
     data = await response.json();
   } else {
     if (!app) throw new Error('宿主尚未连接');
-    const response = await app.callServerTool({ name, arguments: args });
+    const response = await app.callServerTool({ name, arguments: args }, name === 'browse_folder' ? { timeout: 180_000 } : undefined);
     data = response.structuredContent ?? {};
     if (response.isError && !data.error) throw new Error(response.content?.filter(c => c.type === 'text').map(c => c.text).join('\n') ?? '操作失败');
   }

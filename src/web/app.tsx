@@ -53,6 +53,7 @@ function App() {
   const [connected, setConnected] = useState(false);
   const [creating, setCreating] = useState<string | null>(null);
   const [projectModal, setProjectModal] = useState(false);
+  const [projectLoading, setProjectLoading] = useState(false);
   const [rootDraft, setRootDraft] = useState('');
   const [dragging, setDragging] = useState<string>();
   const [dropColumn, setDropColumn] = useState<string>();
@@ -93,6 +94,21 @@ function App() {
   }, []);
   useEffect(() => { if (selected && board) bridge.context(board.root, selected).catch(() => {}); }, [selected, board?.root]);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(''), 5000); return () => clearTimeout(timer); }, [notice]);
+  useEffect(() => {
+    if (!projectModal || !connected) return;
+    let cancelled = false;
+    setProjectLoading(true);
+    bridge.call('list_projects').then(data => { if (!cancelled) accept(data); }).catch(e => { if (!cancelled) setError(e.message); }).finally(() => { if (!cancelled) setProjectLoading(false); });
+    return () => { cancelled = true; };
+  }, [projectModal, connected]);
+
+  async function openProject(root: string) {
+    await run(async () => {
+      if (dirty.current && !window.confirm('丢弃当前草稿并切换项目？')) return;
+      await load(root);
+      dirty.current = false; setSelected(undefined); setProjectModal(false);
+    });
+  }
 
   function choose(id?: string) {
     if (dirty.current && !window.confirm('当前有未保存草稿。丢弃草稿并切换？')) return;
@@ -118,7 +134,7 @@ function App() {
     </aside>
     <main className="main" inert={projectModal || creating !== null}>
       <header className="topbar"><span className="breadcrumb"><Columns3 size={16} />Issue <span>/</span><strong>{selectedIssue ? selectedIssue.name : readyOnly ? '可开始' : '全部'}</strong></span><button className="icon-button" title="重新读取文件" aria-label="刷新" disabled={!board || busy} onClick={() => run(() => load())}><RefreshCw size={15} className={busy ? 'spin' : ''} /></button></header>
-      {error && <div className="banner error" role="alert"><AlertCircle size={16} /><span>{error}</span><button onClick={() => setError('')} aria-label="关闭错误"><X size={15} /></button></div>}
+      {error && !projectModal && <div className="banner error" role="alert"><AlertCircle size={16} /><span>{error}</span><button onClick={() => setError('')} aria-label="关闭错误"><X size={15} /></button></div>}
       {notice && <div className="toast" role="status"><Check size={15} />{notice}</div>}
       {!board ? <div className="welcome"><div className="welcome-icon"><Columns3 size={30} /></div><h1>让工作留在项目里</h1><p>把 Issue 放进 Markdown，<br />从这里看进度，在对话里继续工作。</p><button className="primary" onClick={() => setProjectModal(true)}><Folder size={16} />选择项目文件夹</button><span>{connected ? '从项目根目录的 issues 文件夹读取' : '正在连接宿主…'}</span></div> : selectedIssue ?
         <Detail key={selectedIssue.id} issue={selectedIssue} board={board} busy={busy} connected={connected} onClose={() => choose()} onDirty={value => { dirty.current = value; }} run={run} onSaved={async () => { await load(); }} notify={setNotice} /> : <>
@@ -135,13 +151,16 @@ function App() {
         </>}
     </main>
     {projectModal && <div className="overlay" onMouseDown={e => { if (e.target === e.currentTarget) setProjectModal(false); }}>
-      <DialogForm className="modal project-modal" aria-labelledby="project-dialog-title" onClose={() => setProjectModal(false)} onSubmit={e => { e.preventDefault(); run(async () => { if (dirty.current && !window.confirm('丢弃当前草稿并切换项目？')) return; await load(rootDraft.trim()); dirty.current = false; setSelected(undefined); setProjectModal(false); }); }}>
+      <DialogForm className="modal project-modal" aria-labelledby="project-dialog-title" onClose={() => setProjectModal(false)} onSubmit={e => { e.preventDefault(); openProject(rootDraft.trim()); }}>
         <div className="modal-heading"><h2 id="project-dialog-title">选择项目</h2><button type="button" className="icon-button" aria-label="关闭" onClick={() => setProjectModal(false)}><X size={18} /></button></div>
         <label htmlFor="project-root">项目文件夹</label>
         <div className="folder-input"><Folder size={20} aria-hidden="true" /><input id="project-root" data-autofocus required placeholder="/Users/你/Projects/项目" value={rootDraft} onChange={e => setRootDraft(e.target.value)} /></div>
-        {projects.length > 0 && <div className="recent-projects"><p>可用项目</p>{projects.map(p => <button type="button" className="project-option" key={p.root} onClick={() => run(async () => { if (dirty.current && !window.confirm('丢弃当前草稿并切换项目？')) return; dirty.current = false; await load(p.root); setSelected(undefined); setProjectModal(false); })}><Folder size={18} /><span><strong>{p.name}</strong><small>{p.root}</small></span>{p.root === board?.root && <Check size={16} />}</button>)}</div>}
-        <div className="project-help"><FileText size={20} aria-hidden="true" /><p>打开文件夹里的 Issue 看板，名称、属性和评论保存在项目的 issues 文件夹中。</p></div>
-        <div className="modal-footer"><button type="button" className="secondary" onClick={() => setProjectModal(false)}>取消</button><button className="primary" disabled={busy || !rootDraft.trim()}>{busy ? <Loader2 className="spin" size={15} /> : null}打开项目</button></div>
+        <button type="button" className="project-browse" disabled={!connected || busy} onClick={() => run(async () => { const data = await bridge.call('browse_folder'); if (data.root) setRootDraft(data.root); })}><Folder size={20} aria-hidden="true" /><span>浏览文件夹</span>{busy ? <Loader2 className="spin" size={16} /> : <ChevronDown size={16} />}</button>
+        {projectLoading && <p className="project-loading" role="status">正在读取已添加的项目…</p>}
+        {projects.length > 0 && <div className="recent-projects"><p>已添加的项目</p>{projects.map(p => <button type="button" className="project-option" disabled={busy || !connected} key={p.root} onClick={() => openProject(p.root)}><Folder size={18} /><span><strong>{p.name}</strong><small>{p.root}</small></span>{p.root === board?.root && <Check size={16} />}</button>)}</div>}
+        {error && <p className="dialog-error" role="alert">{error}</p>}
+        <p className="project-caption">名称、属性和评论保存在项目的 issues 文件夹中。</p>
+        <div className="modal-footer"><button type="button" className="secondary" onClick={() => setProjectModal(false)}>取消</button><button className="primary" disabled={!connected || busy || !rootDraft.trim()}>{busy ? <Loader2 className="spin" size={15} /> : null}打开项目</button></div>
       </DialogForm>
     </div>}
     {creating !== null && board && <CreateModal status={creating} board={board} busy={busy} run={run} close={() => setCreating(null)} created={async issue => { await load(); setCreating(null); setSelected(issue.id); setNotice('Issue 已创建'); }} />}

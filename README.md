@@ -11,6 +11,7 @@ myIssue 是项目内的 Markdown Issue 看板，也是可安装的 Codex 插件�
 - 看板通过官方宿主消息能力发送最新 Issue 上下文到当前或新对话；没有对应能力时显示不可用。对话通过 MCP 工具创建或开始处理 Issue。
 - 可配置的字段映射、名称来源、章节名与状态列。未知属性保留，未知状态增加派生列。
 - ChatGPT 风格的中性页面与弹窗。跟随宿主浅色/深色和语义颜色，未提供主题时跟随系统；焦点与链接使用宿主传入的交互颜色。
+- 项目选择窗提供 macOS 系统文件夹浏览，列出桌面已添加的本地项目及最近打开的文件夹；保留桌面项目名称。弹窗背景不透明。
 
 无需 Issue 数据库、云账号或 myIssue 托管的 Agent Runtime。核心操作不依赖页面。许可证尚未选择；公开可见不代表授予开源许可。
 
@@ -25,7 +26,9 @@ npm run install:plugin
 
 安装脚本构建自包含的插件，注册本仓库的 `myissue-local` Marketplace，安装并检查 `myissue@myissue-local`。运行时只需要 Node；使用插件无需本仓库的 `node_modules`。当前清单采用根目录 `plugin.json` / `mcp.json`，同时保留 `.codex-plugin/plugin.json`。便携清单负责展开 `${PLUGIN_ROOT}`，不要替换为旧式 `${CLAUDE_PLUGIN_ROOT}` 启动参数。
 
-在桌面 Plugins Directory 的 **myIssue Local** 来源查看插件。如果桌面目录尚未刷新，按官方本地 Marketplace 流程重启桌面应用后查看。全局入口名为 **myIssue**；对话中也可要求“打开这个项目的 myIssue 看板”。第一次选择绝对项目根目录，随后宿主共享的文件夹和已成功打开的项目会出现在选择器中。
+在桌面 Plugins Directory 的 **myIssue Local** 来源查看插件。如果桌面目录尚未刷新，按官方本地 Marketplace 流程重启桌面应用后查看。全局入口名为 **myIssue**；对话中也可要求“打开这个项目的 myIssue 看板”。选择窗中的“浏览文件夹”打开 macOS 系统选择器，选中后填入路径，点击“打开项目”才切换；也可直接点击已添加的本地项目，或输入绝对项目根目录。取消文件夹浏览保留已填路径。
+
+打开选择窗时，通过公开 Codex app-server `project/list` 刷新桌面已添加的本地项目，使用每个项目的主要根目录和桌面名称；没有本地目录的云项目不显示。需要可用的 Codex CLI（优先 PATH，可用 `MYISSUE_CODEX_BIN` 指定路径；macOS 也尝试桌面应用附带的 CLI）。读取超时或不可用时仍可输入路径、使用宿主共享文件夹和最近成功打开的项目。读取列表或选择文件夹不写入 Issue，也不自动打开新发现的项目。其他操作系统当前使用手动路径。
 
 ```sh
 # 查看安装状态
@@ -35,7 +38,7 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.2.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.3.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
 
 已安装旧版时，重新执行安装命令更新，然后完全退出并重新启动 ChatGPT / Codex 桌面应用，见[官方本地插件更新流程](https://developers.openai.com/plugins/build/plugins)。仅关闭再打开 myIssue 页面不足以刷新旧对话保留的 MCP 服务进程。
 
@@ -102,7 +105,7 @@ parent: "[[issue-001]]"
 2. 从对话开始：调用 `get_issue` 读取最新内容和评论，按用户授权处理，再用 `append_comment` 追加实际进展或结果。
 3. 从看板分发：打开详情 → 分发到对话 → 选择当前/新对话 → 发送并启动。准备阶段重新读取文件；发送不修改 Issue 状态，也不把派发等同于工作完成。
 
-MCP 工具：`open_board`、`list_projects`、`list_issues`、`get_issue`、`create_issue`、`update_issue`、`append_comment`、`prepare_dispatch`，以及 SDK 的 `search_mentions`。工具接收绝对项目根目录。写入必须传入最近读取返回的 `revision`。
+MCP 工具：`open_board`、`list_projects`、`list_issues`、`get_issue`、`create_issue`、`update_issue`、`append_comment`、`prepare_dispatch`，以及 SDK 的 `search_mentions`。`browse_folder` 仅供页面的显式点击调用。Issue 工具接收绝对项目根目录；写入必须传入最近读取返回的 `revision`。
 
 ## 写入边界
 
@@ -126,7 +129,9 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 
 预览地址默认 `http://127.0.0.1:4310`，可用 `MYISSUE_PREVIEW_PORT` 改端口。绑定回环地址，并检查请求来源与 Host。预览是调试载体，不替代独立插件入口。
 
-验收已覆盖真实文件、版本冲突、Schema 映射、评论保留、MCP stdio、实际 SDK 消息协议，以及浏览器页面创建/编辑/追加评论/搜索/列表/拖动。主题测试覆盖宿主与系统偏好冲突、运行时变更、重点色替换和清除；浏览器实际确认浅色/深色、控件颜色及弹窗键盘操作。Codex app-server 已实际加载 0.1.2 安装包，返回工具与全局/对话入口元数据，并成功读取两个页面兼容地址。用户 2026-10-02 截图确认全局独立页面已显示；同日对话侧栏失败已通过桌面日志定位为新资源地址与旧服务进程错配。**重启应用后对话侧栏的实际显示、真实新对话分发和用户自定义重点色的实际下发仍未人工验收**：本执行环境禁止自动化操作该原生窗口。协议测试中的接收方是测试宿主，不是真实 ChatGPT 对话。
+验收已覆盖真实文件、版本冲突、Schema 映射、评论保留、MCP stdio、实际 SDK 消息协议，以及浏览器页面创建/编辑/追加评论/搜索/列表/拖动。主题测试覆盖宿主与系统偏好冲突、运行时变更、重点色替换和清除；浏览器实际确认浅色/深色、控件颜色及弹窗键盘操作。
+
+0.1.3 已安装并启用；独立 Codex app-server 返回 10 个工具、全局/对话入口元数据和两个页面兼容地址。已安装服务实际返回 37 个可用本地项目，包含桌面名称 myIssue。实际 SDK 测试宿主已验证文件夹浏览、取消保留路径、错误提示、点击项目打开看板，以及宿主半透明颜色下的弹窗不透明底色；系统选择器实际返回了本机选中的目录。当前原生 MCP Apps 页面仍显示旧版弹窗，**0.1.3 原生页面需完全重启桌面应用后确认**。真实新对话分发和用户自定义重点色的实际下发仍未验收；协议测试中的接收方是测试宿主，不是真实 ChatGPT 对话。
 
 ## 文档
 

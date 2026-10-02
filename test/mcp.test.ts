@@ -11,7 +11,7 @@ test('built plugin exposes independent UI, real CRUD and dispatch context over M
   const root = await mkdtemp(path.join(os.tmpdir(), 'myissue-mcp-')); t.after(() => rm(root, { recursive: true, force: true }));
   const client = new Client({ name: 'myissue-acceptance', version: '1' });
   const preferencesDir = path.join(root, '.plugin-preferences');
-  const transport = new StdioClientTransport({ command: process.execPath, args: [path.resolve('plugins/myissue/scripts/server.cjs'), '--root', root], env: { ...Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => typeof entry[1] === 'string')), PLUGIN_DATA: preferencesDir } });
+  const transport = new StdioClientTransport({ command: process.execPath, args: [path.resolve('plugins/myissue/scripts/server.cjs'), '--root', root], env: { ...Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => typeof entry[1] === 'string')), PLUGIN_DATA: preferencesDir, MYISSUE_CODEX_BIN: path.join(root, 'unavailable-desktop-cli') } });
   await client.connect(transport); t.after(() => client.close());
   const catalog = await client.listTools(); const open = catalog.tools.find(tool => tool.name === 'open_board')!;
   assert.deepEqual((open._meta?.['openai/ui'] as any).entrypoints, [{ type: 'global' }, { type: 'thread' }]);

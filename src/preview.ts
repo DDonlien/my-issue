@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execute, type Operation } from './service.js';
 import { IssueError } from './core.js';
+import { desktopProjects, chooseDesktopFolder } from './desktop.js';
 
 const port = Number(process.env.MYISSUE_PREVIEW_PORT ?? 4310);
 const projectRoot = path.resolve(process.env.MYISSUE_ROOT ?? process.cwd());
@@ -19,9 +20,11 @@ const server = createServer(async (req, res) => {
     let text = '';
     for await (const chunk of req) { text += chunk; if (Buffer.byteLength(text) > 2_000_000) throw new Error('请求过大'); }
     const args = JSON.parse(text || '{}'); const operation = req.url.slice(5);
-    const projects = [{ root: projectRoot, name: path.basename(projectRoot) }];
+    const saved = operation === 'list_projects' || operation === 'open_board' ? await desktopProjects(operation === 'list_projects').catch(() => []) : [];
+    const projects = [{ root: projectRoot, name: path.basename(projectRoot) }, ...saved.filter(p => p.root !== projectRoot)];
     let data;
     if (operation === 'list_projects') data = { projects };
+    else if (operation === 'browse_folder') data = { root: await chooseDesktopFolder() };
     else if (operation === 'open_board') data = { ...(await execute('open_board', { root: projectRoot, ...args })), projects };
     else data = await execute(operation as Operation, args);
     res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data));
