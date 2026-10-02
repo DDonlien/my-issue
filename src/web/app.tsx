@@ -23,6 +23,22 @@ function yaml(text: string) {
 function short(value: unknown) { return typeof value === 'string' ? value : JSON.stringify(value); }
 function readAuthor() { try { return localStorage.getItem('myissue-author') ?? '我'; } catch { return '我'; } }
 function rememberAuthor(author: string) { try { localStorage.setItem('myissue-author', author); } catch { /* Sandboxed hosts may disable storage. */ } }
+function DialogForm({ children, onClose, ...props }: React.ComponentProps<'form'> & { onClose: () => void }) {
+  const ref = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    ref.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus();
+    return () => { if (previous?.isConnected) previous.focus(); };
+  }, []);
+  return <form {...props} ref={ref} role="dialog" aria-modal="true" onKeyDown={e => {
+    if (e.key === 'Escape') { e.preventDefault(); onClose(); }
+    if (e.key !== 'Tab') return;
+    const controls = [...e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [tabindex="0"]')].filter(el => el.getClientRects().length);
+    const first = controls[0], last = controls.at(-1);
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+  }}>{children}</form>;
+}
 function App() {
   const [board, setBoard] = useState<Board>();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -41,6 +57,8 @@ function App() {
   const [dragging, setDragging] = useState<string>();
   const [dropColumn, setDropColumn] = useState<string>();
   const dirty = useRef(false);
+  const dialogOpen = useRef(false);
+  dialogOpen.current = projectModal || creating !== null;
   const rootRef = useRef<string | undefined>(undefined);
   const busyRef = useRef(false);
   const selectedIssue = board?.issues.find(i => i.id === selected);
@@ -69,7 +87,7 @@ function App() {
       if (bridge.preview) accept(await bridge.call('open_board'));
     }).catch(e => setError(e.message));
     const interval = setInterval(() => {
-      if (!dirty.current && !busyRef.current && rootRef.current && document.visibilityState === 'visible') load().catch(e => setError(e.message));
+      if (!dialogOpen.current && !dirty.current && !busyRef.current && rootRef.current && document.visibilityState === 'visible') load().catch(e => setError(e.message));
     }, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -88,7 +106,7 @@ function App() {
     });
   }
   return <div className="shell" aria-busy={busy}>
-    <aside className="sidebar">
+    <aside className="sidebar" inert={projectModal || creating !== null}>
       <div className="brand"><div className="brand-icon"><Columns3 size={19} /></div><span>myIssue</span><span className="version">local</span></div>
       <button className="project-button" onClick={() => setProjectModal(true)}><Folder size={16} /><span>{board?.project ?? '选择项目'}</span><ChevronDown size={14} /></button>
       <button className="nav-search" onClick={() => document.getElementById('search')?.focus()}><Search size={16} />搜索 Issue<span className="key">/</span></button>
@@ -98,7 +116,7 @@ function App() {
       <button className={'nav-item ' + (readyOnly ? 'active' : '')} onClick={() => setReadyOnly(!readyOnly)}><CheckCircle2 size={16} />可开始<span>{board?.issues.filter(i => i.ready).length ?? 0}</span></button>
       <div className="sidebar-footer"><div className="small-dot" />文件实时同步<div className="store-label" title={board?.root}>{board ? `${board.project}/issues/*.md` : '项目根目录 / issues'}</div></div>
     </aside>
-    <main className="main">
+    <main className="main" inert={projectModal || creating !== null}>
       <header className="topbar"><span className="breadcrumb"><Columns3 size={16} />Issue <span>/</span><strong>{selectedIssue ? selectedIssue.name : readyOnly ? '可开始' : '全部'}</strong></span><button className="icon-button" title="重新读取文件" aria-label="刷新" disabled={!board || busy} onClick={() => run(() => load())}><RefreshCw size={15} className={busy ? 'spin' : ''} /></button></header>
       {error && <div className="banner error" role="alert"><AlertCircle size={16} /><span>{error}</span><button onClick={() => setError('')} aria-label="关闭错误"><X size={15} /></button></div>}
       {notice && <div className="toast" role="status"><Check size={15} />{notice}</div>}
@@ -116,7 +134,16 @@ function App() {
           <footer className="board-footer"><span><FileText size={13} />名称 · 属性 · 评论</span><span>拖动卡片改变状态 · 每 5 秒读取文件</span></footer>
         </>}
     </main>
-    {projectModal && <div className="overlay" onMouseDown={e => { if (e.target === e.currentTarget) setProjectModal(false); }}><div className="modal"><div className="modal-heading"><h2>选择项目</h2><button className="icon-button" aria-label="关闭" onClick={() => setProjectModal(false)}><X size={18} /></button></div><p>读取项目根目录下的 issues 文件夹。</p>{projects.map(p => <button className="project-option" key={p.root} onClick={() => run(async () => { if (dirty.current && !window.confirm('丢弃当前草稿并切换项目？')) return; dirty.current = false; await load(p.root); setSelected(undefined); setProjectModal(false); })}><Folder size={17} /><span><strong>{p.name}</strong><small>{p.root}</small></span>{p.root === board?.root && <Check size={16} />}</button>)}<label>项目根目录<input placeholder="/Users/你/Projects/项目" value={rootDraft} onChange={e => setRootDraft(e.target.value)} /></label><div className="modal-footer"><button className="primary" disabled={busy || !rootDraft.trim()} onClick={() => run(async () => { if (dirty.current && !window.confirm('丢弃当前草稿并切换项目？')) return; await load(rootDraft.trim()); dirty.current = false; setSelected(undefined); setProjectModal(false); })}>打开项目<ArrowUpRight size={15} /></button></div></div></div>}
+    {projectModal && <div className="overlay" onMouseDown={e => { if (e.target === e.currentTarget) setProjectModal(false); }}>
+      <DialogForm className="modal project-modal" aria-labelledby="project-dialog-title" onClose={() => setProjectModal(false)} onSubmit={e => { e.preventDefault(); run(async () => { if (dirty.current && !window.confirm('丢弃当前草稿并切换项目？')) return; await load(rootDraft.trim()); dirty.current = false; setSelected(undefined); setProjectModal(false); }); }}>
+        <div className="modal-heading"><h2 id="project-dialog-title">选择项目</h2><button type="button" className="icon-button" aria-label="关闭" onClick={() => setProjectModal(false)}><X size={18} /></button></div>
+        <label htmlFor="project-root">项目文件夹</label>
+        <div className="folder-input"><Folder size={20} aria-hidden="true" /><input id="project-root" data-autofocus required placeholder="/Users/你/Projects/项目" value={rootDraft} onChange={e => setRootDraft(e.target.value)} /></div>
+        {projects.length > 0 && <div className="recent-projects"><p>可用项目</p>{projects.map(p => <button type="button" className="project-option" key={p.root} onClick={() => run(async () => { if (dirty.current && !window.confirm('丢弃当前草稿并切换项目？')) return; dirty.current = false; await load(p.root); setSelected(undefined); setProjectModal(false); })}><Folder size={18} /><span><strong>{p.name}</strong><small>{p.root}</small></span>{p.root === board?.root && <Check size={16} />}</button>)}</div>}
+        <div className="project-help"><FileText size={20} aria-hidden="true" /><p>打开文件夹里的 Issue 看板，名称、属性和评论保存在项目的 issues 文件夹中。</p></div>
+        <div className="modal-footer"><button type="button" className="secondary" onClick={() => setProjectModal(false)}>取消</button><button className="primary" disabled={busy || !rootDraft.trim()}>{busy ? <Loader2 className="spin" size={15} /> : null}打开项目</button></div>
+      </DialogForm>
+    </div>}
     {creating !== null && board && <CreateModal status={creating} board={board} busy={busy} run={run} close={() => setCreating(null)} created={async issue => { await load(); setCreating(null); setSelected(issue.id); setNotice('Issue 已创建'); }} />}
   </div>;
 }
@@ -124,7 +151,7 @@ function App() {
 type Run = <T>(action: () => Promise<T>) => Promise<T | undefined>;
 function CreateModal({ status, board, busy, run, close, created }: { status: string; board: Board; busy: boolean; run: Run; close: () => void; created: (issue: Issue) => Promise<void> }) {
   const [name, setName] = useState(''); const [content, setContent] = useState(''); const [props, setProps] = useState(stringify({ [board.schema.statusKey]: status }));
-  return <div className="overlay"><form className="modal create-modal" onSubmit={e => { e.preventDefault(); run(async () => { const data = await bridge.call('create_issue', { root: board.root, name, description: content, properties: yaml(props) }); await created(data.issue); }); }}><div className="modal-heading"><h2>新建 Issue</h2><button type="button" className="icon-button" aria-label="关闭新建" onClick={close}><X size={18} /></button></div><label>名称<input autoFocus required placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></label><label>内容 <span className="muted">可选 · Markdown</span><textarea rows={5} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} /></label><label>属性 <span className="muted">任意 YAML 属性</span><textarea className="code-input" rows={4} value={props} onChange={e => setProps(e.target.value)} /></label><div className="modal-footer"><span className="muted"><FileText size={13} />保存在 issues/*.md</span><button className="primary" disabled={busy || !name.trim()}>{busy ? <Loader2 className="spin" size={15} /> : <Plus size={15} />}创建 Issue</button></div></form></div>;
+  return <div className="overlay"><DialogForm className="modal create-modal" aria-label="新建 Issue" onClose={close} onSubmit={e => { e.preventDefault(); run(async () => { const data = await bridge.call('create_issue', { root: board.root, name, description: content, properties: yaml(props) }); await created(data.issue); }); }}><div className="modal-heading"><h2>新建 Issue</h2><button type="button" className="icon-button" aria-label="关闭新建" onClick={close}><X size={18} /></button></div><label>名称<input data-autofocus required placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></label><label>内容 <span className="muted">可选 · Markdown</span><textarea rows={5} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} /></label><label>属性 <span className="muted">任意 YAML 属性</span><textarea className="code-input" rows={4} value={props} onChange={e => setProps(e.target.value)} /></label><div className="modal-footer"><span className="muted"><FileText size={13} />保存在 issues/*.md</span><button className="primary" disabled={busy || !name.trim()}>{busy ? <Loader2 className="spin" size={15} /> : <Plus size={15} />}创建 Issue</button></div></DialogForm></div>;
 }
 function Detail({ issue, board, busy, connected, onClose, onDirty, run, onSaved, notify }: { issue: Issue; board: Board; busy: boolean; connected: boolean; onClose: () => void; onDirty: (dirty: boolean) => void; run: Run; onSaved: () => Promise<void>; notify: (text: string) => void }) {
   const [baseline, setBaseline] = useState(issue);

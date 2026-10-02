@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "myissue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local Markdown issue boards with editable properties, shared comments and conversation dispatch.",
   "author": {
     "name": "DDonlien",
@@ -19,7 +19,7 @@
           "Interactive",
           "Write"
         ],
-        "brandColor": "#6656CF",
+        "brandColor": "#424242",
         "composerIcon": "./assets/icon.svg",
         "logo": "./assets/icon.svg",
         "defaultPrompt": [

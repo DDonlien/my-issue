@@ -1,6 +1,7 @@
-import { App, applyDocumentTheme, applyHostStyleVariables } from '@modelcontextprotocol/ext-apps';
+import { App } from '@modelcontextprotocol/ext-apps';
 import { OpenAIExtensions } from '@openai/mcp-extensions/app';
 import { dispatchAvailable, dispatchMessage } from '../message.js';
+import { followHostTheme } from './theme.js';
 
 export type ToolData = Record<string, any>;
 let app: App | undefined;
@@ -10,16 +11,12 @@ export const preview = window.parent === window;
 export function onResult(callback: typeof handler) { handler = callback; }
 export async function connect() {
   if (preview) return;
-  app = new App({ name: 'myIssue', version: '0.1.0' });
+  app = new App({ name: 'myIssue', version: '0.1.1' });
   extensions = new OpenAIExtensions(app);
   app.ontoolresult = result => { if (result.structuredContent) handler(result.structuredContent); };
-  const theme = (context: ReturnType<App['getHostContext']>) => {
-    if (context?.theme) applyDocumentTheme(context.theme);
-    if (context?.styles?.variables) applyHostStyleVariables(context.styles.variables);
-  };
-  app.addEventListener('hostcontextchanged', theme);
+  const theme = followHostTheme(app);
   await app.connect();
-  theme(app.getHostContext());
+  theme();
 }
 export async function call(name: string, args: ToolData = {}): Promise<ToolData> {
   let data: ToolData;

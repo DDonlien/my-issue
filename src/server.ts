@@ -9,9 +9,9 @@ import { z } from 'zod';
 import { IssueStore, IssueError } from './core.js';
 import { execute, inputs, type Operation } from './service.js';
 
-export const UI_URI = 'ui://myissue/board-v1.html';
+export const UI_URI = 'ui://myissue/board-v2.html';
 export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string) {
-  const server = new McpServer({ name: 'myissue', version: '0.1.0' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
+  const server = new McpServer({ name: 'myissue', version: '0.1.1' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
   const extensions = new OpenAIExtensions(server);
   const knownRoots = new Set<string>(fallbackRoot ? [fallbackRoot] : []);
   async function loadPreferences() {

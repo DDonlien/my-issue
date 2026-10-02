@@ -10,6 +10,7 @@ myIssue 是项目内的 Markdown Issue 看板，也是可安装的 Codex 插件�
 - 标准 MCP Apps 全局独立入口和对话侧栏入口，以及 Issue composer mention 搜索。
 - 看板通过官方宿主消息能力发送最新 Issue 上下文到当前或新对话；没有对应能力时显示不可用。对话通过 MCP 工具创建或开始处理 Issue。
 - 可配置的字段映射、名称来源、章节名与状态列。未知属性保留，未知状态增加派生列。
+- ChatGPT 风格的中性页面与弹窗。跟随宿主浅色/深色和语义颜色，未提供主题时跟随系统；焦点与链接使用宿主传入的交互颜色。
 
 无需 Issue 数据库、云账号或 myIssue 托管的 Agent Runtime。核心操作不依赖页面。许可证尚未选择；公开可见不代表授予开源许可。
 
@@ -34,7 +35,15 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.0.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.1.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+
+已安装旧版时，重新执行安装命令即可更新。关闭再打开 myIssue 页面以加载新版资源。
+
+## 外观与重点色
+
+页面消费 MCP Apps `hostContext.styles.variables` 的背景、文字、边框、字体和圆角变量，并响应宿主主题更新。主按钮使用 ChatGPT 常见的黑/白反色，输入框焦点继承 `--color-ring-primary`，链接继承 `--color-text-info`。撤回的变量会清除，避免切换主题后残留旧配色。
+
+如果 ChatGPT 将用户自定义重点色映射到这些变量，页面自动同步。标准协议没有单独承诺用户重点色设置；不通过私有 API 读取，也不固定为截图中的橙色。已用实际 SDK 测试宿主验证橙色、蓝色及撤回后的默认色；当前用户的原生 ChatGPT 是否下发自定义色仍需原生页面确认。[官方主题更新说明](https://developers.openai.com/plugins/changelog#may-2026)
 
 ## 文件与 Schema
 
@@ -115,7 +124,7 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 
 预览地址默认 `http://127.0.0.1:4310`，可用 `MYISSUE_PREVIEW_PORT` 改端口。绑定回环地址，并检查请求来源与 Host。预览是调试载体，不替代独立插件入口。
 
-验收已覆盖真实文件、版本冲突、Schema 映射、评论保留、MCP stdio、实际 SDK 消息协议，以及浏览器页面创建/编辑/追加评论/搜索/列表/拖动。Codex app-server 已实际加载安装包，返回工具与全局/对话入口元数据。**ChatGPT 桌面原生窗口的独立入口显示与真实新对话分发尚未人工验收**：本执行环境禁止自动化操作该原生窗口。协议测试中的接收方是测试宿主，不是真实 ChatGPT 对话。
+验收已覆盖真实文件、版本冲突、Schema 映射、评论保留、MCP stdio、实际 SDK 消息协议，以及浏览器页面创建/编辑/追加评论/搜索/列表/拖动。主题测试覆盖宿主与系统偏好冲突、运行时变更、重点色替换和清除；浏览器实际确认浅色/深色、控件颜色及弹窗键盘操作。Codex app-server 已实际加载 0.1.1 安装包，返回工具与全局/对话入口元数据。用户 2026-10-02 截图确认全局独立页面已显示。**对话内原生入口、真实新对话分发和用户自定义重点色的实际下发仍未人工验收**：本执行环境禁止自动化操作该原生窗口。协议测试中的接收方是测试宿主，不是真实 ChatGPT 对话。
 
 ## 文档
 

@@ -5,7 +5,7 @@
 ## Phase - Codex 插件首版（2026-10-01 确认）
 
 - [x] [CODEX-PLUGIN-001] 提供标准插件清单、Marketplace、安装命令和可分发包，实际检查本机安装状态。
-- [ ] [CODEX-PLUGIN-002] 提供 MCP Apps 全局独立侧栏入口及对话内入口，使用官方 OpenAI UI entrypoints；平台是否展示必须单独人工验收。已实现并由 Codex app-server 读取元数据，桌面实际显示未验收。
+- [ ] [CODEX-PLUGIN-002] 提供 MCP Apps 全局独立侧栏入口及对话内入口，使用官方 OpenAI UI entrypoints；平台是否展示必须单独人工验收。已实现并由 Codex app-server 读取元数据；2026-10-02 用户截图已确认全局页面显示，对话侧栏入口仍未人工验收。
 - [x] [CODEX-PLUGIN-003] 采用 Multica 风格状态列、卡片与详情面板，语义只围绕名称、自由属性、追加式评论；名称下自由 Markdown 内容兼容既有 Description。
 - [x] [CODEX-PLUGIN-004] 创建、读取、修改名称与任意 YAML 属性、追加评论、搜索、筛选、看板/列表切换、拖动状态均操作真实文件。
 - [ ] [CODEX-PLUGIN-005] 从看板显式发送 Issue 上下文到当前或新对话；从对话通过插件工具创建/读取/更新 Issue 或打开看板。发送成功才显示成功，宿主缺少能力时明确显示不可用。
@@ -13,6 +13,10 @@
 - [x] [CODEX-PLUGIN-007] 通过项目级 `.myissue.json` 配置名称来源、属性字段映射、章节名和状态列；未知属性与未知状态必须保留。结构无法解析时只报告，不自动迁移或覆盖。
 - [x] [CODEX-PLUGIN-008] 写入检查文件版本，插件进程之间串行写入并原子替换；保留既有评论与不相关正文。普通编辑器不参与锁协议，检测到外部修改即要求重新加载。
 - [x] [CODEX-PLUGIN-009] 分别验收文件测试、MCP 协议、真实页面交互、插件安装和宿主独立入口，不混淆已实现与已验证。
+
+## Phase - ChatGPT 外观与主题（2026-10-02 确认）
+
+- [x] [CODEX-PLUGIN-010] 项目选择弹窗、输入框、按钮、侧栏和页面使用 ChatGPT 的中性配色、字体与圆角逻辑。优先使用 MCP Apps 宿主语义颜色变量并响应主题变更；宿主明确的浅色/深色优先于系统偏好，未提供时跟随系统。重点色只继承宿主提供的焦点/交互变量，不硬编码用户截图的橙色或读取宿主私有设置。已完成隔离 SDK 宿主与浏览器验证；当前 ChatGPT 用户自定义重点色是否实际下发仍未验收。
 
 首版工程决定：Node.js 22+ / TypeScript，共用文件核心；默认 YAML frontmatter、H1 名称、可选 `## Description`、追加式 `## Comments`。新评论使用带时区 ISO 8601 时间与 `· author · human/model`；旧评论原文保留。默认状态 backlog/todo/in_progress/in_review/done/blocked/cancelled 可配置；不识别的状态仍独立展示。ID 使用文件名 `issue-<UUID>.md`，不改已有文件名或 ID。`REQUIREMENTS.md` 暂继续独立保存。仅由宿主对话能力执行分发，不托管 Agent Runtime；原“不启动 Agent”边界不限制用户本次确认的对话启动动作。许可证仍待用户选择。
 
