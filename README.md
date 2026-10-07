@@ -9,7 +9,7 @@ myIssue 是项目内的 Markdown Issue 看板，也是可安装的 Codex 插件�
 - 详情页：名称及自由内容、完整渲染任意属性、追加式人类/Agent 评论、只读源文件。
 - 上传图片和文件附件，保存到项目内，在描述和评论正文直接预览图片、Markdown 和文本，其他文件显示下载卡片。
 - 标准 MCP Apps 全局独立入口和对话侧栏入口，以及 Issue composer mention 搜索。
-- 看板通过官方宿主消息能力发送最新 Issue 上下文到当前或新对话；没有对应能力时显示不可用。对话通过 MCP 工具创建或开始处理 Issue。
+- 分发目标读取真实 Codex 对话名称。当前/新对话通过官方消息能力发送；已有对话通过宿主公开控制接口定向发送，按接口是否可用启用按钮。对话通过 MCP 工具创建或开始处理 Issue。
 - 可配置的字段映射、名称来源、章节名与状态列。未知属性保留，未知状态增加派生列。
 - ChatGPT 风格的中性页面与弹窗。跟随宿主浅色/深色和语义颜色，未提供主题时跟随系统；焦点与链接使用宿主传入的交互颜色。
 - 左侧导航已移除；顶部名称菜单切换已有项目并添加项目，保留桌面项目名称。添加窗支持 macOS 文件夹浏览。
@@ -43,7 +43,7 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.8.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.9.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
 
 已安装旧版时，重新执行安装命令更新，然后完全退出并重新启动 ChatGPT / Codex 桌面应用，见[官方本地插件更新流程](https://developers.openai.com/plugins/build/plugins)。仅关闭再打开 myIssue 页面不足以刷新旧对话保留的 MCP 服务进程。
 
@@ -178,6 +178,16 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 - `agent-log/`：实施与验证记录
 
 实现参考：[官方插件打包](https://developers.openai.com/plugins/build/plugins)、[独立侧栏及对话入口](https://developers.openai.com/plugins/build/extensions)、[MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)。
+
+## 选择已有 Codex 对话
+
+打开“分发到对话”时，通过公开 `thread/list` 读取本机的非归档交互对话，显示真实名称，当前项目的对话优先分组；保留“新对话”和“当前对话”。读取失败可重试，选择目标只修改页面状态。
+
+`list_codex_conversations` 和 `dispatch_to_conversation` 仅供页面调用。已有对话发送经 `codex app-server proxy` 连接宿主已运行的控制接口，以明确的 thread ID 调用 `thread/read`、必要时 `thread/resume`、然后 `turn/start`；不覆盖模型、权限或工作目录。只有宿主接受消息才显示成功，并使用确认后的实际名称和 URL 保存关联；关联冲突会另行反馈，已接受的发送保持成功。
+
+当前本机桌面没有开放默认公开控制 socket，真实列表仍可读取，已有目标的发送按钮因此禁用。可用 `MYISSUE_CODEX_SOCKET` 指定宿主已开放的公开控制 socket，`MYISSUE_CODEX_BIN` 指定 CLI；新建/当前对话继续使用页面宿主的消息能力。myIssue 不启动独立执行进程来代替桌面中的目标对话，也不自动开启 daemon。
+
+接口依据：[官方 App Server 文档](https://learn.chatgpt.com/docs/app-server)。
 
 
 ## 2026-10-07 正文内附件验收

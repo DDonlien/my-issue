@@ -11,11 +11,12 @@ import { desktopProjects, chooseDesktopFolder, type DesktopProject } from './des
 import { ProjectPreferences, projectOrder } from './preferences.js';
 import { version } from './version.js';
 import { currentUsername } from './user.js';
+import { codexDispatch, dispatchToConversation, type CodexDispatch } from './dispatch.js';
 
 // This is a persistent entrypoint identity, not a release/cache version. Desktop
 // tool inventories and conversation-specific MCP processes can refresh separately.
 export const UI_URI = 'ui://myissue/board-v2.html';
-export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string, desktop: { projects: (refresh?: boolean) => Promise<DesktopProject[]>; chooseFolder: () => Promise<string | undefined> } = { projects: desktopProjects, chooseFolder: chooseDesktopFolder }, legacyPreferencesFile?: string) {
+export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string, desktop: { projects: (refresh?: boolean) => Promise<DesktopProject[]>; chooseFolder: () => Promise<string | undefined> } = { projects: desktopProjects, chooseFolder: chooseDesktopFolder }, legacyPreferencesFile?: string, dispatch: CodexDispatch = codexDispatch) {
   const server = new McpServer({ name: 'myissue', version }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
   const extensions = new OpenAIExtensions(server);
   const username = currentUsername();
@@ -74,6 +75,8 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
   }));
   server.registerTool('list_projects', { description: 'Read the project configuration shared by all myIssue panels on this computer, saved desktop projects and host-shared folders. Cloud projects without a local directory cannot contain issues/*.md.', inputSchema: z.object({ refresh: z.boolean().optional() }), annotations: readAnnotations }, wrap(async args => projects(args.refresh ?? true)));
   server.registerTool('browse_folder', { title: '选择项目文件夹', description: 'Open the local system folder chooser after an explicit user click. Return a path without opening the board or changing issue files. Cancellation returns no path.', inputSchema: z.object({}), annotations: readAnnotations, _meta: { ui: { visibility: ['app'] } } }, wrap(async () => ({ root: await desktop.chooseFolder() })));
+  server.registerTool('list_codex_conversations', { description: 'Read real local Codex conversation names and identifiers without resuming or sending messages. Availability of directed sends is determined by the existing host control connection.', inputSchema: z.object({}), annotations: readAnnotations, _meta: { ui: { visibility: ['app'] } } }, wrap(() => dispatch.list()));
+  server.registerTool('dispatch_to_conversation', { description: 'Send the latest issue to the exact existing Codex conversation selected by an explicit user click. Requires the existing host control interface; never starts an independent agent. Preserve the target model, permissions and directory. Record association only after the host accepts the message.', inputSchema: inputs.prepare_dispatch.extend({ threadId: z.string().regex(/^[\w-]{1,128}$/) }), annotations: { ...writeAnnotations, openWorldHint: true }, _meta: { ui: { visibility: ['app'] } } }, wrap(args => dispatchToConversation(args, dispatch)));
   const descriptions: Record<Exclude<Operation, 'open_board'>, string> = {
     list_issues: 'Read the current Markdown files and derive the board, ready state and relation errors. Unknown properties and statuses remain visible.',
     get_issue: 'Read one issue by its filename stem and return the current content and revision.',

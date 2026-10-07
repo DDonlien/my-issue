@@ -1,11 +1,13 @@
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
-import { execute, type Operation } from './service.js';
+import { execute, inputs, type Operation } from './service.js';
 import { IssueError } from './core.js';
 import { desktopProjects, chooseDesktopFolder } from './desktop.js';
 import { ProjectPreferences, sharedPreferencesFile, projectOrder } from './preferences.js';
 import { currentUsername } from './user.js';
+import { codexDispatch, dispatchToConversation } from './dispatch.js';
+import { z } from 'zod';
 
 const port = Number(process.env.MYISSUE_PREVIEW_PORT ?? 4310);
 const projectRoot = path.resolve(process.env.MYISSUE_ROOT ?? process.cwd());
@@ -51,6 +53,8 @@ const server = createServer(async (req, res) => {
         data = { ...opened, projects: projects.sort(projectOrder), username };
       }
     }
+    else if (operation === 'list_codex_conversations') data = await codexDispatch.list();
+    else if (operation === 'dispatch_to_conversation') data = await dispatchToConversation(inputs.prepare_dispatch.extend({ threadId: z.string().regex(/^[\w-]{1,128}$/) }).parse(args));
     else if (operation === 'browse_folder') data = { root: await chooseDesktopFolder() };
     else data = await execute(operation as Operation, args);
     res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data));

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Columns3, List, Search, Plus, ArrowUpRight, MessageSquare, X, Folder, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2, Paperclip } from 'lucide-react';
+import { Columns3, List, Search, Plus, MessageSquare, X, Folder, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2, Paperclip } from 'lucide-react';
 import { parseDocument, stringify } from 'yaml';
 import type { Board, Issue } from '../core.js';
 import * as bridge from './bridge.js';
@@ -26,6 +26,7 @@ import { IssueName } from './issue-name.js';
 import { CommentComposer } from './comment-composer.js';
 import './style.css';
 import './conversations.css';
+import { DispatchPanel } from './dispatch.js';
 
 function yaml(text: string) {
   const doc = parseDocument(text, { uniqueKeys: true });
@@ -205,9 +206,6 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
   const [comment, setComment] = useState('');
   const [author, setAuthor] = useState(() => readAuthor(username));
   useEffect(() => { if (username) setAuthor(current => current || readAuthor(username)); }, [username]);
-  const [target, setTarget] = useState<'active' | 'new'>('new');
-  const [instruction, setInstruction] = useState('');
-  const [dispatchOpen, setDispatchOpen] = useState(false);
   const [sourceOpen, setSourceOpen] = useState(false);
   const [draftRevision, setDraftRevision] = useState(issue.revision);
   const attachmentInput = useRef<HTMLInputElement>(null);
@@ -267,7 +265,7 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
         await bridge.call('link_conversation', { root: board.root, id: issue.id, revision: issue.revision, url, ...(title ? { title } : {}) });
         await onSaved(); notify('对话已关联'); return true;
       })} />
-      <div className="dispatch-box"><div className="dispatch-icon"><ArrowUpRight size={20} /></div><h3>在对话里继续</h3><p>把名称、属性与最新评论交给对话，一起完成这件事。</p><Button disabled={busy || !connected} onClick={() => setDispatchOpen(!dispatchOpen)}>分发到对话<ArrowUpRight size={14} /></Button>{dispatchOpen && <div className="dispatch-options"><Label htmlFor="dispatch-target">目标</Label><Select value={target} onValueChange={value => setTarget(value as 'active' | 'new')}><SelectTrigger id="dispatch-target" aria-label="分发目标"><SelectValue /></SelectTrigger><SelectContent position="popper"><SelectItem value="new">新对话</SelectItem><SelectItem value="active">当前对话</SelectItem></SelectContent></Select><Textarea rows={3} aria-label="分发指令" placeholder="补充这次对话要做的事（可选）" value={instruction} onChange={e => setInstruction(e.target.value)} /><p className="muted">点击发送会立即启动所选对话。</p>{!bridge.canDispatch(target) && <p className="dispatch-unavailable">当前页面没有可用的宿主对话能力。在已安装插件的页面中使用。</p>}<Button disabled={busy || !bridge.canDispatch(target)} onClick={() => run(async () => { if (changed || comment.trim()) throw new Error('请先保存修改或追加评论，再分发最新内容'); const data = await bridge.call('prepare_dispatch', { root: board.root, id: issue.id, instruction }); await bridge.send(data.prompt, target); notify(target === 'new' ? '已发送到新对话' : '已发送到当前对话'); setDispatchOpen(false); })}>发送并启动<ArrowUpRight size={14} /></Button></div>}</div>
+      <DispatchPanel root={board.root} id={issue.id} busy={busy} connected={connected} hasDraft={changed || !!comment.trim()} run={run} onSaved={onSaved} notify={notify} />
     </aside>
     </div><CommentComposer value={comment} author={author} busy={busy} onChange={setComment} onAuthorChange={setAuthor} onSubmit={() => run(async () => { if (changed) throw new Error('请先保存名称、描述或属性修改，再追加评论'); await bridge.call('append_comment', { root: board.root, id: issue.id, revision: issue.revision, body: comment, author: author.trim(), actor: 'human' }); rememberAuthor(author.trim()); setComment(''); dirtyRef.current = false; onDirty(false); await onSaved(); notify('评论已追加'); })} />
   </div></AttachmentProvider>;
