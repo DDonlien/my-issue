@@ -20,6 +20,8 @@
 - [x] [CODEX-PLUGIN-011] 修复升级后的对话侧栏启动：页面资源地址保持稳定，兼容已经发布的旧地址；安装更新后明确提示重启桌面应用，以清除旧对话保留的 MCP 进程。工具目录中的入口地址及兼容地址都必须能够通过实际 MCP 读取。2026-10-02 日志确认旧对话请求 board-v2.html，而保留的 0.1.0 进程只提供 board-v1.html。0.1.2 已安装，独立 Codex app-server 实际读取两个地址成功；重启桌面应用后的原生侧栏显示仍按 CODEX-PLUGIN-002 单独验收。
 - [x] [CODEX-PLUGIN-012] 项目选择窗提供可点击的系统文件夹选择器，取消不切换项目；同时读取桌面已添加的本地项目并保留其名称，打开弹窗时刷新列表。通过公开 Codex app-server project/list 获取主要本地根目录，不把没有本地目录的云项目当作文件项目；不可用时保留手动路径和已打开项目。新增项目不自动打开或写入 Issue。弹窗背景必须不透明，宿主半透明颜色应在不透明底色上合成；保持宿主主题与焦点色。2026-10-02 已实现 macOS 文件夹选择器，协议测试与实际 SDK 浏览器点击通过，已安装服务读取 37 个本地项目；系统选择器实际返回目录。0.1.3 原生页面的刷新后显示仍按 CODEX-PLUGIN-002 单独验收。
 
+- [x] [CODEX-PLUGIN-SCROLL-001] 页面所有滚动区域隐藏横向和纵向滚动条，保留滚轮、触控板和键盘滚动；不通过关闭 overflow 裁掉超出区域的内容。2026-10-07 确认并实现；Web 页面实际横向滚动通过，根页面、侧栏和看板的两种隐藏规则生效，overflow 保持 auto。
+
 首版工程决定：Node.js 22+ / TypeScript，共用文件核心；默认 YAML frontmatter、H1 名称、可选 `## Description`、追加式 `## Comments`。新评论使用带时区 ISO 8601 时间与 `· author · human/model`；旧评论原文保留。默认状态 backlog/todo/in_progress/in_review/done/blocked/cancelled 可配置；不识别的状态仍独立展示。ID 使用文件名 `issue-<UUID>.md`，不改已有文件名或 ID。`REQUIREMENTS.md` 暂继续独立保存。仅由宿主对话能力执行分发，不托管 Agent Runtime；原“不启动 Agent”边界不限制用户本次确认的对话启动动作。许可证仍待用户选择。
 
 ## Phase - v0.1.0 - Markdown Issue Protocol 与最小可用流程
