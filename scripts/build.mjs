@@ -1,17 +1,24 @@
 import { build } from 'esbuild';
 import { mkdir, writeFile, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
+import { compile } from '@tailwindcss/node';
+import { Scanner } from '@tailwindcss/oxide';
 const base = path.resolve(import.meta.dirname, '..');
 const { version } = JSON.parse(await readFile(path.join(base, 'package.json'), 'utf8'));
 const plugin = path.join(base, 'plugins/myissue');
 await mkdir(path.join(plugin, 'scripts'), { recursive: true });
 await mkdir(path.join(plugin, 'assets'), { recursive: true });
-const ui = await build({ entryPoints: [path.join(base, 'src/web/app.tsx')], bundle: true, minify: true, write: false, outfile: 'app.js', format: 'iife', target: 'es2022', define: { 'process.env.NODE_ENV': '"production"' }, legalComments: 'none', metafile: true });
+await mkdir(path.join(base, '_builds'), { recursive: true });
+const styles = path.join(base, 'src/web/style.css');
+const compiler = await compile(await readFile(styles, 'utf8'), { base: path.dirname(styles), onDependency() {} });
+const scanner = new Scanner({ sources: compiler.sources });
+const compiledCss = compiler.build(scanner.scan());
+const ui = await build({ entryPoints: [path.join(base, 'src/web/app.tsx')], bundle: true, minify: true, write: false, outfile: 'app.js', format: 'iife', target: 'es2022', define: { 'process.env.NODE_ENV': '"production"', __MYISSUE_VERSION__: JSON.stringify(version) }, legalComments: 'none', metafile: true, plugins: [{ name: 'shadcn-styles', setup(plugin) { plugin.onLoad({ filter: /[\\/]web[\\/]style\.css$/ }, () => ({ contents: compiledCss, loader: 'css' })); } }] });
 const js = ui.outputFiles.find(f => f.path.endsWith('.js')).text;
 const css = ui.outputFiles.find(f => f.path.endsWith('.css')).text;
 const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>myIssue</title><style>${css}</style></head><body><div id="root"></div><script>${js.replaceAll('</script', '<\\/script')}</script></body></html>`;
 await writeFile(path.join(plugin, 'assets/board.html'), html);
-const serverBuild = await build({ entryPoints: [path.join(base, 'src/mcp.ts')], bundle: true, minify: true, platform: 'node', format: 'cjs', target: 'node22', outfile: path.join(plugin, 'scripts/server.cjs'), legalComments: 'none', metafile: true });
+const serverBuild = await build({ entryPoints: [path.join(base, 'src/mcp.ts')], bundle: true, minify: true, platform: 'node', format: 'cjs', target: 'node22', outfile: path.join(plugin, 'scripts/server.cjs'), legalComments: 'none', metafile: true, define: { __MYISSUE_VERSION__: JSON.stringify(version) } });
 const packages = new Set();
 for (const input of [...Object.keys(ui.metafile.inputs), ...Object.keys(serverBuild.metafile.inputs)]) {
   const absolute = path.resolve(base, input).replaceAll('\\', '/');
@@ -21,6 +28,7 @@ for (const input of [...Object.keys(ui.metafile.inputs), ...Object.keys(serverBu
   packages.add(absolute.slice(0, index + 14) + tail.slice(0, tail[0].startsWith('@') ? 2 : 1).join('/'));
 }
 const notices = ['Third-party notices for the bundled myIssue runtime.\n'];
+notices.push(await readFile(path.join(base, 'src/web/components/ui/LICENSE'), 'utf8'));
 for (const folder of [...packages].sort()) {
   const pkg = JSON.parse(await readFile(path.join(folder, 'package.json'), 'utf8'));
   notices.push(`\n===== ${pkg.name}@${pkg.version} (${pkg.license ?? 'see license below'}) =====\n`);

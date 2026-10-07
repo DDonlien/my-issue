@@ -1,12 +1,14 @@
 import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { execute, type Operation } from './service.js';
 import { IssueError } from './core.js';
 import { desktopProjects, chooseDesktopFolder } from './desktop.js';
+import { ProjectPreferences, sharedPreferencesFile, projectOrder } from './preferences.js';
 
 const port = Number(process.env.MYISSUE_PREVIEW_PORT ?? 4310);
 const projectRoot = path.resolve(process.env.MYISSUE_ROOT ?? process.cwd());
+const preferences = new ProjectPreferences(sharedPreferencesFile());
 const html = await readFile(path.join(import.meta.dirname, '../plugins/myissue/assets/board.html'));
 const origin = `http://127.0.0.1:${port}`;
 const server = createServer(async (req, res) => {
@@ -30,12 +32,24 @@ const server = createServer(async (req, res) => {
     const limit = req.url === '/api/upload_attachment' ? 14_000_000 : 2_000_000;
     for await (const chunk of req) { text += chunk; if (Buffer.byteLength(text) > limit) throw new Error('请求过大'); }
     const args = JSON.parse(text || '{}'); const operation = req.url.slice(5);
-    const saved = operation === 'list_projects' || operation === 'open_board' ? await desktopProjects(operation === 'list_projects').catch(() => []) : [];
-    const projects = [{ root: projectRoot, name: path.basename(projectRoot) }, ...saved.filter(p => p.root !== projectRoot)];
     let data;
-    if (operation === 'list_projects') data = { projects };
+    if (operation === 'list_projects' || operation === 'open_board') {
+      const [prefs, saved] = await Promise.all([preferences.read(), desktopProjects(operation === 'list_projects' && args.refresh !== false).catch(() => [])]);
+      const candidates = new Map([{ root: projectRoot, name: path.basename(projectRoot) }, ...prefs.projects, ...saved].map(project => [project.root, project] as const));
+      const projects = [];
+      for (const project of candidates.values()) { try { if ((await stat(project.root)).isDirectory()) projects.push(project); } catch { /* Hide missing folders. */ } }
+      projects.sort(projectOrder);
+      if (operation === 'list_projects') data = { projects, lastRoot: prefs.lastRoot };
+      else {
+        const root = args.root ?? (process.env.MYISSUE_ROOT ? projectRoot : projects.some(project => project.root === prefs.lastRoot) ? prefs.lastRoot : projectRoot);
+        const opened = await execute('open_board', { ...args, root });
+        const project = projects.find(project => project.root === opened.board!.root) ?? { root: opened.board!.root, name: path.basename(opened.board!.root) };
+        await preferences.remember(project);
+        if (!projects.some(saved => saved.root === project.root)) projects.push(project);
+        data = { ...opened, projects: projects.sort(projectOrder) };
+      }
+    }
     else if (operation === 'browse_folder') data = { root: await chooseDesktopFolder() };
-    else if (operation === 'open_board') data = { ...(await execute('open_board', { root: projectRoot, ...args })), projects };
     else data = await execute(operation as Operation, args);
     res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data));
   } catch (e) {

@@ -8,6 +8,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "paths": { "@/*": ["./src/web/*"] },
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "types": ["node"]

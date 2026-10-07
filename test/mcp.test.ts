@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { mkdtemp, rm, readFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { UI_URI } from '../src/server.js';
@@ -11,7 +11,7 @@ test('built plugin exposes independent UI, real CRUD and dispatch context over M
   const root = await mkdtemp(path.join(os.tmpdir(), 'myissue-mcp-')); t.after(() => rm(root, { recursive: true, force: true }));
   const client = new Client({ name: 'myissue-acceptance', version: '1' });
   const preferencesDir = path.join(root, '.plugin-preferences');
-  const transport = new StdioClientTransport({ command: process.execPath, args: [path.resolve('plugins/myissue/scripts/server.cjs'), '--root', root], env: { ...Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => typeof entry[1] === 'string')), PLUGIN_DATA: preferencesDir, MYISSUE_CODEX_BIN: path.join(root, 'unavailable-desktop-cli') } });
+  const transport = new StdioClientTransport({ command: process.execPath, args: [path.resolve('plugins/myissue/scripts/server.cjs'), '--root', root], env: { ...Object.fromEntries(Object.entries(process.env).filter((entry): entry is [string, string] => typeof entry[1] === 'string')), MYISSUE_CONFIG_DIR: preferencesDir, PLUGIN_DATA: path.join(root, 'legacy-data'), MYISSUE_CODEX_BIN: path.join(root, 'unavailable-desktop-cli') } });
   await client.connect(transport); t.after(() => client.close());
   const catalog = await client.listTools(); const open = catalog.tools.find(tool => tool.name === 'open_board')!;
   assert.deepEqual((open._meta?.['openai/ui'] as any).entrypoints, [{ type: 'global' }, { type: 'thread' }]);
@@ -30,7 +30,7 @@ test('built plugin exposes independent UI, real CRUD and dispatch context over M
   const dispatch = await invoke('prepare_dispatch', { root, id: created.id });
   assert.match(dispatch.prompt, /真实评论/); assert.match(dispatch.prompt, /从对话创建/);
   const board = await invoke('open_board', { root, issueId: created.id }); assert.equal(board.board.issues[0].comments.length, 1);
-  assert.deepEqual(JSON.parse(await readFile(path.join(preferencesDir, 'projects.json'), 'utf8')), [root]);
+  assert.deepEqual(JSON.parse(await readFile(path.join(preferencesDir, 'projects.json'), 'utf8')), { version: 1, projects: [{ root, name: path.basename(root) }], lastRoot: root });
   const mention = await invoke('search_mentions', { query: '从对话' });
   assert.equal(mention.items.length, 1);
   const mentionResource = await client.readResource({ uri: mention.items[0].resourceUri });
