@@ -184,8 +184,9 @@
   .status-badge { border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
   .ready-badge { color: var(--success); }
   .content-heading { display: flex; align-items: center; justify-content: space-between; color: var(--muted-fg); font-size: 13px; margin-bottom: 12px; }
+  .content-actions { display: flex; align-items: center; gap: 4px; }
   .markdown { font-size: 14px; line-height: 1.85; overflow-wrap: anywhere; }
-  .markdown p { margin: 0 0 12px; }
+  .markdown p, .markdown-paragraph { margin: 0 0 12px; }
   .markdown h1, .markdown h2, .markdown h3, .markdown h4 { font-size: 16px; font-weight: 600; margin: 20px 0 10px; }
   .markdown ul { list-style: disc; padding-left: 24px; }
   .markdown ol { list-style: decimal; padding-left: 24px; }
@@ -200,9 +201,18 @@
   .empty-content { padding: 12px 0; color: var(--muted-fg); }
   .content-editor, .properties-editor { display: block; width: 100%; }
   .content-editor { min-height: 180px; }
-  .attachments { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
   .attachment-input { display: none; }
-  .attachment-caption, .attachment-placeholder { color: var(--muted-fg); font-size: 13px; }
+  .attachment-placeholder { color: var(--muted-fg); font-size: 13px; }
+  .attachment-inline-image, .attachment-inline-file { display: block; margin: 12px 0; }
+  .markdown .attachment-file { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 100%; padding: 10px 12px; background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius); color: var(--fg); text-decoration: none; }
+  .attachment-file-name { min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+  .attachment-file-size { flex-shrink: 0; color: var(--muted-fg); font-size: 11px; }
+  .attachment-inline-document { margin: 12px 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .markdown .attachment-inline-document > .attachment-file { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+  .attachment-document-body { padding: 14px; }
+  .attachment-document-body > :first-child { margin-top: 0; }
+  .attachment-document-body > :last-child { margin-bottom: 0; }
+  .attachment-document-body > pre { white-space: pre-wrap; overflow-wrap: anywhere; }
   .attachment-error { color: var(--danger); font-size: 13px; }
   .save-row { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; font-size: 12px; color: var(--muted-fg); gap: 12px; }
   .comments-heading { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 24px; margin: 28px 0 24px; gap: 12px; }

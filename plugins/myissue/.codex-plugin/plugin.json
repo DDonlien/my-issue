@@ -1,6 +1,6 @@
 {
   "name": "myissue",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Local Markdown issue boards with editable properties, shared comments and conversation dispatch.",
   "author": {
     "name": "DDonlien",

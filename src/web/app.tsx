@@ -8,7 +8,7 @@ import { Markdown, AttachmentProvider } from './markdown.js';
 import { PropertyList } from './properties.js';
 import { ConversationLinks, ConversationSection } from './conversations.js';
 import { CONVERSATIONS_PROPERTY } from '../conversation-links.js';
-import { attachmentReferences, MAX_ATTACHMENT_BYTES } from '../attachment-links.js';
+import { MAX_ATTACHMENT_BYTES } from '../attachment-links.js';
 import type { Project } from '../preferences.js';
 import { ProjectMenu, ProjectDialog } from './project-menu.js';
 import { Button } from './components/ui/button.js';
@@ -239,11 +239,10 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
           latest = data.issue;
           setBaseline(latest); setContent(latest.description); setProperties(stringify(latest.properties)); setDraftRevision(latest.revision);
         }
-      } finally { if (latest.revision !== issue.revision) await onSaved(); }
+      } finally { if (latest.revision !== issue.revision) { setEditingContent(false); await onSaved(); } }
       notify(`已添加 ${files.length} 个附件`);
     });
   }
-  const attachments = attachmentReferences([issue.description, ...issue.comments.map(comment => comment.body)].join('\n\n'));
   const col = board.columns.find(c => c.value === issue.status);
   return <AttachmentProvider root={board.root} id={issue.id} revision={issue.revision}><div className="detail-layout"><div className="detail-body">
     <article className="detail-main">
@@ -253,9 +252,8 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
       <div className="detail-meta"><span className="status-badge" style={{ color: col?.color }}><Circle size={13} />{col?.label}</span>{issue.ready && <span className="ready-badge"><CheckCircle2 size={12} />可开始</span>}<span><MessageSquare size={12} />{issue.comments.length} 条评论</span></div>
       {draftRevision !== issue.revision && changed && <div className="draft-warning"><AlertCircle size={14} />文件已更新。草稿保留，先查看源文件，再重新加载。<Button variant="ghost" size="sm" className="text-button" onClick={() => { if (window.confirm('丢弃草稿并载入最新文件？')) { setBaseline(issue); setName(issue.name); setContent(issue.description); setProperties(stringify(issue.properties)); setDraftRevision(issue.revision); } }}>载入最新</Button></div>}
       {sourceOpen && <pre className="source-view">{issue.raw}</pre>}
-      <div className="content-heading"><span>描述</span><Button variant="ghost" size="sm" className="text-button" onClick={() => setEditingContent(!editingContent)}><Pencil size={13} />{editingContent ? '预览' : '编辑'}</Button></div>
+      <div className="content-heading"><span>描述</span><div className="content-actions"><Button variant="ghost" size="sm" className="text-button" disabled={busy || changed || !connected} onClick={() => attachmentInput.current?.click()}><Paperclip size={13} />添加附件</Button><Button variant="ghost" size="sm" className="text-button" onClick={() => setEditingContent(!editingContent)}><Pencil size={13} />{editingContent ? '预览' : '编辑'}</Button></div><input className="attachment-input" ref={attachmentInput} type="file" multiple aria-label="选择附件" onChange={event => { const files = [...(event.currentTarget.files ?? [])]; event.currentTarget.value = ''; if (files.length) attach(files); }} /></div>
       {editingContent ? <Textarea className="content-editor" rows={9} value={content} onChange={e => setContent(e.target.value)} aria-label="Issue 描述" /> : content ? <Markdown text={content} /> : <Button variant="ghost" className="empty-content" onClick={() => setEditingContent(true)}>补充这件事的上下文…</Button>}
-      <section className="attachments" aria-label="Issue 附件"><div className="content-heading"><span>附件{attachments.length ? ` · ${attachments.length}` : ''}</span><Button variant="ghost" size="sm" className="text-button" disabled={busy || changed || !connected} onClick={() => attachmentInput.current?.click()}><Paperclip size={13} />添加附件</Button><input className="attachment-input" ref={attachmentInput} type="file" multiple aria-label="选择附件" onChange={event => { const files = [...(event.currentTarget.files ?? [])]; event.currentTarget.value = ''; if (files.length) attach(files); }} /></div>{attachments.length ? <Markdown text={attachments.map(ref => `[${ref.label.replace(/[\\[\]]/g, '\\$&')}](${ref.href})`).join('\n\n')} /> : <p className="attachment-caption">添加图片或文件，单个文件最大 10 MB。</p>}</section>
       {changed && <div className="save-row"><span>有未保存的修改</span><Button disabled={busy} onClick={save}><Check size={14} />保存修改</Button></div>}
       <div className="comments-heading"><h2>评论<span>{issue.comments.length}</span></h2></div>
       <div className="comments">{issue.comments.map((c, i) => { const parts = c.heading.split(' · '); const who = parts[1] ?? '评论'; const actor = parts[2]?.trim(); return <div className="comment" key={i}><Avatar className="size-8"><AvatarFallback>{who.slice(0, 1).toUpperCase()}</AvatarFallback></Avatar><div className="comment-body"><div className="comment-meta"><strong>{who}</strong>{actor && actor !== 'human' && <Badge variant="outline">{actor}</Badge>}<time>{parts[0]}</time></div><Markdown text={c.body} /></div></div>; })}{!issue.comments.length && <div className="no-comments">补充要求、讨论方案，或者记录工作进展。</div>}</div>

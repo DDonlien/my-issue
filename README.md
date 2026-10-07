@@ -7,7 +7,7 @@ myIssue 是项目内的 Markdown Issue 看板，也是可安装的 Codex 插件�
 - 状态看板与列表，搜索名称、属性、自由内容和评论，状态筛选及可开始视图。
 - 创建真实文件，修改名称与自由 Markdown，编辑任意 YAML 属性，拖动卡片改变状态。
 - 详情页：名称及自由内容、完整渲染任意属性、追加式人类/Agent 评论、只读源文件。
-- 上传图片和文件附件，保存到项目内，正文预览本地图片，通过普通 Markdown 链接读取和下载。
+- 上传图片和文件附件，保存到项目内，在描述和评论正文直接预览图片、Markdown 和文本，其他文件显示下载卡片。
 - 标准 MCP Apps 全局独立入口和对话侧栏入口，以及 Issue composer mention 搜索。
 - 看板通过官方宿主消息能力发送最新 Issue 上下文到当前或新对话；没有对应能力时显示不可用。对话通过 MCP 工具创建或开始处理 Issue。
 - 可配置的字段映射、名称来源、章节名与状态列。未知属性保留，未知状态增加派生列。
@@ -43,7 +43,7 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.7.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.8.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
 
 已安装旧版时，重新执行安装命令更新，然后完全退出并重新启动 ChatGPT / Codex 桌面应用，见[官方本地插件更新流程](https://developers.openai.com/plugins/build/plugins)。仅关闭再打开 myIssue 页面不足以刷新旧对话保留的 MCP 服务进程。
 
@@ -114,7 +114,7 @@ parent: "[[issue-001]]"
 
 ## 附件与属性显示
 
-创建 Issue 后，在详情的“附件”区域点击“添加附件”，可一次选择多个文件；先保存正在编辑的内容。单个文件最大 10 MB，保存到项目内 `issues/attachments/<UUID>-<文件名>`。正文追加普通相对 Markdown 链接，PNG/JPEG/GIF/WebP 图片直接预览，其他文件点击下载。SVG 作为文件下载。旧文件无需迁移；手工加入的 `attachments/` 链接也可从正文或既有评论读取。系统不改写既有评论，不增加必填附件属性。
+创建 Issue 后，在描述旁点击“添加附件”，可一次选择多个文件；先保存正在编辑的内容。单个文件最大 10 MB，保存到项目内 `issues/attachments/<UUID>-<文件名>`，在描述正文追加普通相对 Markdown 引用。没有独立附件分组。描述和评论中的 PNG/JPEG/GIF/WebP 图片在引用位置直接预览，包括普通文件链接和图片语法；UTF-8 Markdown、文本、CSV、JSON、YAML 和日志文件默认展示正文，自动文本预览上限 64 KiB。其他文件、过大文本、SVG 和 HTML 使用可下载文件卡片，不执行文件内容。嵌入 Markdown 不递归读取其他文件。旧文件无需迁移；手工加入的 `attachments/` 引用同样支持正文预览。系统不改写既有评论，不增加必填附件属性。
 
 附件引用由 Markdown 保存，复制或提交项目时一起保留 `issues/attachments/`。读取只接受当前 Issue 引用的本地附件，拒绝越出目录或符号链接；冲突时 Issue 保留原文，本次新附件清理。插件下载使用标准 MCP Apps 宿主接口，宿主不支持时显示文件所在目录；本地预览使用同源下载。
 
@@ -178,3 +178,8 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 - `agent-log/`：实施与验证记录
 
 实现参考：[官方插件打包](https://developers.openai.com/plugins/build/plugins)、[独立侧栏及对话入口](https://developers.openai.com/plugins/build/extensions)、[MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)。
+
+
+## 2026-10-07 正文内附件验收
+
+0.1.8 移除独立附件分组，将添加入口放到描述旁。描述与评论中的图片引用默认显示，Markdown/UTF-8 文本附件展开正文，其他文件保留紧凑下载卡片。独立发布源码通过构建、类型检查和 47 项测试；Web 实际上传、评论追加、图片加载、文件下载及 390px 布局通过。已安装并启用 0.1.8，已安装页面和 ZIP 文件逐字节核对一致；现有原生桌面仍需完全退出并重开后独立验收。
