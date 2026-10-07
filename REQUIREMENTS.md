@@ -22,6 +22,8 @@
 
 - [x] [CODEX-PLUGIN-SCROLL-001] 页面所有滚动区域隐藏横向和纵向滚动条，保留滚轮、触控板和键盘滚动；不通过关闭 overflow 裁掉超出区域的内容。2026-10-07 确认并实现；Web 页面实际横向滚动通过，根页面、侧栏和看板的两种隐藏规则生效，overflow 保持 auto。
 
+- [x] [CODEX-PLUGIN-FOOTER-001] 移除看板和列表主区域底部的说明栏及占用空间，不显示名称/属性/评论、同步状态、拖动和轮询说明。2026-10-07 确认并实现；移除共用 footer 节点及全部专用样式，Web 刷新后 footer 节点数为 0。
+
 首版工程决定：Node.js 22+ / TypeScript，共用文件核心；默认 YAML frontmatter、H1 名称、可选 `## Description`、追加式 `## Comments`。新评论使用带时区 ISO 8601 时间与 `· author · human/model`；旧评论原文保留。默认状态 backlog/todo/in_progress/in_review/done/blocked/cancelled 可配置；不识别的状态仍独立展示。ID 使用文件名 `issue-<UUID>.md`，不改已有文件名或 ID。`REQUIREMENTS.md` 暂继续独立保存。仅由宿主对话能力执行分发，不托管 Agent Runtime；原“不启动 Agent”边界不限制用户本次确认的对话启动动作。许可证仍待用户选择。
 
 ## Phase - v0.1.0 - Markdown Issue Protocol 与最小可用流程

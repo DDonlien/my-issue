@@ -522,18 +522,6 @@ select {
   background:var(--hover);
   opacity:1;
 }
-.board-footer {
-  padding:8px 30px 13px;
-  display:flex;
-  justify-content:space-between;
-  color:var(--muted);
-  font-size:9px;
-}
-.board-footer span {
-  display:flex;
-  gap:5px;
-  align-items:center;
-}
 .issue-list {
   overflow:auto;
   margin:0 30px;
@@ -1257,12 +1245,6 @@ to {
 }
 .search input {
   width:170px;
-}
-.board-footer {
-  padding:10px 18px;
-}
-.board-footer>span:last-child {
-  display:none;
 }
 .detail-layout {
   display:block;
