@@ -24,6 +24,8 @@
 
 - [x] [CODEX-PLUGIN-FOOTER-001] 移除看板和列表主区域底部的说明栏及占用空间，不显示名称/属性/评论、同步状态、拖动和轮询说明。2026-10-07 确认并实现；移除共用 footer 节点及全部专用样式，Web 刷新后 footer 节点数为 0。
 
+- [x] [CODEX-PLUGIN-LIVE-001] 移除主区手动刷新按钮，使用 2 秒心跳读取文件并比较数据差异，只有变化才更新界面；页面重新可见或获得焦点时立即检查。心跳请求不重叠，错误后后续心跳可重试；未保存草稿、打开的对话框和本页操作期间暂停，迟到的响应不得覆盖草稿、切换后的项目或刚保存的结果。2026-10-07 实现；新增四项自动测试通过，实际 Web 页面外修改名称/状态、删除和新增文件均自动同步。
+
 首版工程决定：Node.js 22+ / TypeScript，共用文件核心；默认 YAML frontmatter、H1 名称、可选 `## Description`、追加式 `## Comments`。新评论使用带时区 ISO 8601 时间与 `· author · human/model`；旧评论原文保留。默认状态 backlog/todo/in_progress/in_review/done/blocked/cancelled 可配置；不识别的状态仍独立展示。ID 使用文件名 `issue-<UUID>.md`，不改已有文件名或 ID。`REQUIREMENTS.md` 暂继续独立保存。仅由宿主对话能力执行分发，不托管 Agent Runtime；原“不启动 Agent”边界不限制用户本次确认的对话启动动作。许可证仍待用户选择。
 
 ## Phase - 侧栏、附件与属性显示（2026-10-07 确认）

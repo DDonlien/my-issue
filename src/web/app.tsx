@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Columns3, List, Search, Plus, ArrowUpRight, MessageSquare, X, ChevronDown, Folder, RefreshCw, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2, CornerDownLeft, Paperclip } from 'lucide-react';
+import { Columns3, List, Search, Plus, ArrowUpRight, MessageSquare, X, ChevronDown, Folder, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2, CornerDownLeft, Paperclip } from 'lucide-react';
 import { parseDocument, stringify } from 'yaml';
 import type { Board, Issue } from '../core.js';
 import * as bridge from './bridge.js';
 import { Markdown, AttachmentProvider } from './markdown.js';
 import { PropertyList } from './properties.js';
 import { attachmentReferences, MAX_ATTACHMENT_BYTES } from '../attachment-links.js';
+import { createHeartbeat, retainSnapshot } from './heartbeat.js';
 import './style.css';
 
 type Project = { root: string; name: string };
@@ -55,6 +56,8 @@ function App() {
   const [dragging, setDragging] = useState<string>();
   const [dropColumn, setDropColumn] = useState<string>();
   const dirty = useRef(false);
+  const refreshGeneration = useRef(0);
+  const connectionReady = useRef(false);
   const dialogOpen = useRef(false);
   dialogOpen.current = projectModal || creating !== null;
   const rootRef = useRef<string | undefined>(undefined);
@@ -64,14 +67,15 @@ function App() {
 
   async function run<T>(action: () => Promise<T>): Promise<T | undefined> {
     if (busyRef.current) return;
+    refreshGeneration.current++;
     busyRef.current = true; setBusy(true); setError('');
     try { return await action(); } catch (e) { setError((e as Error).message); return undefined; }
     finally { busyRef.current = false; setBusy(false); }
   }
   function accept(data: bridge.ToolData) {
     if (data.error) { setError(data.error.message); return; }
-    if (data.projects) setProjects(data.projects);
-    if (data.board) { rootRef.current = data.board.root; setBoard(data.board); setRootDraft(data.board.root); }
+    if (data.projects) setProjects(previous => retainSnapshot(previous, data.projects));
+    if (data.board) { rootRef.current = data.board.root; setBoard(previous => retainSnapshot(previous, data.board)); setRootDraft(data.board.root); }
     if (data.issueId) setSelected(data.issueId);
   }
   async function load(root = rootRef.current) {
@@ -81,13 +85,36 @@ function App() {
   useEffect(() => {
     bridge.onResult(accept);
     bridge.connect().then(async () => {
-      setConnected(true);
+      connectionReady.current = true; setConnected(true);
       if (bridge.preview) accept(await bridge.call('open_board'));
     }).catch(e => setError(e.message));
-    const interval = setInterval(() => {
-      if (!dialogOpen.current && !dirty.current && !busyRef.current && rootRef.current && document.visibilityState === 'visible') load().catch(e => setError(e.message));
-    }, 5000);
-    return () => clearInterval(interval);
+    const heartbeat = createHeartbeat({
+      canRead: () => connectionReady.current && !dialogOpen.current && !dirty.current && !busyRef.current && document.visibilityState === 'visible',
+      generation: () => refreshGeneration.current,
+      read: async () => {
+        const root = rootRef.current;
+        const [issues, projects] = await Promise.all([
+          root ? bridge.call('list_issues', { root }) : Promise.resolve(undefined),
+          bridge.call('list_projects', { refresh: false }),
+        ]);
+        return { root, issues, projects };
+      },
+      apply: ({ root, issues, projects }) => {
+        if (root !== rootRef.current) return;
+        if (issues) accept(issues);
+        accept(projects);
+      },
+      onError: error => setError((error as Error).message),
+    });
+    const check = () => { void heartbeat.tick(); };
+    const interval = setInterval(check, 2000);
+    window.addEventListener('focus', check);
+    document.addEventListener('visibilitychange', check);
+    return () => {
+      connectionReady.current = false; heartbeat.stop(); clearInterval(interval);
+      window.removeEventListener('focus', check);
+      document.removeEventListener('visibilitychange', check);
+    };
   }, []);
   useEffect(() => { if (selected && board) bridge.context(board.root, selected).catch(() => {}); }, [selected, board?.root]);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(''), 5000); return () => clearTimeout(timer); }, [notice]);
@@ -131,11 +158,11 @@ function App() {
       <div className="sidebar-footer"><div className="small-dot" />文件实时同步<div className="store-label" title={board?.root}>{board ? `${board.project}/issues/*.md` : '项目根目录 / issues'}</div></div>
     </aside>
     <main className="main" inert={projectModal || creating !== null}>
-      <header className="topbar"><span className="breadcrumb"><Columns3 size={16} />Issue <span>/</span><strong>{selectedIssue ? selectedIssue.name : readyOnly ? '可开始' : '全部'}</strong></span><button className="icon-button" title="重新读取文件" aria-label="刷新" disabled={!board || busy} onClick={() => run(() => load())}><RefreshCw size={15} className={busy ? 'spin' : ''} /></button></header>
+      <header className="topbar"><span className="breadcrumb"><Columns3 size={16} />Issue <span>/</span><strong>{selectedIssue ? selectedIssue.name : readyOnly ? '可开始' : '全部'}</strong></span></header>
       {error && !projectModal && <div className="banner error" role="alert"><AlertCircle size={16} /><span>{error}</span><button onClick={() => setError('')} aria-label="关闭错误"><X size={15} /></button></div>}
       {notice && <div className="toast" role="status"><Check size={15} />{notice}</div>}
       {!board ? <div className="welcome"><div className="welcome-icon"><Columns3 size={30} /></div><h1>让工作留在项目里</h1><p>把 Issue 放进 Markdown，<br />从这里看进度，在对话里继续工作。</p><button className="primary" onClick={() => setProjectModal(true)}><Folder size={16} />选择项目文件夹</button><span>{connected ? '从项目根目录的 issues 文件夹读取' : '正在连接宿主…'}</span></div> : selectedIssue ?
-        <Detail key={selectedIssue.id} issue={selectedIssue} board={board} busy={busy} connected={connected} onClose={() => choose()} onSelect={id => { choose(id); }} onDirty={value => { dirty.current = value; }} run={run} onSaved={async () => { await load(); }} notify={setNotice} /> : <>
+        <Detail key={selectedIssue.id} issue={selectedIssue} board={board} busy={busy} connected={connected} onClose={() => choose()} onSelect={id => { choose(id); }} onDirty={value => { if (dirty.current !== value) refreshGeneration.current++; dirty.current = value; }} run={run} onSaved={async () => { await load(); }} notify={setNotice} /> : <>
           <div className="page-heading"><div><div className="eyebrow">{board.project}</div><h1>{readyOnly ? '可开始的 Issue' : 'Issue 看板'}<span>{filtered.length}</span></h1></div><button className="primary" disabled={busy} onClick={() => setCreating(board.schema.columns[0].value)}><Plus size={16} />新建 Issue</button></div>
           <div className="toolbar"><div className="segmented"><button className={view === 'board' ? 'selected' : ''} onClick={() => setView('board')}><Columns3 size={14} />看板</button><button className={view === 'list' ? 'selected' : ''} onClick={() => setView('list')}><List size={14} />列表</button></div><div className="toolbar-right"><div className="search"><Search size={14} /><input id="search" placeholder="搜索名称、属性、评论…" value={query} onChange={e => setQuery(e.target.value)} /></div><div className="filter"><SlidersHorizontal size={14} /><select aria-label="按状态筛选" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}><option value="*">全部状态</option>{board.columns.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div></div></div>
           {board.errors.length > 0 && <details className="file-errors"><summary><AlertCircle size={14} />{board.errors.length} 条文件或关系问题</summary>{board.errors.map((e, i) => <p key={i}><code>{e.filename}</code> {e.message}</p>)}</details>}
