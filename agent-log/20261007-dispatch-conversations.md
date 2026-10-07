@@ -22,4 +22,8 @@
 
 ## 交付
 
-- Git、安装目录、打包及当前预览的核对结果在交付时补记。
+- 实现提交 3a6899f8a8864484f3faf035538f4b1519740f0f 已推送 origin/main，远端读回一致；18 个文件均为本次差异，正文附件与间距调整作为已提交基线保留。工作区干净。
+- 0.1.9 本机 installed=true/enabled=true。安装目录、独立交付与 dist/myissue-0.1.9.zip 的 10 个插件文件逐字节一致；ZIP SHA-256 e82b4ccab007cd3a37c4050f35e82de91b54f2a76507f2154e7eb7295e309634。
+- 从实际安装目录启动 stdio 服务，读取到版本 0.1.9、15 个工具、103 个真实对话及 canSend=false；打开隔离项目和读取稳定 board-v2 资源正常，HTML 与已安装文件一致。没有调用真实定向发送。报告在 _builds/dispatch-acceptance/installed-results.json。
+- 当前 4310 页面已重载新资源，真实浏览器实际选择“开发 myIssue Codex 插件”，按钮按当前缺少控制接口禁用，四处说明均不存在，无 JavaScript 错误。用户现有 issue-9bad9c70-a421-4186-a6e0-811a0423bf9a.md 的字节与检查前相同（SHA-256 5153de2f5b7b2fe1dd75d5b407118c3d8fface1308235cedca036145159436a0）。没有强制重载用户浏览器或重启桌面应用。报告与截图在 preview-results.json、preview-conversations.png。
+- 4310 用户预览保持运行；4315 隔离测试服务关闭。完成记录作为单独文档提交保存。
