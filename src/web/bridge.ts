@@ -2,16 +2,17 @@ import { App } from '@modelcontextprotocol/ext-apps';
 import { OpenAIExtensions } from '@openai/mcp-extensions/app';
 import { dispatchAvailable, dispatchMessage } from '../message.js';
 import { followHostTheme } from './theme.js';
+import { downloadAttachment } from '../download.js';
 
 export type ToolData = Record<string, any>;
 let app: App | undefined;
 let extensions: OpenAIExtensions | undefined;
 let handler: (data: ToolData) => void = () => {};
-export const preview = window.parent === window;
+export const preview = typeof window !== 'undefined' && window.parent === window;
 export function onResult(callback: typeof handler) { handler = callback; }
 export async function connect() {
   if (preview) return;
-  app = new App({ name: 'myIssue', version: '0.1.3' });
+  app = new App({ name: 'myIssue', version: '0.1.4' });
   extensions = new OpenAIExtensions(app);
   app.ontoolresult = result => { if (result.structuredContent) handler(result.structuredContent); };
   const theme = followHostTheme(app);
@@ -42,4 +43,9 @@ export async function send(prompt: string, target: 'active' | 'new') {
 export async function context(root: string, id: string) {
   if (!app) return;
   await app.updateModelContext({ content: [{ type: 'text', text: `myIssue 当前选择：${root}/issues/${id}.md。需要操作时请先通过 get_issue 读取最新内容。` }] });
+}
+
+export async function download(file: { name: string; mimeType: string; data: string }) {
+  if (!app) throw new Error('宿主尚未连接');
+  return downloadAttachment(app, file);
 }

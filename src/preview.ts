@@ -16,9 +16,19 @@ const server = createServer(async (req, res) => {
   if (req.headers.host !== `127.0.0.1:${port}` || (req.headers.origin && req.headers.origin !== origin)) { res.writeHead(403); res.end(); return; }
   try {
     if (req.method === 'GET' && req.url === '/') { res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.end(html); return; }
+    if (req.method === 'GET' && req.url?.startsWith('/api/attachment?')) {
+      if (req.headers['sec-fetch-site'] && req.headers['sec-fetch-site'] !== 'same-origin') { res.writeHead(403); res.end(); return; }
+      const query = new URL(req.url, origin).searchParams;
+      const result = await execute('read_attachment', { root: query.get('root'), id: query.get('id'), path: query.get('path') });
+      const attachment = result.attachment!;
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(attachment.name)}`);
+      res.end(Buffer.from(attachment.data, 'base64')); return;
+    }
     if (req.method !== 'POST' || !req.url?.startsWith('/api/') || !req.headers['content-type']?.startsWith('application/json')) { res.writeHead(404); res.end(); return; }
     let text = '';
-    for await (const chunk of req) { text += chunk; if (Buffer.byteLength(text) > 2_000_000) throw new Error('请求过大'); }
+    const limit = req.url === '/api/upload_attachment' ? 14_000_000 : 2_000_000;
+    for await (const chunk of req) { text += chunk; if (Buffer.byteLength(text) > limit) throw new Error('请求过大'); }
     const args = JSON.parse(text || '{}'); const operation = req.url.slice(5);
     const saved = operation === 'list_projects' || operation === 'open_board' ? await desktopProjects(operation === 'list_projects').catch(() => []) : [];
     const projects = [{ root: projectRoot, name: path.basename(projectRoot) }, ...saved.filter(p => p.root !== projectRoot)];

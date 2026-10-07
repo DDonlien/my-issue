@@ -38,4 +38,12 @@ test('built plugin exposes independent UI, real CRUD and dispatch context over M
   assert.equal(await readFile(path.join(root, 'issues', created.filename), 'utf8'), commented.raw);
   const stale = await client.callTool({ name: 'update_issue', arguments: { root, id: created.id, revision: created.revision, name: 'Overwrite' } });
   assert.equal(stale.isError, true); assert.equal((stale.structuredContent as any).error.code, 'CONFLICT');
+  assert.equal(catalog.tools.find(tool => tool.name === 'upload_attachment')?.annotations?.readOnlyHint, false);
+  assert.equal(catalog.tools.find(tool => tool.name === 'read_attachment')?.annotations?.readOnlyHint, true);
+  const attached = await invoke('upload_attachment', { root, id: created.id, revision: commented.revision, name: 'context.txt', data: Buffer.from('portable attachment').toString('base64') });
+  assert.match(attached.issue.description, /context.txt/);
+  assert.deepEqual(attached.issue.comments, commented.comments);
+  const attachment = await invoke('read_attachment', { root, id: created.id, path: attached.attachment.path });
+  assert.equal(Buffer.from(attachment.attachment.data, 'base64').toString(), 'portable attachment');
+  assert.match((await invoke('prepare_dispatch', { root, id: created.id })).prompt, /attachments\//);
 });

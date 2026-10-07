@@ -14,7 +14,7 @@ import { desktopProjects, chooseDesktopFolder, type DesktopProject } from './des
 // tool inventories and conversation-specific MCP processes can refresh separately.
 export const UI_URI = 'ui://myissue/board-v2.html';
 export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string, desktop: { projects: (refresh?: boolean) => Promise<DesktopProject[]>; chooseFolder: () => Promise<string | undefined> } = { projects: desktopProjects, chooseFolder: chooseDesktopFolder }) {
-  const server = new McpServer({ name: 'myissue', version: '0.1.3' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
+  const server = new McpServer({ name: 'myissue', version: '0.1.4' }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
   const extensions = new OpenAIExtensions(server);
   const knownRoots = new Set<string>(fallbackRoot ? [fallbackRoot] : []);
   async function loadPreferences() {
@@ -94,9 +94,11 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     update_issue: 'Update an issue name, free content or selected YAML properties with revision checking. Existing comments remain immutable. Removing properties must be explicit.',
     append_comment: 'Append a shared human/Agent comment to the issue file. Pass the actual author and human or actual available model identifier.',
     prepare_dispatch: 'Read the latest issue and prepare context for a user-requested conversation dispatch. This tool alone does not send or start a conversation.',
+    upload_attachment: 'Save a Base64-encoded file in issues/attachments and append its relative Markdown link to the issue description. Requires the latest revision. Preserves existing comments and unrelated properties. Maximum 10 MB per file.',
+    read_attachment: 'Read an attachment referenced by this issue description or comments. Only local attachments/ paths and regular files are allowed. Returns file metadata and Base64 data.',
   };
   for (const operation of Object.keys(descriptions) as Exclude<Operation, 'open_board'>[]) {
-    server.registerTool(operation, { description: descriptions[operation], inputSchema: inputs[operation], annotations: ['create_issue', 'update_issue', 'append_comment'].includes(operation) ? writeAnnotations : readAnnotations }, wrap(async args => {
+    server.registerTool(operation, { description: descriptions[operation], inputSchema: inputs[operation], annotations: ['create_issue', 'update_issue', 'append_comment', 'upload_attachment'].includes(operation) ? writeAnnotations : readAnnotations }, wrap(async args => {
       knownRoots.add(args.root);
       return await execute(operation, args);
     }));

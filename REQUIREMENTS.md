@@ -26,6 +26,15 @@
 
 首版工程决定：Node.js 22+ / TypeScript，共用文件核心；默认 YAML frontmatter、H1 名称、可选 `## Description`、追加式 `## Comments`。新评论使用带时区 ISO 8601 时间与 `· author · human/model`；旧评论原文保留。默认状态 backlog/todo/in_progress/in_review/done/blocked/cancelled 可配置；不识别的状态仍独立展示。ID 使用文件名 `issue-<UUID>.md`，不改已有文件名或 ID。`REQUIREMENTS.md` 暂继续独立保存。仅由宿主对话能力执行分发，不托管 Agent Runtime；原“不启动 Agent”边界不限制用户本次确认的对话启动动作。许可证仍待用户选择。
 
+## Phase - 侧栏、附件与属性显示（2026-10-07 确认）
+
+- [x] [CODEX-PLUGIN-013] 侧栏使用宿主的三级背景，选中项使用独立的中性背景；全部 Issue 与可开始只能有一个选中项，切换时显示对应视图。保留浅色、深色、主题动态切换与窄屏布局。
+- [x] [CODEX-PLUGIN-014] Issue 详情允许选择附件，单个文件上限 10 MB。文件保存在项目内 `issues/attachments/`，使用唯一文件名；描述新增普通相对 Markdown 图片或文件链接，不增加必填属性或改写既有评论。读取、图片预览与下载复用 MCP 和预览服务；仅允许读取当前 Issue 已引用的附件，不跟随符号链接或越过附件目录。冲突或写入失败保留原 Issue 并清理本次新文件。旧 Issue 无需迁移，手工 Markdown 附件链接也可读取。
+- [x] [CODEX-PLUGIN-015] 详情完整渲染任意属性：文本、数值、布尔、空值、数组与嵌套对象；URL 可以打开，Issue wikilink 可跳转，缺失目标明确显示。保留未知字段，卡片属性显示字段名与值，YAML 编辑保留现有入口。
+
+
+本阶段三项已实现并通过独立源码、文件协议及浏览器验证；原生新版页面与用户验收仍待桌面应用重启后确认。
+
 ## Phase - v0.1.0 - Markdown Issue Protocol 与最小可用流程
 
 ### protocol/main: 建立可脱离 Agent 与 Harness 的 Issue 协议
