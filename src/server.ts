@@ -81,11 +81,12 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     update_issue: 'Update an issue name, free content or selected YAML properties with revision checking. Existing comments remain immutable. Removing properties must be explicit.',
     append_comment: 'Append a shared human/Agent comment to the issue file. Pass the actual author and human or actual available model identifier.',
     prepare_dispatch: 'Read the latest issue and prepare context for a user-requested conversation dispatch. This tool alone does not send or start a conversation.',
+    link_conversation: 'Associate an actual conversation URL and optional verified title with this issue. Use the latest revision. After receiving a dispatched issue, record your own conversation only if its real URL is available; never guess it from anonymous session IDs or recent chats. Adds or updates an optional conversations YAML property and preserves existing comments. Does not send messages or manage sessions.',
     upload_attachment: 'Save a Base64-encoded file in issues/attachments and append its relative Markdown link to the issue description. Requires the latest revision. Preserves existing comments and unrelated properties. Maximum 10 MB per file.',
     read_attachment: 'Read an attachment referenced by this issue description or comments. Only local attachments/ paths and regular files are allowed. Returns file metadata and Base64 data.',
   };
   for (const operation of Object.keys(descriptions) as Exclude<Operation, 'open_board'>[]) {
-    server.registerTool(operation, { description: descriptions[operation], inputSchema: inputs[operation], annotations: ['create_issue', 'update_issue', 'append_comment', 'upload_attachment'].includes(operation) ? writeAnnotations : readAnnotations }, wrap(async args => {
+    server.registerTool(operation, { description: descriptions[operation], inputSchema: inputs[operation], annotations: ['create_issue', 'update_issue', 'append_comment', 'upload_attachment', 'link_conversation'].includes(operation) ? writeAnnotations : readAnnotations }, wrap(async args => {
       knownRoots.add(args.root);
       return await execute(operation, args);
     }));

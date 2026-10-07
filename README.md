@@ -43,7 +43,7 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.6.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.7.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
 
 已安装旧版时，重新执行安装命令更新，然后完全退出并重新启动 ChatGPT / Codex 桌面应用，见[官方本地插件更新流程](https://developers.openai.com/plugins/build/plugins)。仅关闭再打开 myIssue 页面不足以刷新旧对话保留的 MCP 服务进程。
 
@@ -138,7 +138,7 @@ conversations:
     url: codex://threads/实际对话ID
 ```
 
-支持实际 HTTP/HTTPS 对话链接及 `codex://threads/<id>`。`link_conversation` 使用最新 revision 追加或更新关联，同一 URL 不重复，未知关联字段和既有评论保留；已存在的 `conversations` 不是列表时拒绝自动覆盖。接收分发的 Agent 在获得可信的当前对话 URL 后可调用此工具写回，缺少地址时跳过。公开发送接口没有承诺返回可跳转地址，匿名 `openai/session` 元数据也不能构造链接；页面不会根据发送成功或最近对话猜测目标。插件通过宿主 `openLink` 跳转，拒绝时报告并保留地址；Web 预览使用普通链接。
+支持实际 HTTP/HTTPS 对话链接及 `codex://threads/<id>`。`link_conversation` 使用最新 revision 追加或更新关联，同一 URL 不重复，未知关联字段和既有评论保留；已存在的 `conversations` 不是列表、或被 Schema 映射为名称/状态/关系时拒绝自动覆盖。接收分发的 Agent 在获得可信的当前对话 URL 后可调用此工具写回，缺少地址时跳过。公开发送接口没有承诺返回可跳转地址，匿名 `openai/session` 元数据也不能构造链接；页面不会根据发送成功或最近对话猜测目标。插件通过宿主 `openLink` 跳转，拒绝时报告并保留地址；Web 预览使用普通链接。
 
 ## 写入边界
 

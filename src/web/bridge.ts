@@ -3,6 +3,7 @@ import { OpenAIExtensions } from '@openai/mcp-extensions/app';
 import { dispatchAvailable, dispatchMessage } from '../message.js';
 import { followHostTheme } from './theme.js';
 import { downloadAttachment } from '../download.js';
+import { openConversation as navigateConversation } from '../conversation-navigation.js';
 import { version } from '../version.js';
 
 export type ToolData = Record<string, any>;
@@ -48,4 +49,8 @@ export async function context(root: string, id: string) {
 export async function download(file: { name: string; mimeType: string; data: string }) {
   if (!app) throw new Error('宿主尚未连接');
   return downloadAttachment(app, file);
+}
+export async function openConversation(url: string) {
+  if (!app) throw new Error('宿主尚未连接');
+  await navigateConversation(app, url);
 }

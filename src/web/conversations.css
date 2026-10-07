@@ -1,0 +1,38 @@
+.issue-card .card-open {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: inherit;
+  font: inherit;
+}
+.issue-card:focus-within { border-color: var(--focus, var(--ring)); }
+.board .column { min-width: 0; }
+.card-footer > .chips { flex: 1 1 0; min-width: 0; overflow: hidden; }
+.card-footer > .comment-count { flex-shrink: 0; }
+.card-conversations { display: flex; align-items: center; gap: 4px; min-width: 0; max-width: 144px; flex: 0 1 auto; }
+.conversation-link { display: inline-flex; align-items: center; gap: 4px; min-width: 0; color: var(--text-secondary, var(--muted-foreground)); font-size: 11px; text-decoration: none; border-radius: 4px; padding: 2px 3px; }
+.conversation-link > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conversation-link > svg { flex-shrink: 0; }
+.conversation-link:hover { color: var(--text, var(--foreground)); background: var(--hover, var(--secondary)); }
+.conversation-link:focus-visible, .more-conversations > summary:focus-visible { outline: 2px solid var(--focus, var(--ring)); outline-offset: 2px; }
+.more-conversations { position: relative; flex-shrink: 0; font-size: 11px; }
+.more-conversations > summary { list-style: none; cursor: pointer; padding: 2px 3px; border-radius: 4px; color: var(--text-secondary, var(--muted-foreground)); }
+.more-conversations > summary::-webkit-details-marker, .assigned-conversations > details > summary::-webkit-details-marker { display: none; }
+.conversation-popover { position: absolute; right: 0; top: calc(100% + 5px); width: 180px; max-width: 60vw; padding: 6px; background: linear-gradient(var(--card), var(--card)), var(--background, var(--bg)); border: 1px solid var(--line, var(--border)); border-radius: 8px; z-index: 5; box-shadow: 0 4px 14px #0002; }
+.conversation-popover .conversation-link { display: flex; width: 100%; }
+.conversation-list { display: flex; flex-direction: column; gap: 5px; margin: 8px 0; }
+.conversation-list .conversation-link { max-width: 100%; font-size: 12px; }
+.assigned-conversations { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line, var(--border)); }
+.assigned-conversations h3 { font-size: 13px; margin: 0 0 8px; font-weight: 600; }
+.assigned-conversations > details > summary { display: flex; align-items: center; gap: 5px; list-style: none; font-size: 12px; cursor: pointer; color: var(--text-secondary, var(--muted-foreground)); }
+.assigned-conversations form { display: flex; flex-direction: column; align-items: stretch; gap: 10px; margin-top: 12px; }
+.assigned-conversations label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+.assigned-conversations input { width: 100%; min-width: 0; padding: 7px 9px; border: 1px solid var(--line, var(--border)); border-radius: 7px; background: var(--input-bg, var(--background, var(--bg))); color: inherit; font: inherit; }
+.conversation-save { border: 1px solid var(--line, var(--border)); border-radius: 7px; background: transparent; color: inherit; font: inherit; font-size: 12px; padding: 7px 10px; cursor: pointer; }
+.conversation-save:disabled { opacity: .5; cursor: default; }
