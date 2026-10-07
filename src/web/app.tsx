@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Columns3, List, Search, Plus, ArrowUpRight, MessageSquare, X, Folder, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2, CornerDownLeft, Paperclip } from 'lucide-react';
+import { Columns3, List, Search, Plus, ArrowUpRight, MessageSquare, X, Folder, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2, Paperclip } from 'lucide-react';
 import { parseDocument, stringify } from 'yaml';
 import type { Board, Issue } from '../core.js';
 import * as bridge from './bridge.js';
@@ -20,6 +20,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs.js';
 import { Toggle } from './components/ui/toggle.js';
 import { createHeartbeat, retainSnapshot } from './heartbeat.js';
+import { IssueName } from './issue-name.js';
+import { CommentComposer } from './comment-composer.js';
 import './style.css';
 
 function yaml(text: string) {
@@ -30,11 +32,12 @@ function yaml(text: string) {
   return data as Record<string, unknown>;
 }
 function short(value: unknown) { return typeof value === 'string' ? value : JSON.stringify(value); }
-function readAuthor() { try { return localStorage.getItem('myissue-author') ?? '我'; } catch { return '我'; } }
+function readAuthor(username: string) { try { const saved = localStorage.getItem('myissue-author')?.trim(); return saved && saved !== '我' ? saved : username; } catch { return username; } }
 function rememberAuthor(author: string) { try { localStorage.setItem('myissue-author', author); } catch { /* Sandboxed hosts may disable storage. */ } }
 function App() {
   const [board, setBoard] = useState<Board>();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [username, setUsername] = useState('');
   const [selected, setSelected] = useState<string>();
   const [view, setView] = useState<'board' | 'list'>('board');
   const [query, setQuery] = useState('');
@@ -71,6 +74,7 @@ function App() {
   }
   function accept(data: bridge.ToolData) {
     if (data.error) { setError(data.error.message); return; }
+    if (typeof data.username === 'string') setUsername(data.username);
     if (data.projects) setProjects(previous => retainSnapshot(previous, data.projects));
     if (data.board) {
       if (rootRef.current !== data.board.root) { setSelected(undefined); setStatusFilter('*'); }
@@ -155,7 +159,7 @@ function App() {
       {error && !projectModal && <div className="banner error" role="alert"><AlertCircle size={16} /><span>{error}</span><Button variant="ghost" size="icon-sm" onClick={() => setError('')} aria-label="关闭错误"><X /></Button></div>}
       {notice && <div className="toast" role="status"><Check size={15} />{notice}</div>}
       {!board ? <div className="welcome"><div className="welcome-icon"><Columns3 size={30} /></div><h1>让工作留在项目里</h1><p>把 Issue 放进 Markdown，<br />从这里看进度，在对话里继续工作。</p><Button onClick={() => { setRootDraft(''); setProjectModal(true); }}><Folder />添加项目</Button><span>{connected ? '项目配置会在这台电脑的所有面板间共享' : '正在连接宿主…'}</span></div> : selectedIssue ?
-        <Detail key={board.root + selectedIssue.id} issue={selectedIssue} board={board} busy={busy} connected={connected} onClose={() => choose()} onSelect={id => { choose(id); }} onDirty={value => { if (dirty.current !== value) refreshGeneration.current++; dirty.current = value; }} run={run} onSaved={async () => { await load(); }} notify={setNotice} /> : <>
+        <Detail key={board.root + selectedIssue.id} issue={selectedIssue} board={board} username={username} busy={busy} connected={connected} onClose={() => choose()} onSelect={id => { choose(id); }} onDirty={value => { if (dirty.current !== value) refreshGeneration.current++; dirty.current = value; }} run={run} onSaved={async () => { await load(); }} notify={setNotice} /> : <>
           <div className="page-heading"><h1>{readyOnly ? '可开始的 Issue' : 'Issues'}<Badge variant="secondary">{filtered.length}</Badge></h1><Button data-create-issue disabled={busy} onClick={() => setCreating(board.schema.columns[0].value)}><Plus />新建 Issue</Button></div>
           <Tabs className="board-workspace" value={view} onValueChange={value => setView(value as 'board' | 'list')}>
           <div className="toolbar"><div className="toolbar-views"><TabsList aria-label="Issue 视图"><TabsTrigger value="board"><Columns3 />看板</TabsTrigger><TabsTrigger value="list"><List />列表</TabsTrigger></TabsList><Toggle aria-label="只看可开始" pressed={readyOnly} onPressedChange={value => setReadyOnly(value)}><CheckCircle2 />可开始</Toggle></div><div className="toolbar-right"><div className="search"><Search className="size-4" /><Input id="search" className="pl-9" aria-label="搜索 Issue" placeholder="搜索名称、属性、评论…" value={query} onChange={e => setQuery(e.target.value)} /></div><Select value={statusFilter} onValueChange={setStatusFilter}><SelectTrigger aria-label="按状态筛选"><SlidersHorizontal /><SelectValue /></SelectTrigger><SelectContent position="popper"><SelectItem value="*">全部状态</SelectItem>{board.columns.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent></Select></div></div>
@@ -178,7 +182,7 @@ type Run = <T>(action: () => Promise<T>) => Promise<T | undefined>;
 function CreateModal({ status, board, busy, run, close, created }: { status: string; board: Board; busy: boolean; run: Run; close: () => void; created: (issue: Issue) => Promise<void> }) {
   const [name, setName] = useState(''); const [content, setContent] = useState(''); const [props, setProps] = useState(stringify({ [board.schema.statusKey]: status }));
   const input = useRef<HTMLInputElement>(null);
-  return <Dialog open onOpenChange={open => { if (!open) close(); }}><DialogContent className="create-dialog rounded-2xl" showCloseButton={false} onOpenAutoFocus={event => { event.preventDefault(); input.current?.focus(); }}><DialogHeader><DialogTitle>新建 Issue</DialogTitle><DialogDescription>写下需要完成的事，再补充内容和属性。</DialogDescription></DialogHeader><form className="dialog-form" onSubmit={e => { e.preventDefault(); run(async () => { const data = await bridge.call('create_issue', { root: board.root, name, description: content, properties: yaml(props) }); await created(data.issue); }); }}><div className="field"><Label htmlFor="create-name">名称</Label><Input ref={input} id="create-name" required placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></div><div className="field"><Label htmlFor="create-content">内容 <span className="muted">可选 · Markdown</span></Label><Textarea id="create-content" rows={5} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} /></div><div className="field"><Label htmlFor="create-properties">属性 <span className="muted">YAML</span></Label><Textarea id="create-properties" className="code-input" rows={4} value={props} onChange={e => setProps(e.target.value)} /></div><DialogFooter><DialogClose asChild><Button type="button" variant="outline">取消</Button></DialogClose><Button disabled={busy || !name.trim()}>{busy ? <Loader2 className="animate-spin" /> : <Plus />}创建 Issue</Button></DialogFooter></form></DialogContent></Dialog>;
+  return <Dialog open onOpenChange={open => { if (!open) close(); }}><DialogContent className="create-dialog rounded-2xl" showCloseButton={false} onOpenAutoFocus={event => { event.preventDefault(); input.current?.focus(); }}><DialogHeader><DialogTitle>新建 Issue</DialogTitle><DialogDescription>写下需要完成的事，再补充描述和属性。</DialogDescription></DialogHeader><form className="dialog-form" onSubmit={e => { e.preventDefault(); run(async () => { const data = await bridge.call('create_issue', { root: board.root, name, description: content, properties: yaml(props) }); await created(data.issue); }); }}><div className="field"><Label htmlFor="create-name">名称</Label><Input ref={input} id="create-name" required placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></div><div className="field"><Label htmlFor="create-content">描述 <span className="muted">可选 · Markdown</span></Label><Textarea id="create-content" rows={5} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} /></div><div className="field"><Label htmlFor="create-properties">属性 <span className="muted">YAML</span></Label><Textarea id="create-properties" className="code-input" rows={4} value={props} onChange={e => setProps(e.target.value)} /></div><DialogFooter><DialogClose asChild><Button type="button" variant="outline">取消</Button></DialogClose><Button disabled={busy || !name.trim()}>{busy ? <Loader2 className="animate-spin" /> : <Plus />}创建 Issue</Button></DialogFooter></form></DialogContent></Dialog>;
 }
 function fileData(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -188,7 +192,7 @@ function fileData(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
-function Detail({ issue, board, busy, connected, onClose, onSelect, onDirty, run, onSaved, notify }: { issue: Issue; board: Board; busy: boolean; connected: boolean; onClose: () => void; onSelect: (id: string) => void; onDirty: (dirty: boolean) => void; run: Run; onSaved: () => Promise<void>; notify: (text: string) => void }) {
+function Detail({ issue, board, username, busy, connected, onClose, onSelect, onDirty, run, onSaved, notify }: { issue: Issue; board: Board; username: string; busy: boolean; connected: boolean; onClose: () => void; onSelect: (id: string) => void; onDirty: (dirty: boolean) => void; run: Run; onSaved: () => Promise<void>; notify: (text: string) => void }) {
   const [baseline, setBaseline] = useState(issue);
   const [name, setName] = useState(issue.name);
   const [content, setContent] = useState(issue.description);
@@ -196,7 +200,8 @@ function Detail({ issue, board, busy, connected, onClose, onSelect, onDirty, run
   const [editingContent, setEditingContent] = useState(false);
   const [editingProperties, setEditingProperties] = useState(false);
   const [comment, setComment] = useState('');
-  const [author, setAuthor] = useState(readAuthor);
+  const [author, setAuthor] = useState(() => readAuthor(username));
+  useEffect(() => { if (username) setAuthor(current => current || readAuthor(username)); }, [username]);
   const [target, setTarget] = useState<'active' | 'new'>('new');
   const [instruction, setInstruction] = useState('');
   const [dispatchOpen, setDispatchOpen] = useState(false);
@@ -237,20 +242,19 @@ function Detail({ issue, board, busy, connected, onClose, onSelect, onDirty, run
   }
   const attachments = attachmentReferences([issue.description, ...issue.comments.map(comment => comment.body)].join('\n\n'));
   const col = board.columns.find(c => c.value === issue.status);
-  return <AttachmentProvider root={board.root} id={issue.id} revision={issue.revision}><div className="detail-layout">
+  return <AttachmentProvider root={board.root} id={issue.id} revision={issue.revision}><div className="detail-layout"><div className="detail-body">
     <article className="detail-main">
       <div className="detail-nav"><Button variant="ghost" size="sm" className="text-button" onClick={onClose}><ArrowLeft size={14} />返回看板</Button><code>{issue.filename}</code><Button variant="ghost" size="sm" className="text-button" onClick={() => setSourceOpen(!sourceOpen)}><FileText size={14} />源文件</Button></div>
-      <Input className="issue-name h-auto rounded-sm border-0 bg-transparent px-0 text-2xl font-semibold shadow-none md:text-2xl" aria-label="Issue 名称" value={name} onChange={e => setName(e.target.value)} />
+      <IssueName value={name} onChange={setName} />
       <div className="detail-meta"><span className="status-badge" style={{ color: col?.color }}><Circle size={13} />{col?.label}</span>{issue.ready && <span className="ready-badge"><CheckCircle2 size={12} />可开始</span>}<span><MessageSquare size={12} />{issue.comments.length} 条评论</span></div>
       {draftRevision !== issue.revision && changed && <div className="draft-warning"><AlertCircle size={14} />文件已更新。草稿保留，先查看源文件，再重新加载。<Button variant="ghost" size="sm" className="text-button" onClick={() => { if (window.confirm('丢弃草稿并载入最新文件？')) { setBaseline(issue); setName(issue.name); setContent(issue.description); setProperties(stringify(issue.properties)); setDraftRevision(issue.revision); } }}>载入最新</Button></div>}
       {sourceOpen && <pre className="source-view">{issue.raw}</pre>}
-      <div className="content-heading"><span>内容</span><Button variant="ghost" size="sm" className="text-button" onClick={() => setEditingContent(!editingContent)}><Pencil size={13} />{editingContent ? '预览' : '编辑'}</Button></div>
-      {editingContent ? <Textarea className="content-editor" rows={9} value={content} onChange={e => setContent(e.target.value)} aria-label="Issue 内容" /> : content ? <Markdown text={content} /> : <Button variant="ghost" className="empty-content" onClick={() => setEditingContent(true)}>补充这件事的上下文…</Button>}
+      <div className="content-heading"><span>描述</span><Button variant="ghost" size="sm" className="text-button" onClick={() => setEditingContent(!editingContent)}><Pencil size={13} />{editingContent ? '预览' : '编辑'}</Button></div>
+      {editingContent ? <Textarea className="content-editor" rows={9} value={content} onChange={e => setContent(e.target.value)} aria-label="Issue 描述" /> : content ? <Markdown text={content} /> : <Button variant="ghost" className="empty-content" onClick={() => setEditingContent(true)}>补充这件事的上下文…</Button>}
       <section className="attachments" aria-label="Issue 附件"><div className="content-heading"><span>附件{attachments.length ? ` · ${attachments.length}` : ''}</span><Button variant="ghost" size="sm" className="text-button" disabled={busy || changed || !connected} onClick={() => attachmentInput.current?.click()}><Paperclip size={13} />添加附件</Button><input className="attachment-input" ref={attachmentInput} type="file" multiple aria-label="选择附件" onChange={event => { const files = [...(event.currentTarget.files ?? [])]; event.currentTarget.value = ''; if (files.length) attach(files); }} /></div>{attachments.length ? <Markdown text={attachments.map(ref => `[${ref.label.replace(/[\\[\]]/g, '\\$&')}](${ref.href})`).join('\n\n')} /> : <p className="attachment-caption">添加图片或文件，单个文件最大 10 MB。</p>}</section>
       {changed && <div className="save-row"><span>有未保存的修改</span><Button disabled={busy} onClick={save}><Check size={14} />保存修改</Button></div>}
-      <div className="comments-heading"><h2>评论<span>{issue.comments.length}</span></h2><span>人类与 Agent 共用</span></div>
-      <div className="comments">{issue.comments.map((c, i) => { const parts = c.heading.split(' · '); const who = parts[1] ?? '评论'; return <div className="comment" key={i}><Avatar className="size-8"><AvatarFallback>{who.slice(0, 1).toUpperCase()}</AvatarFallback></Avatar><div className="comment-body"><div className="comment-meta"><strong>{who}</strong>{parts[2] && <Badge variant="outline">{parts[2]}</Badge>}<time>{parts[0]}</time></div><Markdown text={c.body} /></div></div>; })}{!issue.comments.length && <div className="no-comments">补充要求、讨论方案，或者记录工作进展。</div>}</div>
-      <form className="comment-compose" onSubmit={e => { e.preventDefault(); run(async () => { if (changed) throw new Error('请先保存名称、内容或属性修改，再追加评论'); await bridge.call('append_comment', { root: board.root, id: issue.id, revision: issue.revision, body: comment, author, actor: 'human' }); rememberAuthor(author); setComment(''); dirtyRef.current = false; onDirty(false); await onSaved(); notify('评论已追加'); }); }}><Textarea className="rounded-b-none border-0 bg-transparent shadow-none" aria-label="评论内容" placeholder="留下评论…" rows={3} value={comment} onChange={e => setComment(e.target.value)} /><div><label>作者<Input aria-label="评论作者" value={author} onChange={e => setAuthor(e.target.value)} /></label><span className="muted">human</span><Button disabled={busy || !comment.trim() || !author.trim()}>追加评论<CornerDownLeft size={14} /></Button></div></form>
+      <div className="comments-heading"><h2>评论<span>{issue.comments.length}</span></h2></div>
+      <div className="comments">{issue.comments.map((c, i) => { const parts = c.heading.split(' · '); const who = parts[1] ?? '评论'; const actor = parts[2]?.trim(); return <div className="comment" key={i}><Avatar className="size-8"><AvatarFallback>{who.slice(0, 1).toUpperCase()}</AvatarFallback></Avatar><div className="comment-body"><div className="comment-meta"><strong>{who}</strong>{actor && actor !== 'human' && <Badge variant="outline">{actor}</Badge>}<time>{parts[0]}</time></div><Markdown text={c.body} /></div></div>; })}{!issue.comments.length && <div className="no-comments">补充要求、讨论方案，或者记录工作进展。</div>}</div>
     </article>
     <aside className="detail-aside"><div className="aside-heading"><h2>属性</h2><Button variant="ghost" size="sm" className="text-button" onClick={() => setEditingProperties(!editingProperties)}><Pencil size={13} />{editingProperties ? '收起' : '编辑'}</Button></div><div className="status-control"><Label htmlFor="issue-status">状态</Label><Select value={issue.status} disabled={busy || changed} onValueChange={status => run(async () => { await bridge.call('update_issue', { root: board.root, id: issue.id, revision: issue.revision, properties: { [board.schema.statusKey]: status } }); dirtyRef.current = false; await onSaved(); notify('状态已保存'); })}><SelectTrigger id="issue-status" aria-label="Issue 状态"><SelectValue /></SelectTrigger><SelectContent position="popper">{board.columns.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent></Select></div>
       {editingProperties ? <><Textarea className="properties-editor code-input" aria-label="YAML 属性" rows={10} value={properties} onChange={e => setProperties(e.target.value)} /><p className="muted">保留任意属性。删除一行会删除该属性；状态列由状态属性推导。</p></> : <><PropertyList properties={issue.properties} board={board} onSelect={onSelect} /><Button variant="ghost" size="sm" className="add-property" onClick={() => setEditingProperties(true)}><Plus size={14} />添加属性</Button></>}
@@ -258,6 +262,7 @@ function Detail({ issue, board, busy, connected, onClose, onSelect, onDirty, run
       <div className="dispatch-box"><div className="dispatch-icon"><ArrowUpRight size={20} /></div><h3>在对话里继续</h3><p>把名称、属性与最新评论交给对话，一起完成这件事。</p><Button disabled={busy || !connected} onClick={() => setDispatchOpen(!dispatchOpen)}>分发到对话<ArrowUpRight size={14} /></Button>{dispatchOpen && <div className="dispatch-options"><Label htmlFor="dispatch-target">目标</Label><Select value={target} onValueChange={value => setTarget(value as 'active' | 'new')}><SelectTrigger id="dispatch-target" aria-label="分发目标"><SelectValue /></SelectTrigger><SelectContent position="popper"><SelectItem value="new">新对话</SelectItem><SelectItem value="active">当前对话</SelectItem></SelectContent></Select><Textarea rows={3} aria-label="分发指令" placeholder="补充这次对话要做的事（可选）" value={instruction} onChange={e => setInstruction(e.target.value)} /><p className="muted">点击发送会立即启动所选对话。</p>{!bridge.canDispatch(target) && <p className="dispatch-unavailable">当前页面没有可用的宿主对话能力。在已安装插件的页面中使用。</p>}<Button disabled={busy || !bridge.canDispatch(target)} onClick={() => run(async () => { if (changed || comment.trim()) throw new Error('请先保存修改或追加评论，再分发最新内容'); const data = await bridge.call('prepare_dispatch', { root: board.root, id: issue.id, instruction }); await bridge.send(data.prompt, target); notify(target === 'new' ? '已发送到新对话' : '已发送到当前对话'); setDispatchOpen(false); })}>发送并启动<ArrowUpRight size={14} /></Button></div>}</div>
       <div className="file-location"><FileText size={14} /><span>事实来源<code>issues/{issue.filename}</code></span></div>
     </aside>
+    </div><CommentComposer value={comment} author={author} busy={busy} onChange={setComment} onAuthorChange={setAuthor} onSubmit={() => run(async () => { if (changed) throw new Error('请先保存名称、描述或属性修改，再追加评论'); await bridge.call('append_comment', { root: board.root, id: issue.id, revision: issue.revision, body: comment, author: author.trim(), actor: 'human' }); rememberAuthor(author.trim()); setComment(''); dirtyRef.current = false; onDirty(false); await onSaved(); notify('评论已追加'); })} />
   </div></AttachmentProvider>;
 }
 

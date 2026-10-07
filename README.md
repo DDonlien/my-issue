@@ -14,6 +14,7 @@ myIssue 是项目内的 Markdown Issue 看板，也是可安装的 Codex 插件�
 - ChatGPT 风格的中性页面与弹窗。跟随宿主浅色/深色和语义颜色，未提供主题时跟随系统；焦点与链接使用宿主传入的交互颜色。
 - 左侧导航已移除；顶部名称菜单切换已有项目并添加项目，保留桌面项目名称。添加窗支持 macOS 文件夹浏览。
 - 同一电脑的所有面板共享项目列表与最近项目，新面板自动恢复；已打开的面板可各自查看不同项目。常用控件使用标准 shadcn/ui 组件。
+- 详情长名称完整换行，正文显示为“描述”。评论输入固定在主区底部，正文、评论和属性可滚动；作者默认使用本机用户名，不显示 human 标签或共享说明。
 
 无需 Issue 数据库、云账号或 myIssue 托管的 Agent Runtime。核心操作不依赖页面。许可证尚未选择；公开可见不代表授予开源许可。
 
@@ -42,7 +43,7 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.5.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.6.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
 
 已安装旧版时，重新执行安装命令更新，然后完全退出并重新启动 ChatGPT / Codex 桌面应用，见[官方本地插件更新流程](https://developers.openai.com/plugins/build/plugins)。仅关闭再打开 myIssue 页面不足以刷新旧对话保留的 MCP 服务进程。
 
@@ -125,7 +126,19 @@ parent: "[[issue-001]]"
 2. 从对话开始：调用 `get_issue` 读取最新内容和评论，按用户授权处理，再用 `append_comment` 追加实际进展或结果。
 3. 从看板分发：打开详情 → 分发到对话 → 选择当前/新对话 → 发送并启动。准备阶段重新读取文件；发送不修改 Issue 状态，也不把派发等同于工作完成。
 
-MCP 工具：`open_board`、`list_projects`、`list_issues`、`get_issue`、`create_issue`、`update_issue`、`append_comment`、`prepare_dispatch`、`upload_attachment`、`read_attachment`，以及 SDK 的 `search_mentions`。`browse_folder` 仅供页面的显式点击调用。Issue 工具接收绝对项目根目录；写入必须传入最近读取返回的 `revision`。
+MCP 工具：`open_board`、`list_projects`、`list_issues`、`get_issue`、`create_issue`、`update_issue`、`append_comment`、`prepare_dispatch`、`link_conversation`、`upload_attachment`、`read_attachment`，以及 SDK 的 `search_mentions`。`browse_folder` 仅供页面的显式点击调用。Issue 工具接收绝对项目根目录；写入必须传入最近读取返回的 `revision`。
+
+卡片底部的对话入口最多占 144px，长名称省略并保留完整名称提示；多个关联显示最近添加的对话和“+N”入口。点击链接直接打开目标，评论计数与卡片拖动保留。详情的“已分配对话 → 关联对话”可粘贴真实地址并填写名称，普通属性编辑也能维护或移除关联。
+
+关联只是可选的普通属性，旧 Issue 无需迁移，仍能脱离插件读取：
+
+```yaml
+conversations:
+  - title: 处理这个 Issue 的对话
+    url: codex://threads/实际对话ID
+```
+
+支持实际 HTTP/HTTPS 对话链接及 `codex://threads/<id>`。`link_conversation` 使用最新 revision 追加或更新关联，同一 URL 不重复，未知关联字段和既有评论保留；已存在的 `conversations` 不是列表时拒绝自动覆盖。接收分发的 Agent 在获得可信的当前对话 URL 后可调用此工具写回，缺少地址时跳过。公开发送接口没有承诺返回可跳转地址，匿名 `openai/session` 元数据也不能构造链接；页面不会根据发送成功或最近对话猜测目标。插件通过宿主 `openLink` 跳转，拒绝时报告并保留地址；Web 预览使用普通链接。
 
 ## 写入边界
 
@@ -154,6 +167,8 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 0.1.4 已安装并启用；独立交付源码通过构建、类型检查和 26 项自动测试，覆盖附件真实文件、版本冲突清理、目录限制、属性渲染及真实 SDK 下载协议。浏览器通过批量选择图片/文本、图片预览、下载内容核对、关系跳转、侧栏切换与浅色/深色检查。原生 MCP Apps 当前进程仍保留升级前页面，新版本须完全退出并重新打开桌面应用后确认；协议测试中的下载接收方是测试宿主，不能替代原生下载验收。真实新对话分发不在本次验证范围。
 
 0.1.5 已安装并启用；标准控件、移除左侧栏、顶部项目菜单和共享配置通过类型检查、34 项自动测试及实际 SDK 测试宿主的 16 项页面交互验证。两个独立 stdio 进程验证并发添加、不同插件数据目录、旧路径配置、重启恢复及失效目录；浅色/深色、主题更新、弹窗焦点与 390px 布局通过浏览器验证。测试宿主使用隔离项目，不替代重启后原生 ChatGPT 的页面验收。
+
+0.1.6 已安装并启用；详情名称换行、描述用语、默认用户名和底部固定评论输入通过独立构建、类型检查、34 项自动测试及 SDK 测试宿主的 8 项浏览器检查，覆盖 1201px/390px/短视口、标题伸缩、主题及真实评论写入。安装的 10 个文件与便携 ZIP 内容一致，原生桌面新版仍待重启后确认。
 
 ## 文档
 

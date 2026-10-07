@@ -5,10 +5,12 @@ import { execute, type Operation } from './service.js';
 import { IssueError } from './core.js';
 import { desktopProjects, chooseDesktopFolder } from './desktop.js';
 import { ProjectPreferences, sharedPreferencesFile, projectOrder } from './preferences.js';
+import { currentUsername } from './user.js';
 
 const port = Number(process.env.MYISSUE_PREVIEW_PORT ?? 4310);
 const projectRoot = path.resolve(process.env.MYISSUE_ROOT ?? process.cwd());
 const preferences = new ProjectPreferences(sharedPreferencesFile());
+const username = currentUsername();
 const html = await readFile(path.join(import.meta.dirname, '../plugins/myissue/assets/board.html'));
 const origin = `http://127.0.0.1:${port}`;
 const server = createServer(async (req, res) => {
@@ -39,14 +41,14 @@ const server = createServer(async (req, res) => {
       const projects = [];
       for (const project of candidates.values()) { try { if ((await stat(project.root)).isDirectory()) projects.push(project); } catch { /* Hide missing folders. */ } }
       projects.sort(projectOrder);
-      if (operation === 'list_projects') data = { projects, lastRoot: prefs.lastRoot };
+      if (operation === 'list_projects') data = { projects, lastRoot: prefs.lastRoot, username };
       else {
         const root = args.root ?? (process.env.MYISSUE_ROOT ? projectRoot : projects.some(project => project.root === prefs.lastRoot) ? prefs.lastRoot : projectRoot);
         const opened = await execute('open_board', { ...args, root });
         const project = projects.find(project => project.root === opened.board!.root) ?? { root: opened.board!.root, name: path.basename(opened.board!.root) };
         await preferences.remember(project);
         if (!projects.some(saved => saved.root === project.root)) projects.push(project);
-        data = { ...opened, projects: projects.sort(projectOrder) };
+        data = { ...opened, projects: projects.sort(projectOrder), username };
       }
     }
     else if (operation === 'browse_folder') data = { root: await chooseDesktopFolder() };

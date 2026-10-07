@@ -10,6 +10,7 @@ import { execute, inputs, type Operation } from './service.js';
 import { desktopProjects, chooseDesktopFolder, type DesktopProject } from './desktop.js';
 import { ProjectPreferences, projectOrder } from './preferences.js';
 import { version } from './version.js';
+import { currentUsername } from './user.js';
 
 // This is a persistent entrypoint identity, not a release/cache version. Desktop
 // tool inventories and conversation-specific MCP processes can refresh separately.
@@ -17,6 +18,7 @@ export const UI_URI = 'ui://myissue/board-v2.html';
 export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string, desktop: { projects: (refresh?: boolean) => Promise<DesktopProject[]>; chooseFolder: () => Promise<string | undefined> } = { projects: desktopProjects, chooseFolder: chooseDesktopFolder }, legacyPreferencesFile?: string) {
   const server = new McpServer({ name: 'myissue', version }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
   const extensions = new OpenAIExtensions(server);
+  const username = currentUsername();
   const knownRoots = new Set<string>(fallbackRoot ? [fallbackRoot] : []);
   const preferences = new ProjectPreferences(preferencesFile, legacyPreferencesFile);
   async function projects(refresh = false) {
@@ -37,7 +39,7 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     }
     const available = [];
     for (const root of candidates) { try { if ((await fs.stat(root)).isDirectory()) available.push({ root, name: names.get(root) ?? path.basename(root) }); } catch { /* Hide folders that no longer exist. */ } }
-    return { projects: available.sort(projectOrder), lastRoot: prefs.lastRoot };
+    return { projects: available.sort(projectOrder), lastRoot: prefs.lastRoot, username };
   }
   const readAnnotations = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
   const writeAnnotations = { readOnlyHint: false, destructiveHint: false, openWorldHint: false };
@@ -61,14 +63,14 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
   }, wrap(async args => {
     const { projects: list, lastRoot } = await projects();
     const chosenRoot = args.root ?? fallbackRoot ?? (lastRoot && list.some(project => project.root === lastRoot) ? lastRoot : undefined);
-    if (!chosenRoot) return { projects: list };
+    if (!chosenRoot) return { projects: list, username };
     const data = await execute('open_board', { ...args, root: chosenRoot });
     const root = data.board!.root;
     const project = list.find(project => project.root === root) ?? { root, name: path.basename(root) };
     await preferences.remember(project);
     knownRoots.add(root);
     if (!list.some(saved => saved.root === root)) list.push(project);
-    return { ...data, projects: list.sort(projectOrder) };
+    return { ...data, projects: list.sort(projectOrder), username };
   }));
   server.registerTool('list_projects', { description: 'Read the project configuration shared by all myIssue panels on this computer, saved desktop projects and host-shared folders. Cloud projects without a local directory cannot contain issues/*.md.', inputSchema: z.object({ refresh: z.boolean().optional() }), annotations: readAnnotations }, wrap(async args => projects(args.refresh ?? true)));
   server.registerTool('browse_folder', { title: '选择项目文件夹', description: 'Open the local system folder chooser after an explicit user click. Return a path without opening the board or changing issue files. Cancellation returns no path.', inputSchema: z.object({}), annotations: readAnnotations, _meta: { ui: { visibility: ['app'] } } }, wrap(async () => ({ root: await desktop.chooseFolder() })));

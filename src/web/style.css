@@ -88,7 +88,7 @@
 }
 
 @layer components {
-  .shell { display: flex; height: 100dvh; min-height: 480px; background: var(--background); }
+  .shell { display: flex; height: 100dvh; min-height: 0; background: var(--background); }
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; }
   .topbar { height: 60px; min-height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
   .project-trigger { max-width: min(70vw, 440px); padding-inline: 10px; font-size: 18px; font-weight: 600; gap: 10px; }
@@ -170,13 +170,14 @@
   .welcome p { font-size: 14px; color: var(--muted-fg); line-height: 1.9; margin: 18px 0 26px; }
   .welcome > span { font-size: 12px; color: var(--muted-fg); margin-top: 16px; }
 
-  .detail-layout { display: flex; flex: 1; min-height: 0; overflow: hidden; border-top: 1px solid var(--line); }
-  .detail-main { flex: 1; min-width: 0; overflow: auto; padding: 24px 40px 48px; }
+  .detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: minmax(0, 1fr) auto; flex: 1; min-height: 0; overflow: hidden; border-top: 1px solid var(--line); }
+  .detail-body { display: contents; }
+  .detail-main { grid-column: 1; grid-row: 1; min-width: 0; overflow: auto; padding: 24px 40px; }
   .detail-nav { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; color: var(--muted-fg); }
   .detail-nav code { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .detail-nav > button:last-child { margin-left: auto; }
   .text-button { color: var(--muted-fg); }
-  .issue-name { display: block; width: 100%; height: auto; font-size: 26px; font-weight: 600; letter-spacing: -.5px; border: 0; box-shadow: none; border-radius: 4px; padding: 6px 0; }
+  .issue-name { display: block; width: 100%; height: auto; min-height: 0; font-size: 26px; font-weight: 600; letter-spacing: -.5px; border: 0; box-shadow: none; border-radius: 4px; padding: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   .detail-meta { display: flex; align-items: center; gap: 14px; margin: 14px 0 28px; color: var(--muted-fg); font-size: 12px; flex-wrap: wrap; }
   .detail-meta > span { display: flex; align-items: center; gap: 5px; }
   .status-badge { border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
@@ -206,7 +207,6 @@
   .comments-heading { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 24px; margin: 28px 0 24px; gap: 12px; }
   .comments-heading h2 { margin: 0; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
   .comments-heading h2 span { font-size: 12px; color: var(--muted-fg); font-weight: 400; }
-  .comments-heading > span { font-size: 12px; color: var(--muted-fg); }
   .comment { display: flex; gap: 12px; margin-bottom: 24px; }
   .comment-body { flex: 1; min-width: 0; }
   .comment-meta { display: flex; align-items: center; gap: 8px; margin: 3px 0 10px; font-size: 13px; flex-wrap: wrap; }
@@ -214,13 +214,13 @@
   .comment-meta time { color: var(--muted-fg); font-size: 11px; margin-left: auto; }
   .comment-meta [data-slot="badge"] { color: var(--muted-fg); font-size: 10px; }
   .no-comments { color: var(--muted-fg); font-size: 13px; line-height: 1.8; margin: 0 0 24px; }
-  .comment-compose { border: 1px solid var(--line); border-radius: var(--radius); margin-top: 8px; }
-  .comment-compose > textarea { border: 0; box-shadow: none; min-height: 90px; padding: 14px; background: none; }
-  .comment-compose > div { display: flex; align-items: center; gap: 8px; padding: 12px; border-top: 1px solid var(--line); flex-wrap: wrap; }
-  .comment-compose label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted-fg); }
-  .comment-compose input { width: 90px; height: 30px; }
+  .comment-compose { grid-column: 1; grid-row: 2; flex-shrink: 0; border-top: 1px solid var(--line); margin: 0; padding: 12px 40px max(12px, env(safe-area-inset-bottom)); background: linear-gradient(var(--background), var(--background)), light-dark(#fff, #212121); }
+  .comment-compose > textarea { border: 0; box-shadow: none; min-height: 90px; max-height: min(180px, 24dvh); padding: 12px 0; background: none; }
+  .comment-compose > div { display: flex; align-items: center; gap: 8px; padding: 8px 0 0; flex-wrap: wrap; }
+  .comment-compose label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted-fg); white-space: nowrap; }
+  .comment-compose input { width: 120px; height: 30px; }
   .comment-compose button { margin-left: auto; }
-  .detail-aside { width: 300px; flex-shrink: 0; background: var(--background); border-left: 1px solid var(--line); padding: 24px; overflow: auto; }
+  .detail-aside { grid-column: 2; grid-row: 1 / span 2; min-width: 0; background: var(--background); border-left: 1px solid var(--line); padding: 24px; overflow: auto; }
   .aside-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   .aside-heading h2 { font-size: 15px; font-weight: 600; margin: 0; }
   .status-control { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
@@ -260,8 +260,10 @@
   .derived code { display: block; font-size: 11px; margin-top: 8px; overflow-wrap: anywhere; }
 
   @media (max-width: 1000px) {
+    .detail-layout { grid-template-columns: minmax(0, 1fr) 260px; }
     .detail-main { padding: 24px; }
-    .detail-aside { width: 260px; padding: 24px 18px; }
+    .detail-aside { padding: 24px 18px; }
+    .comment-compose { padding-inline: 24px; }
   }
   @media (max-width: 720px) {
     .topbar { padding: 0 10px; height: 56px; min-height: 56px; }
@@ -274,16 +276,17 @@
     .search { flex: 1; width: auto; min-width: 0; }
     .board { padding: 0 16px 16px; gap: 12px; }
     .column { flex-basis: 250px; }
-    .detail-layout { display: block; overflow: auto; }
+    .detail-layout { display: flex; flex-direction: column; }
+    .detail-body { display: block; flex: 1; min-height: 0; overflow: auto; }
     .detail-main { overflow: visible; padding: 20px 16px; }
     .detail-aside { width: 100%; border-left: 0; border-top: 1px solid var(--line); padding: 24px 16px; overflow: visible; }
+    .comment-compose { padding-inline: 16px; }
     .detail-nav { gap: 4px; flex-wrap: wrap; }
     .detail-nav code { display: none; }
     .issue-name { font-size: 22px; }
     .issue-list { margin: 0 16px; }
     .list-heading, .list-row { grid-template-columns: minmax(0, 1fr) 75px 32px; padding: 14px 8px; gap: 8px; }
     .list-row code { display: none; }
-    .comments-heading > span { font-size: 11px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
