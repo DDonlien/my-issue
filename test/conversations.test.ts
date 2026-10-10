@@ -10,7 +10,7 @@ import { AppBridge } from '@modelcontextprotocol/ext-apps/app-bridge';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { IssueStore } from '../src/core.js';
 import { execute } from '../src/service.js';
-import { conversationLinks, conversationUrl } from '../src/conversation-links.js';
+import { conversationLinks, conversationUrl, currentConversation } from '../src/conversation-links.js';
 import { openConversation } from '../src/conversation-navigation.js';
 import { ConversationLinks } from '../src/web/conversations.js';
 
@@ -28,14 +28,13 @@ async function fixture(t: test.TestContext) {
 test('linking a verified conversation persists ordinary properties and preserves original content/comments', async t => {
   const { root, raw, issue } = await fixture(t);
   const linked = await execute('link_conversation', { root, id: issue.id, revision: issue.revision, url, title: '开发 myIssue Codex 插件' });
-  assert.deepEqual(conversationLinks(linked.issue.properties), [{ url, title: '开发 myIssue Codex 插件' }]);
+  assert.deepEqual(currentConversation(linked.issue.properties), { url, title: '开发 myIssue Codex 插件' });
   assert.ok(linked.issue.raw.includes('status: todo # untouched\ncustom: "keep quotes"'));
   assert.equal(linked.issue.raw.slice(linked.issue.raw.indexOf('# Work')), raw.slice(raw.indexOf('# Work')));
   assert.equal(await readFile(path.join(root, 'issues/work.md'), 'utf8'), linked.issue.raw);
   assert.equal(linked.issue.status, 'todo');
   const again = await execute('link_conversation', { root, id: issue.id, revision: linked.issue.revision, url, title: '新的实际标题' });
-  assert.equal((again.issue.properties.conversations as unknown[]).length, 1);
-  assert.equal(conversationLinks(again.issue.properties)[0].title, '新的实际标题');
+  assert.deepEqual(again.issue.properties.current_conversation, { url, title: '新的实际标题' });
 });
 
 test('stale/competing association writes cannot overwrite a newer file', async t => {
@@ -52,10 +51,12 @@ test('stale/competing association writes cannot overwrite a newer file', async t
 
 test('unknown entries and metadata survive association updates; malformed existing property is not overwritten', async t => {
   const { root, store, issue } = await fixture(t);
-  const existing = await store.update(issue.id, issue.revision, { properties: { conversations: [{ url, title: 'Original', future: { keep: true } }, { futureSchema: 2 }] } });
+  const legacy = [{ url, title: 'Legacy', future: { keep: true } }, { futureSchema: 2 }];
+  const existing = await store.update(issue.id, issue.revision, { properties: { conversations: legacy, current_conversation: { url, title: 'Original', future: { keep: true } } } });
   const linked = await execute('link_conversation', { root, id: issue.id, revision: existing.revision, url, title: 'New' });
-  assert.deepEqual(linked.issue.properties.conversations, [{ url, title: 'New', future: { keep: true } }, { futureSchema: 2 }]);
-  const incompatible = await store.update(issue.id, linked.issue.revision, { properties: { conversations: { custom: 'unrecognized schema' } } });
+  assert.deepEqual(linked.issue.properties.conversations, legacy);
+  assert.deepEqual(linked.issue.properties.current_conversation, { url, title: 'New', future: { keep: true } });
+  const incompatible = await store.update(issue.id, linked.issue.revision, { properties: { current_conversation: ['unrecognized schema'] } });
   await assert.rejects(execute('link_conversation', { root, id: issue.id, revision: incompatible.revision, url }), { code: 'INVALID_CONVERSATIONS' });
   assert.equal((await store.get(issue.id)).raw, incompatible.raw);
 });
@@ -64,25 +65,29 @@ test('link derivation handles old files, duplicate URLs and invalid targets with
   assert.deepEqual(conversationLinks({ status: 'todo', session: 'anonymous-id' }), []);
   for (const invalid of ['javascript:alert(1)', 'data:text/html,test', 'file:///tmp/test', 'codex://review', 'codex://threads/', 'https://user:password@chatgpt.com/c/id']) assert.equal(conversationUrl(invalid), undefined);
   const links = conversationLinks({ conversations: [null, 'legacy', { url: 'javascript:alert(1)' }, { url, title: 'Valid' }, { url, title: 'Duplicate' }, { url: 'https://example.com/chat/2' }] });
-  assert.deepEqual(links, [{ url, title: 'Valid' }, { url: 'https://example.com/chat/2', title: '已分配对话' }]);
+  assert.deepEqual(links, [{ url, title: 'Valid' }, { url: 'https://example.com/chat/2', title: '对话' }]);
+  assert.equal(currentConversation({ conversations: links }), undefined);
+  assert.deepEqual(currentConversation({ conversations: links.slice(0, 1) }), links[0]);
+  assert.equal(currentConversation({ current_conversation: null, conversations: links.slice(0, 1) }), undefined);
 });
 
 test('custom schema mappings cannot be overwritten by an optional conversation property', async t => {
   const { root, store, issue } = await fixture(t);
-  for (const config of [{ statusKey: 'conversations' }, { parentKey: 'conversations' }, { dependenciesKey: 'conversations' }]) {
+  for (const config of [{ statusKey: 'current_conversation' }, { parentKey: 'current_conversation' }, { dependenciesKey: 'current_conversation' }, { name: { source: 'property', key: 'current_conversation' } }]) {
     await writeFile(path.join(root, '.myissue.json'), JSON.stringify(config));
-    await assert.rejects(execute('link_conversation', { root, id: issue.id, revision: issue.revision, url }), { code: 'INVALID_CONVERSATIONS' });
-    assert.equal((await store.get(issue.id)).raw, issue.raw);
+    const before = await readFile(path.join(root, 'issues/work.md'), 'utf8');
+    await assert.rejects(execute('link_conversation', { root, id: issue.id, revision: issue.revision, url }));
+    assert.equal(await readFile(path.join(root, 'issues/work.md'), 'utf8'), before);
   }
 });
 
-test('compact links show latest conversation, expose other targets and escape titles', () => {
-  const html = renderToStaticMarkup(React.createElement(ConversationLinks, { compact: true, properties: { conversations: [{ url, title: 'Older' }, { url: 'https://chatgpt.com/c/actual', title: '<script>long name</script>' }] } }));
+test('compact links show only the explicit current conversation and escape titles', () => {
+  const properties = { conversations: [{ url, title: 'Older' }], current_conversation: { url: 'https://chatgpt.com/c/actual', title: '<script>long name</script>' } };
+  const html = renderToStaticMarkup(React.createElement(ConversationLinks, { compact: true, properties }));
   assert.match(html, /class="card-conversations"/);
   assert.match(html, /href="https:\/\/chatgpt.com\/c\/actual"/);
   assert.match(html, /&lt;script&gt;long name&lt;\/script&gt;/);
-  assert.match(html, /查看其余 1 个对话/);
-  assert.match(html, /href="codex:\/\/threads\//);
+  assert.doesNotMatch(html, /查看其余|Older|codex:\/\/threads\//);
   assert.doesNotMatch(html, /<script>|<button/);
 });
 

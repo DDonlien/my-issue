@@ -7,7 +7,8 @@ import * as bridge from './bridge.js';
 import { Markdown, AttachmentProvider } from './markdown.js';
 import { PropertyList } from './properties.js';
 import { ConversationLinks, ConversationSection } from './conversations.js';
-import { CONVERSATIONS_PROPERTY } from '../conversation-links.js';
+import { CONVERSATION_PROPERTIES } from '../conversation-links.js';
+import { IssueComments } from './comments.js';
 import { MAX_ATTACHMENT_BYTES } from '../attachment-links.js';
 import type { Project } from '../preferences.js';
 import { ProjectMenu, ProjectDialog } from './project-menu.js';
@@ -16,7 +17,6 @@ import { Input } from './components/ui/input.js';
 import { Textarea } from './components/ui/textarea.js';
 import { Label } from './components/ui/label.js';
 import { Badge } from './components/ui/badge.js';
-import { Avatar, AvatarFallback } from './components/ui/avatar.js';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './components/ui/dialog.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs.js';
@@ -171,7 +171,7 @@ function App() {
           <TabsContent value="board" className="board-panel"><div className="board">{board.columns.map(column => <section key={column.value} className={'column ' + (dropColumn === column.value ? 'drop-target' : '')} style={{ '--column-color': column.color } as React.CSSProperties} aria-label={column.label} onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDropColumn(column.value); }} onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropColumn(undefined); }} onDrop={e => { e.preventDefault(); const issue = board.issues.find(i => i.id === e.dataTransfer.getData('text/plain')); if (issue) move(issue, column.value); setDropColumn(undefined); setDragging(undefined); }}>
             <div className="column-heading"><span className="status-dot" /><strong>{column.label}</strong><span className="count">{filtered.filter(i => i.status === column.value).length}</span><Button variant="ghost" size="icon-sm" title={'新建' + column.label + ' Issue'} aria-label={'新建' + column.label + ' Issue'} onClick={() => setCreating(column.value)}><Plus /></Button></div>
             <div className="cards">{filtered.filter(i => i.status === column.value).map(issue => <article key={issue.id} className={'issue-card ' + (dragging === issue.id ? 'dragging' : '')} draggable={!busy} onDragStart={e => { e.dataTransfer.setData('text/plain', issue.id); setDragging(issue.id); }} onDragEnd={() => { setDragging(undefined); setDropColumn(undefined); }} onClick={() => choose(issue.id)}>
-              <button type="button" className="card-open"><div className="card-id">{issue.id.startsWith('issue-') && issue.id.length > 20 ? issue.id.slice(0, 14) : issue.id}{issue.ready && <span className="ready-dot" title="依赖已满足，可开始" />}</div><h3>{issue.name}</h3>{issue.description && <p className="card-description">{issue.description.replace(/[#*`>]/g, '').slice(0, 110)}</p>}</button><div className="card-footer"><div className="chips">{Object.entries(issue.properties).filter(([k]) => ![board.schema.statusKey, 'id', CONVERSATIONS_PROPERTY].includes(k)).slice(0, 2).map(([k, v]) => <span key={k} className="chip" title={`${k}: ${short(v)}`}>{k}: {short(v)}</span>)}</div><ConversationLinks properties={issue.properties} compact onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} />{issue.comments.length > 0 && <span className="comment-count"><MessageSquare size={12} />{issue.comments.length}</span>}</div>
+              <button type="button" className="card-open"><div className="card-id">{issue.id.startsWith('issue-') && issue.id.length > 20 ? issue.id.slice(0, 14) : issue.id}{issue.ready && <span className="ready-dot" title="依赖已满足，可开始" />}</div><h3>{issue.name}</h3>{issue.description && <p className="card-description">{issue.description.replace(/[#*`>]/g, '').slice(0, 110)}</p>}</button><div className="card-footer"><div className="chips">{Object.entries(issue.properties).filter(([k]) => ![board.schema.statusKey, 'id', ...CONVERSATION_PROPERTIES].includes(k)).slice(0, 2).map(([k, v]) => <span key={k} className="chip" title={`${k}: ${short(v)}`}>{k}: {short(v)}</span>)}</div><ConversationLinks properties={issue.properties} compact onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} />{issue.comments.length > 0 && <span className="comment-count"><MessageSquare size={12} />{issue.comments.length}</span>}</div>
             </article>)}{filtered.every(i => i.status !== column.value) && <button className="empty-column" onClick={() => setCreating(column.value)}><Plus size={14} />添加 Issue</button>}</div>
           </section>)}</div></TabsContent><TabsContent value="list" className="list-panel"><div className="issue-list"><div className="list-heading"><span>名称</span><span>状态</span><span>评论</span></div>{filtered.map(issue => <button className="list-row" key={issue.id} onClick={() => choose(issue.id)}><span><Circle size={14} style={{ color: board.columns.find(c => c.value === issue.status)?.color }} /><strong>{issue.name}</strong><code>{issue.id.slice(0, 16)}</code></span><span>{board.columns.find(c => c.value === issue.status)?.label}</span><span><MessageSquare size={13} />{issue.comments.length}</span></button>)}{!filtered.length && <div className="empty-list">没有匹配的 Issue</div>}</div></TabsContent>
           </Tabs>
@@ -207,12 +207,13 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
   const [author, setAuthor] = useState(() => readAuthor(username));
   useEffect(() => { if (username) setAuthor(current => current || readAuthor(username)); }, [username]);
   const [sourceOpen, setSourceOpen] = useState(false);
+  const [linkingConversation, setLinkingConversation] = useState(false);
   const [draftRevision, setDraftRevision] = useState(issue.revision);
   const attachmentInput = useRef<HTMLInputElement>(null);
   const changed = name !== baseline.name || content !== baseline.description || properties !== stringify(baseline.properties);
   const dirtyRef = useRef(false);
   dirtyRef.current = changed || !!comment;
-  useEffect(() => { onDirty(changed || !!comment); }, [changed, comment]);
+  useEffect(() => { onDirty(changed || !!comment || linkingConversation); }, [changed, comment, linkingConversation]);
   useEffect(() => {
     if (!dirtyRef.current) { setBaseline(issue); setName(issue.name); setContent(issue.description); setProperties(stringify(issue.properties)); setDraftRevision(issue.revision); }
   }, [issue.revision]);
@@ -241,6 +242,18 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
       notify(`已添加 ${files.length} 个附件`);
     });
   }
+  async function link(url: string, title: string, commentId?: string) {
+    let failure: Error | undefined;
+    const saved = await run(async () => {
+      try {
+        if (changed || comment.trim()) throw new Error('请先保存修改或追加评论，再关联对话');
+        await bridge.call(commentId ? 'link_comment_conversation' : 'link_conversation', { root: board.root, id: issue.id, revision: issue.revision, url, ...(title ? { title } : {}), ...(commentId ? { commentId } : {}) });
+        await onSaved(); notify(commentId ? '评论对话已关联' : '当前对话已更新'); return true;
+      } catch (error) { failure = error as Error; throw error; }
+    });
+    if (failure) throw failure;
+    return !!saved;
+  }
   const col = board.columns.find(c => c.value === issue.status);
   return <AttachmentProvider root={board.root} id={issue.id} revision={issue.revision}><div className="detail-layout"><div className="detail-body">
     <article className="detail-main">
@@ -258,15 +271,11 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
       {editingContent ? <Textarea className="content-editor" rows={9} value={content} onChange={e => setContent(e.target.value)} aria-label="Issue 描述" /> : content ? <Markdown text={content} /> : <Button variant="ghost" className="empty-content" onClick={() => setEditingContent(true)}>补充这件事的上下文…</Button>}
       {changed && <div className="save-row"><span>有未保存的修改</span><Button disabled={busy} onClick={save}><Check size={14} />保存修改</Button></div>}
       <div className="comments-heading"><h2>评论<span>{issue.comments.length}</span></h2></div>
-      <div className="comments">{issue.comments.map((c, i) => { const parts = c.heading.split(' · '); const who = parts[1] ?? '评论'; const actor = parts[2]?.trim(); return <div className="comment" key={i}><Avatar className="size-8"><AvatarFallback>{who.slice(0, 1).toUpperCase()}</AvatarFallback></Avatar><div className="comment-body"><div className="comment-meta"><strong>{who}</strong>{actor && actor !== 'human' && <Badge variant="outline">{actor}</Badge>}<time>{parts[0]}</time></div><Markdown text={c.body} /></div></div>; })}{!issue.comments.length && <div className="no-comments">补充要求、讨论方案，或者记录工作进展。</div>}</div>
+      <IssueComments comments={issue.comments} properties={issue.properties} disabled={busy || changed || !!comment.trim()} onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} onEditing={setLinkingConversation} onLink={(commentId, url, title) => link(url, title, commentId)} />
       </div>
     </article>
     <aside className="detail-aside">
-      <ConversationSection properties={issue.properties} disabled={busy || changed || !!comment.trim()} onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} onLink={async (url, title) => !!await run(async () => {
-        if (changed || comment.trim()) throw new Error('请先保存修改或追加评论，再关联对话');
-        await bridge.call('link_conversation', { root: board.root, id: issue.id, revision: issue.revision, url, ...(title ? { title } : {}) });
-        await onSaved(); notify('对话已关联'); return true;
-      })} />
+      <ConversationSection properties={issue.properties} disabled={busy || changed || !!comment.trim()} onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} onEditing={setLinkingConversation} onLink={link} />
       <DispatchPanel root={board.root} id={issue.id} busy={busy} connected={connected} hasDraft={changed || !!comment.trim()} run={run} onSaved={onSaved} notify={notify} />
     </aside>
     </div><CommentComposer value={comment} author={author} busy={busy} onChange={setComment} onAuthorChange={setAuthor} onSubmit={() => run(async () => { if (changed) throw new Error('请先保存名称、描述或属性修改，再追加评论'); await bridge.call('append_comment', { root: board.root, id: issue.id, revision: issue.revision, body: comment, author: author.trim(), actor: 'human' }); rememberAuthor(author.trim()); setComment(''); dirtyRef.current = false; onDirty(false); await onSaved(); notify('评论已追加'); })} />
