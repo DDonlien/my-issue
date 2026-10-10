@@ -82,14 +82,15 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     get_issue: 'Read one issue by its filename stem and return the current content and revision.',
     create_issue: 'Create a new issue in project-root/issues/*.md from this conversation. Name, arbitrary YAML properties and optional free Markdown content.',
     update_issue: 'Update an issue name, free content or selected YAML properties with revision checking. Existing comments remain immutable. Removing properties must be explicit.',
-    append_comment: 'Append a shared human/Agent comment to the issue file. Pass the actual author and human or actual available model identifier.',
+    append_comment: 'Append a human/Agent comment with the exact available model variant (e.g. gpt-6.1-sol), never just gpt-6. Use unknown if unavailable. Pass conversation to record this comment’s verified source, independently of the issue current conversation. Comment and source are saved atomically; existing comments never change.',
     prepare_dispatch: 'Read the latest issue and prepare context for a user-requested conversation dispatch. This tool alone does not send or start a conversation.',
-    link_conversation: 'Associate an actual conversation URL and optional verified title with this issue. Use the latest revision. After receiving a dispatched issue, record your own conversation only if its real URL is available; never guess it from anonymous session IDs or recent chats. Adds or updates an optional conversations YAML property and preserves existing comments. Does not send messages or manage sessions.',
+    link_conversation: 'Set the single conversation currently executing this issue using a verified URL and title. Use the latest revision. Never guess from anonymous session IDs or recent chats. Writes optional current_conversation YAML; preserves historical comment sources and legacy associations. Does not send messages or manage sessions.',
+    link_comment_conversation: 'Associate this exact comment’s verified source conversation using commentId from get_issue and the latest revision. Writes optional comment_conversations YAML without changing comment text or the issue current conversation. Optional model refines an incomplete historical label only after verifying the exact original writing turn and model. Never guess historical origins or versions.',
     upload_attachment: 'Save a Base64-encoded file in issues/attachments and append its relative Markdown link to the issue description. Requires the latest revision. Preserves existing comments and unrelated properties. Maximum 10 MB per file.',
     read_attachment: 'Read an attachment referenced by this issue description or comments. Only local attachments/ paths and regular files are allowed. Returns file metadata and Base64 data.',
   };
   for (const operation of Object.keys(descriptions) as Exclude<Operation, 'open_board'>[]) {
-    server.registerTool(operation, { description: descriptions[operation], inputSchema: inputs[operation], annotations: ['create_issue', 'update_issue', 'append_comment', 'upload_attachment', 'link_conversation'].includes(operation) ? writeAnnotations : readAnnotations }, wrap(async args => {
+    server.registerTool(operation, { description: descriptions[operation], inputSchema: inputs[operation], annotations: ['create_issue', 'update_issue', 'append_comment', 'upload_attachment', 'link_conversation', 'link_comment_conversation'].includes(operation) ? writeAnnotations : readAnnotations }, wrap(async args => {
       knownRoots.add(args.root);
       return await execute(operation, args);
     }));

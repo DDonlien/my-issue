@@ -108,7 +108,7 @@ test('MCP dispatch records a verified association only after host acceptance and
   assert.equal(result.sent, true);
   assert.match(sent.at(-1).prompt, /这次的指令/); assert.match(sent.at(-1).prompt, /已有评论/);
   const linked = await store.get(issue.id);
-  assert.deepEqual(linked.properties.conversations, [{ url: accepted.conversation.url, title: thread.name }]);
+  assert.deepEqual(linked.properties.current_conversation, { url: accepted.conversation.url, title: thread.name });
   assert.deepEqual(linked.comments, issue.comments); assert.deepEqual(linked.properties.custom, { keep: true });
   raced = true;
   const racedResult = (await call('dispatch_to_conversation', args)).structuredContent as any;

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Board } from '../core.js';
+import { CONVERSATION_PROPERTIES } from '../conversation-links.js';
 
 export function PropertyValue({ value, board, onSelect, ancestors = [] }: { value: unknown; board: Board; onSelect: (id: string) => void; ancestors?: unknown[] }) {
   if (value === null || value === undefined) return <span className="property-empty">空值</span>;
@@ -24,5 +25,6 @@ export function PropertyValue({ value, board, onSelect, ancestors = [] }: { valu
 }
 
 export function PropertyList({ properties, board, onSelect }: { properties: Record<string, unknown>; board: Board; onSelect: (id: string) => void }) {
-  return <dl className="property-list">{Object.entries(properties).filter(([key]) => key !== board.schema.statusKey).map(([key, value]) => <div className="property" key={key}><dt>{key}</dt><dd><PropertyValue value={value} board={board} onSelect={onSelect} /></dd></div>)}</dl>;
+  const mapped = [board.schema.parentKey, board.schema.dependenciesKey, ...(board.schema.name.source === 'property' ? [board.schema.name.key] : [])];
+  return <dl className="property-list">{Object.entries(properties).filter(([key]) => key !== board.schema.statusKey && (!CONVERSATION_PROPERTIES.includes(key) || mapped.includes(key))).map(([key, value]) => <div className="property" key={key}><dt>{key}</dt><dd><PropertyValue value={value} board={board} onSelect={onSelect} /></dd></div>)}</dl>;
 }

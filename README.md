@@ -6,7 +6,7 @@ myIssue 是项目内的 Markdown Issue 看板，也是可安装的 Codex 插件�
 
 - 状态看板与列表，搜索名称、属性、自由内容和评论，状态筛选及可开始视图。
 - 创建真实文件，修改名称与自由 Markdown，编辑任意 YAML 属性，拖动卡片改变状态。
-- 详情页按名称、属性、描述、评论排列；完整渲染任意属性、追加式人类/Agent 评论，并可查看源文件。
+- 详情页按名称、属性、描述、评论排列；完整渲染任意属性、追加式人类/Agent 评论，并可查看源文件。当前执行对话与每条 AI 评论的来源独立显示，评论旁可直接跳转。
 - 上传图片和文件附件，保存到项目内，在描述和评论正文直接预览图片、Markdown 和文本，其他文件显示下载卡片。
 - 标准 MCP Apps 全局独立入口和对话侧栏入口，以及 Issue composer mention 搜索。
 - 分发目标读取真实 Codex 对话名称。当前/新对话通过官方消息能力发送；已有对话通过宿主公开控制接口定向发送，按接口是否可用启用按钮。对话通过 MCP 工具创建或开始处理 Issue。
@@ -43,7 +43,7 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.10.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.11.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
 
 已安装旧版时，重新执行安装命令更新，然后完全退出并重新启动 ChatGPT / Codex 桌面应用，见[官方本地插件更新流程](https://developers.openai.com/plugins/build/plugins)。仅关闭再打开 myIssue 页面不足以刷新旧对话保留的 MCP 服务进程。
 
@@ -134,24 +134,32 @@ parent: "[[issue-001]]"
 2. 从对话开始：调用 `get_issue` 读取最新内容和评论，按用户授权处理，再用 `append_comment` 追加实际进展或结果。
 3. 从看板分发：打开详情 → 分发到对话 → 选择当前/新对话 → 发送并启动。准备阶段重新读取文件；发送不修改 Issue 状态，也不把派发等同于工作完成。
 
-MCP 工具：`open_board`、`list_projects`、`list_issues`、`get_issue`、`create_issue`、`update_issue`、`append_comment`、`prepare_dispatch`、`link_conversation`、`upload_attachment`、`read_attachment`，以及 SDK 的 `search_mentions`。`browse_folder` 仅供页面的显式点击调用。Issue 工具接收绝对项目根目录；写入必须传入最近读取返回的 `revision`。
+MCP 工具：`open_board`、`list_projects`、`list_issues`、`get_issue`、`create_issue`、`update_issue`、`append_comment`、`prepare_dispatch`、`link_conversation`、`link_comment_conversation`、`upload_attachment`、`read_attachment`，以及 SDK 的 `search_mentions`。`browse_folder` 仅供页面的显式点击调用。Issue 工具接收绝对项目根目录；写入必须传入最近读取返回的 `revision`。
 
-卡片底部的对话入口最多占 144px，长名称省略并保留完整名称提示；多个关联显示最近添加的对话和“+N”入口。点击链接直接打开目标，评论计数与卡片拖动保留。详情的“已分配对话 → 关联对话”可粘贴真实地址并填写名称，普通属性编辑也能维护或移除关联。
+对话分为两类。卡片底部和详情侧栏的“当前对话”只表示目前执行这个 Issue 的单个对话；每条 AI 评论旁有自己的来源链接与更换入口。切换当前对话不改变历史评论来源，新增评论也不会自动继承当前对话。关联使用标准弹窗，输入实际链接和名称；打开弹窗期间暂停自动刷新，冲突保留输入。
 
-关联只是可选的普通属性，旧 Issue 无需迁移，仍能脱离插件读取：
+关联保存为可选普通 YAML 属性，正文评论仍保持原结构：
 
 ```yaml
-conversations:
-  - title: 处理这个 Issue 的对话
-    url: codex://threads/实际对话ID
+current_conversation:
+  title: 当前处理这个 Issue 的对话
+  url: codex://threads/实际对话ID
+comment_conversations:
+  comment-实际内容哈希:
+    title: 写下这条评论的对话
+    url: codex://threads/评论来源对话ID
 ```
 
-支持实际 HTTP/HTTPS 对话链接及 `codex://threads/<id>`。`link_conversation` 使用最新 revision 追加或更新关联，同一 URL 不重复，未知关联字段和既有评论保留；已存在的 `conversations` 不是列表、或被 Schema 映射为名称/状态/关系时拒绝自动覆盖。接收分发的 Agent 在获得可信的当前对话 URL 后可调用此工具写回，缺少地址时跳过。公开发送接口没有承诺返回可跳转地址，匿名 `openai/session` 元数据也不能构造链接；页面不会根据发送成功或最近对话猜测目标。插件通过宿主 `openLink` 跳转，拒绝时报告并保留地址；Web 预览使用普通链接。
+`get_issue` 为每条评论返回由标题和正文派生的稳定 `id`。`append_comment` 可接收 `conversation: {url, title}`，在一次锁与 revision 检查中保存评论及其来源；没有可信地址时省略，不填当前执行对话。`link_comment_conversation` 用返回的评论 ID 为历史评论补充来源，Markdown 标题和正文保持原文。新评论 actor 使用实际完整模型名，如 `gpt-6-sol`、`gpt-6-luna`、`gpt-6.1-sol`；gpt-6 家族名会拒绝写入，缺少身份时使用 `unknown` 并说明。旧评论若从原始写入时间和对话核实了模型，可在关联工具中传入可选 `model` 校正显示；已经精确的历史模型不能被此操作换成另一版本。不猜测历史版本。
+
+`link_conversation` 设置 `current_conversation`，保留历史评论来源和旧 `conversations` 列表。旧文件无需迁移：未显式设置当前对话且旧列表只有一个有效关联时兼容显示，多条旧关联不猜测当前目标。显式设置 `current_conversation: null` 清除当前显示。不可解析的目标属性、未知评论 ID 或关联字段被 Schema 映射为名称/状态/关系时拒绝自动覆盖。普通 YAML 编辑仍可维护或移除关联。
+
+支持实际 HTTP/HTTPS 对话链接及 `codex://threads/<id>`。接收分发的 Agent 在获得可信的当前对话 URL 后可调用关联工具写回，缺少地址时跳过。公开发送接口没有承诺返回可跳转地址，匿名 `openai/session` 元数据也不能构造链接；页面不会根据发送成功或最近对话猜测目标。插件通过宿主 `openLink` 跳转，拒绝时报告并保留地址；Web 预览使用普通链接。
 
 ## 写入边界
 
 - 结构化修改保留未涉及的 YAML 与 Markdown；既有评论只能读取，新增评论只能追加。
-- 新评论保存带时区 ISO 8601 时间、作者和 `human` 或实际模型标识。正文中的非代码标题使用四级及更深标题，避免与评论条目三级标题混淆。旧评论原文不重写。
+- 新评论保存带时区 ISO 8601 时间、作者和 `human` 或包含具体版本的完整模型标识。正文中的非代码标题使用四级及更深标题，避免与评论条目三级标题混淆。旧评论原文不重写。
 - 插件进程间使用每文件 `.lock` 目录串行写入，检查版本后原子替换。同一版本的竞争写入只有一个成功。
 - 普通编辑器不参与锁协议。写入前检测到外部修改即失败并保留页面草稿，但普通文件系统没有对不参与协议的外部写者提供绝对的比较并交换保证。
 - 崩溃遗留 `.lock` 不会自动抢占。先确认没有写入者，再手工移除对应锁目录。Issue 本身不受影响。
