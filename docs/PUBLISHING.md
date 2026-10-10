@@ -8,6 +8,8 @@ myIssue 0.1.9 是读取和修改本机项目文件的 stdio MCP 插件。`issues
 
 仓库 https://github.com/DDonlien/my-issue 已公开。公开源码、生成 ZIP、GitHub Release、提交目录审核和目录正式上架是不同的状态。当前发布状态应从 GitHub 和提交平台读回确认。
 
+已建立 [v0.1.9 GitHub 发布草稿](https://github.com/DDonlien/my-issue/releases/tag/untagged-4aad75897b5248480cc0)，尚未公开发布。2026-10-10 读回 `draft=true`、目标提交 `01f0d4b552bde6cf3e837a72d631f402759b16fd`；ZIP 与校验文件均为 uploaded，ZIP 的平台 SHA-256 与本地一致。许可证与发布渠道仍等待用户选择。
+
 ## GitHub 本地安装版
 
 发布材料：

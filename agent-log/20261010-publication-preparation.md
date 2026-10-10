@@ -33,4 +33,7 @@
 
 ## 交付状态
 
-发布草稿、提交与推送状态将在完成后补充。目录提交和公开发布尚未完成；许可证与发布渠道等待用户答复。
+- 准备文档提交 01f0d4b552bde6cf3e837a72d631f402759b16fd 已推送独立分支 codex/publication-preparation，GitHub API 读回分支对象一致。主目录当前开发中的 0.1.10 未提交进本次候选版本。
+- 已建立 GitHub Release 草稿：https://github.com/DDonlien/my-issue/releases/tag/untagged-4aad75897b5248480cc0 。实际读回 tagName=v0.1.9、isDraft=true、isPrerelease=true、targetCommitish=01f0d4b552bde6cf3e837a72d631f402759b16fd；两项附件均 uploaded，ZIP digest 与上面本地 SHA-256 一致。
+- HTTPS Git 推送出现 LibreSSL 连接失败，使用同一仓库的已配置 SSH 认证和严格主机校验成功推送；没有关闭 TLS 校验或修改用户网络/认证配置。一次 GitHub API 读回 EOF 后重试成功。
+- 目录提交和公开发布尚未完成；许可证与发布渠道等待用户答复。草稿是可检查的准备结果，不是已上架或已公开的发行版。
