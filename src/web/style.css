@@ -232,8 +232,9 @@
   .comment-compose input { width: 120px; height: 30px; }
   .comment-compose button { margin-left: auto; }
   .detail-aside { grid-column: 2; grid-row: 1 / span 2; min-width: 0; background: var(--background); border-left: 1px solid var(--line); padding: 24px; overflow: auto; }
-  .aside-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .aside-heading h2 { font-size: 15px; font-weight: 600; margin: 0; }
+  .detail-properties { min-width: 0; margin-bottom: 28px; }
+  .properties-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .properties-heading h2 { font-size: 15px; font-weight: 600; margin: 0; }
   .status-control { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
   .status-control label { color: var(--muted-fg); font-size: 13px; }
   .property { display: grid; grid-template-columns: minmax(65px, .75fr) minmax(0, 1.25fr); gap: 12px; margin: 16px 0; font-size: 13px; line-height: 1.6; }
@@ -251,7 +252,7 @@
   .property-missing { color: var(--warning); }
   .add-property { color: var(--muted-fg); }
   .properties-editor { min-height: 160px; }
-  .detail-aside > .muted { margin-top: 8px; line-height: 1.8; }
+  .detail-properties > .muted { margin-top: 8px; line-height: 1.8; }
   .dispatch-box { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 24px; }
   .dispatch-box > button { width: 100%; justify-content: space-between; }
   .dispatch-options { margin-top: 20px; }
