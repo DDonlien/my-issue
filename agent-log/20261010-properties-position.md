@@ -24,4 +24,7 @@
 
 ## Git
 
-- 起始 main 与 origin/main 均为 d6b9511，工作区干净；只暂存本次源文件、文档和构建产物，保留之后出现的其他未提交工作。提交和推送结果待记录。
+- 起始 main 与 origin/main 均为 d6b9511，工作区干净；只暂存本次源文件、文档和构建产物，保留之后出现的其他未提交工作。
+- 实现提交：077717f7e1f2813a1a16c26ecf59346d2d5c3d2c（fix: show detail properties before description）。
+- 首次 HTTPS 推送遇到 LibreSSL SSL_ERROR_SYSCALL；使用 HTTP/1.1 重试成功，origin/main 从 d6b9511 更新至 077717f。
+- 已向原始 Issue 追加实现和验证记录；状态原为 in_review，保持待验收。交付日志通过单独文档提交记录。
