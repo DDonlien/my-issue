@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Columns3, List, Search, Plus, MessageSquare, X, Folder, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2, Paperclip } from 'lucide-react';
 import { parseDocument, stringify } from 'yaml';
 import type { Board, Issue } from '../core.js';
 import * as bridge from './bridge.js';
 import { Markdown, AttachmentProvider } from './markdown.js';
-import { PropertyList } from './properties.js';
+import { createPropertyRows, parsePropertyRows, PropertyList, PropertyRowsEditor, type PropertyDraftRow } from './properties.js';
 import { ConversationLinks, ConversationSection } from './conversations.js';
 import { CONVERSATION_PROPERTIES } from '../conversation-links.js';
 import { IssueComments } from './comments.js';
@@ -17,7 +17,7 @@ import { Input } from './components/ui/input.js';
 import { Textarea } from './components/ui/textarea.js';
 import { Label } from './components/ui/label.js';
 import { Badge } from './components/ui/badge.js';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './components/ui/dialog.js';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './components/ui/dialog.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select.js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs.js';
 import { Toggle } from './components/ui/toggle.js';
@@ -183,10 +183,98 @@ function App() {
 }
 
 type Run = <T>(action: () => Promise<T>) => Promise<T | undefined>;
+interface PendingAttachment { marker: string; file: File }
+function clipboardMedia(event: React.ClipboardEvent<HTMLTextAreaElement>): File[] {
+  const isMedia = (file: File) => /^(image|video)\//i.test(file.type) || /\.(?:png|jpe?g|gif|webp|avif|bmp|mp4|m4v|mov|webm|ogv|mkv)$/i.test(file.name);
+  const items = [...event.clipboardData.items].filter(item => item.kind === 'file').map(item => item.getAsFile()).filter((file): file is File => !!file);
+  const candidates = items.length ? items : [...event.clipboardData.files];
+  return [...new Set(candidates.filter(isMedia))];
+}
+function markdownLabel(name: string) { return name.replace(/[\\[\]`!*_<>]/g, '\\$&'); }
+function normalizePastedFile(file: File, id: string): File {
+  const extension = ({ 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp', 'image/avif': 'avif', 'image/bmp': 'bmp', 'video/mp4': 'mp4', 'video/x-m4v': 'm4v', 'video/quicktime': 'mov', 'video/webm': 'webm', 'video/ogg': 'ogv', 'video/x-matroska': 'mkv' } as Record<string, string>)[file.type.toLowerCase()];
+  if (!extension) return file;
+  const existing = /\.([^.]+)$/.exec(file.name)?.[1]?.toLowerCase();
+  const valid = existing === extension || (extension === 'jpg' && existing === 'jpeg');
+  if (valid) return file;
+  const stem = file.name.replace(/\.[^.]*$/, '') || `pasted-${id}`;
+  return new File([file], `${stem}.${extension}`, { type: file.type, lastModified: file.lastModified });
+}
+function preparePastedMedia(event: React.ClipboardEvent<HTMLTextAreaElement>, content: string, setContent: (value: string) => void, onFiles: (files: PendingAttachment[]) => void, onError: (message: string) => void): boolean {
+  const files = clipboardMedia(event);
+  if (!files.length) return false;
+  event.preventDefault();
+  if (files.some(file => file.size > MAX_ATTACHMENT_BYTES)) { onError('单个图片或视频不能超过 10 MB'); return true; }
+  const pending = files.map(file => { const id = crypto.randomUUID(); const normalized = normalizePastedFile(file, id); return { file: normalized, marker: `![${markdownLabel(normalized.name)}](pending:${id})` }; });
+  const target = event.currentTarget;
+  const start = target.selectionStart;
+  const end = target.selectionEnd;
+  const insertion = pending.map(item => item.marker).join('\n');
+  setContent(content.slice(0, start) + insertion + content.slice(end));
+  onFiles(pending);
+  requestAnimationFrame(() => { target.focus(); const caret = start + insertion.length; target.setSelectionRange(caret, caret); });
+  return true;
+}
 function CreateModal({ status, board, busy, run, close, created }: { status: string; board: Board; busy: boolean; run: Run; close: () => void; created: (issue: Issue) => Promise<void> }) {
-  const [name, setName] = useState(''); const [content, setContent] = useState(''); const [props, setProps] = useState(stringify({ [board.schema.statusKey]: status }));
+  const [name, setName] = useState(''); const [content, setContent] = useState(''); const [rows, setRows] = useState<PropertyDraftRow[]>(() => createPropertyRows({ [board.schema.statusKey]: status }));
+  const [pending, setPending] = useState<PendingAttachment[]>([]); const [completed, setCompleted] = useState<Record<string, string>>({}); const [createdIssue, setCreatedIssue] = useState<Issue>(); const [pasteError, setPasteError] = useState(''); const [uploadError, setUploadError] = useState('');
   const input = useRef<HTMLInputElement>(null);
-  return <Dialog open onOpenChange={open => { if (!open) close(); }}><DialogContent className="create-dialog rounded-2xl" showCloseButton={false} onOpenAutoFocus={event => { event.preventDefault(); input.current?.focus(); }}><DialogHeader><DialogTitle>新建 Issue</DialogTitle><DialogDescription>写下需要完成的事，再补充描述和属性。</DialogDescription></DialogHeader><form className="dialog-form" onSubmit={e => { e.preventDefault(); run(async () => { const data = await bridge.call('create_issue', { root: board.root, name, description: content, properties: yaml(props) }); await created(data.issue); }); }}><div className="field"><Label htmlFor="create-name">名称</Label><Input ref={input} id="create-name" required placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></div><div className="field"><Label htmlFor="create-content">描述 <span className="muted">可选 · Markdown</span></Label><Textarea id="create-content" rows={5} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} /></div><div className="field"><Label htmlFor="create-properties">属性 <span className="muted">YAML</span></Label><Textarea id="create-properties" className="code-input" rows={4} value={props} onChange={e => setProps(e.target.value)} /></div><DialogFooter><DialogClose asChild><Button type="button" variant="outline">取消</Button></DialogClose><Button disabled={busy || !name.trim()}>{busy ? <Loader2 className="animate-spin" /> : <Plus />}创建 Issue</Button></DialogFooter></form></DialogContent></Dialog>;
+  const propertySuggestions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const issue of board.issues) for (const key of Object.keys(issue.properties)) counts.set(key, (counts.get(key) ?? 0) + 1);
+    const schemaKeys = [board.schema.parentKey, board.schema.dependenciesKey, ...(board.schema.name.source === 'property' ? [board.schema.name.key] : [])];
+    for (const key of schemaKeys) if (key) counts.set(key, counts.get(key) ?? 0);
+    return [...counts.entries()].filter(([key]) => key !== board.schema.statusKey).sort(([keyA, countA], [keyB, countB]) => countB - countA || keyA.localeCompare(keyB)).map(([key]) => key);
+  }, [board.issues, board.schema]);
+  function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    setPasteError('');
+    preparePastedMedia(event, content, setContent, files => setPending(current => [...current, ...files]), setPasteError);
+  }
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setUploadError('');
+    void run(async () => {
+      const properties = parsePropertyRows(rows);
+      let latest: Issue;
+      const uploaded = { ...completed };
+      if (!createdIssue) {
+        const data = await bridge.call('create_issue', { root: board.root, name, description: pending.reduce((value, item) => value.replace(item.marker, ''), content), properties });
+        latest = data.issue;
+        setCreatedIssue(latest);
+      } else {
+        latest = (await bridge.call('get_issue', { root: board.root, id: createdIssue.id })).issue;
+        setCreatedIssue(latest);
+      }
+      if (pending.length) {
+        try {
+          for (const item of pending) {
+            if (uploaded[item.marker]) continue;
+            const data = await bridge.call('upload_attachment', { root: board.root, id: latest.id, revision: latest.revision, name: item.file.name, data: await fileData(item.file) });
+            latest = data.issue;
+            uploaded[item.marker] = data.attachment.markdown;
+            setCompleted({ ...uploaded });
+            setCreatedIssue(latest);
+          }
+          const description = pending.reduce((value, item) => value.replace(item.marker, uploaded[item.marker] ?? ''), content);
+          const originalProperties = createdIssue?.properties ?? latest.properties;
+          const patch: Record<string, unknown> = {};
+          for (const [key, value] of Object.entries(properties)) if (JSON.stringify(value) !== JSON.stringify(originalProperties[key])) patch[key] = value;
+          const removeProperties = Object.keys(originalProperties).filter(key => !Object.hasOwn(properties, key));
+          if (description !== latest.description || name !== latest.name || Object.keys(patch).length || removeProperties.length) {
+            latest = (await bridge.call('update_issue', { root: board.root, id: latest.id, revision: latest.revision, ...(name !== latest.name ? { name } : {}), ...(description !== latest.description ? { description } : {}), properties: patch, removeProperties })).issue;
+          }
+          setCreatedIssue(latest);
+        } catch (error) {
+          setCreatedIssue(latest);
+          const message = `Issue 已创建，附件上传未完成：${error instanceof Error ? error.message : String(error)}。再次点击可继续，不会重复创建。`;
+          setUploadError(message);
+          throw new Error(message);
+        }
+      }
+      await created(latest);
+    });
+  }
+  return <Dialog open onOpenChange={open => { if (!open) close(); }}><DialogContent className="create-dialog rounded-2xl" showCloseButton={false} onOpenAutoFocus={event => { event.preventDefault(); input.current?.focus(); }}><DialogHeader><DialogTitle>新建 Issue</DialogTitle><DialogDescription>写下需要完成的事，再补充描述和属性。</DialogDescription></DialogHeader><form className="dialog-form" onSubmit={submit}><div className="field"><Label htmlFor="create-name">名称</Label><Input ref={input} id="create-name" required disabled={busy || !!createdIssue} placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></div><div className="field"><Label htmlFor="create-content">描述 <span className="muted">可选 · Markdown，可粘贴图片或视频</span></Label><Textarea id="create-content" rows={5} disabled={busy || !!createdIssue} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} onPaste={handlePaste} /></div><div className="field"><Label>属性</Label><PropertyRowsEditor rows={rows} suggestions={propertySuggestions} disabled={busy || !!createdIssue} onChange={setRows} /></div>{pasteError && <p className="dialog-error" role="alert">{pasteError}</p>}{uploadError && <p className="dialog-error" role="alert">{uploadError}</p>}{createdIssue && <p className="muted" role="status">Issue 已创建；附件还未全部完成，继续操作不会重复创建。</p>}<DialogFooter><Button type="button" variant="outline" disabled={busy} onClick={() => { if (createdIssue) void created(createdIssue); else close(); }}>{createdIssue ? '打开已创建的 Issue' : '取消'}</Button><Button disabled={busy || !name.trim()}>{busy ? <Loader2 className="animate-spin" /> : createdIssue ? <Check /> : <Plus />}{createdIssue ? '继续并完成' : '创建 Issue'}</Button></DialogFooter></form></DialogContent></Dialog>;
 }
 function fileData(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -242,6 +330,32 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
       notify(`已添加 ${files.length} 个附件`);
     });
   }
+  function pasteDescription(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    preparePastedMedia(event, content, setContent, files => {
+      void run(async () => {
+        let latest = baseline;
+        let revision = draftRevision;
+        let completed = 0;
+        try {
+          for (const item of files) {
+            const data = await bridge.call('upload_attachment', { root: board.root, id: issue.id, revision, name: item.file.name, data: await fileData(item.file) });
+            latest = data.issue;
+            revision = latest.revision;
+            completed++;
+            setBaseline(latest);
+            setDraftRevision(revision);
+            setContent(current => current.replace(item.marker, data.attachment.markdown));
+          }
+          await onSaved();
+          notify(`已粘贴 ${files.length} 个媒体附件；保存描述后会保留当前位置`);
+        } catch (error) {
+          for (const item of files.slice(completed)) setContent(current => current.replace(item.marker, ''));
+          if (completed) await onSaved();
+          throw error;
+        }
+      });
+    }, notify);
+  }
   async function link(url: string, title: string, commentId?: string) {
     let failure: Error | undefined;
     const saved = await run(async () => {
@@ -268,7 +382,7 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
       {draftRevision !== issue.revision && changed && <div className="draft-warning"><AlertCircle size={14} />文件已更新。草稿保留，先查看源文件，再重新加载。<Button variant="ghost" size="sm" className="text-button" onClick={() => { if (window.confirm('丢弃草稿并载入最新文件？')) { setBaseline(issue); setName(issue.name); setContent(issue.description); setProperties(stringify(issue.properties)); setDraftRevision(issue.revision); } }}>载入最新</Button></div>}
       {sourceOpen && <pre className="source-view">{issue.raw}</pre>}
       <div className="content-heading"><span>描述</span><div className="content-actions"><Button variant="ghost" size="sm" className="text-button" disabled={busy || changed || !connected} onClick={() => attachmentInput.current?.click()}><Paperclip size={13} />添加附件</Button><Button variant="ghost" size="sm" className="text-button" onClick={() => setEditingContent(!editingContent)}><Pencil size={13} />{editingContent ? '预览' : '编辑'}</Button></div><input className="attachment-input" ref={attachmentInput} type="file" multiple aria-label="选择附件" onChange={event => { const files = [...(event.currentTarget.files ?? [])]; event.currentTarget.value = ''; if (files.length) attach(files); }} /></div>
-      {editingContent ? <Textarea className="content-editor" rows={9} value={content} onChange={e => setContent(e.target.value)} aria-label="Issue 描述" /> : content ? <Markdown text={content} /> : <Button variant="ghost" className="empty-content" onClick={() => setEditingContent(true)}>补充这件事的上下文…</Button>}
+      {editingContent ? <Textarea className="content-editor" rows={9} disabled={busy} value={content} onChange={e => setContent(e.target.value)} onPaste={pasteDescription} aria-label="Issue 描述" /> : content ? <Markdown text={content} /> : <Button variant="ghost" className="empty-content" onClick={() => setEditingContent(true)}>补充这件事的上下文…</Button>}
       {changed && <div className="save-row"><span>有未保存的修改</span><Button disabled={busy} onClick={save}><Check size={14} />保存修改</Button></div>}
       <div className="comments-heading"><h2>评论<span>{issue.comments.length}</span></h2></div>
       <IssueComments comments={issue.comments} properties={issue.properties} disabled={busy || changed || !!comment.trim()} onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} onEditing={setLinkingConversation} onLink={(commentId, url, title) => link(url, title, commentId)} />

@@ -106,6 +106,17 @@
   [data-slot="dialog-content"] { max-height: 90dvh; overflow: auto; border-radius: var(--border-radius-xl, 20px); }
   .dialog-form { display: flex; flex-direction: column; gap: 20px; }
   .field { display: flex; flex-direction: column; gap: 8px; }
+  .property-row-editor { display: flex; flex-direction: column; gap: 6px; }
+  .property-row-list { display: flex; flex-direction: column; gap: 8px; }
+  .property-row { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) auto; align-items: center; gap: 8px; }
+  .property-row > input { min-width: 0; }
+  .property-key-field { position: relative; min-width: 0; }
+  .property-name-options { position: absolute; z-index: 40; top: calc(100% + 4px); left: 0; width: max(100%, 240px); max-width: min(320px, calc(100vw - 48px)); max-height: min(260px, 40dvh); overflow: auto; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(var(--popover), var(--popover)), light-dark(#fff, #303030); box-shadow: 0 10px 28px color-mix(in srgb, var(--foreground) 14%, transparent); }
+  .property-name-option { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 0; border-radius: 6px; text-align: left; font-size: 13px; color: var(--foreground); background: transparent; }
+  .property-name-option > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .property-name-option[aria-selected="true"], .property-name-option:hover { background: var(--accent); }
+  .property-name-empty { padding: 9px 10px; font-size: 12px; color: var(--muted-fg); }
+  .property-row-footer { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .folder-field { position: relative; }
   .folder-field > svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted-fg); }
   .folder-field input { padding-left: 38px; }
@@ -204,6 +215,8 @@
   .attachment-input { display: none; }
   .attachment-placeholder { color: var(--muted-fg); font-size: 13px; }
   .attachment-inline-image, .attachment-inline-file { display: block; margin: 12px 0; }
+  .attachment-inline-video { display: grid; gap: 8px; margin: 12px 0; }
+  .markdown .attachment-inline-video video { display: block; width: min(100%, 720px); max-height: 420px; background: #000; border-radius: var(--radius); }
   .markdown .attachment-file { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 100%; padding: 10px 12px; background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius); color: var(--fg); text-decoration: none; }
   .attachment-file-name { min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
   .attachment-file-size { flex-shrink: 0; color: var(--muted-fg); font-size: 11px; }

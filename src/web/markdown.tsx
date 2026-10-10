@@ -39,7 +39,7 @@ export function Markdown({ text }: { text: string }) {
     files: current?.files ?? {}, failures: current?.failures ?? {},
     downloadHref: href => bridge.preview && scope ? scope.downloadUrl(href) : href,
     sanitizeSourceHtml: html => DOMPurify.sanitize(html, { FORBID_TAGS: ['img', 'iframe', 'video', 'audio', 'form', 'input', 'style'], FORBID_ATTR: ['style'] }),
-  }), { FORBID_TAGS: ['iframe', 'video', 'audio', 'form', 'input', 'style'], FORBID_ATTR: ['style'] });
+  }), { FORBID_TAGS: ['iframe', 'audio', 'form', 'input', 'style'], FORBID_ATTR: ['style'] });
   return <><div className="markdown" dangerouslySetInnerHTML={{ __html: html }} onClick={async event => {
     const link = (event.target as Element).closest<HTMLAnchorElement>('a[data-attachment-path]');
     if (!link) return;

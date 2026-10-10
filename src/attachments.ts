@@ -5,12 +5,18 @@ import { randomUUID } from 'node:crypto';
 import { IssueStore, IssueError } from './core.js';
 import { attachmentReferences, localAttachmentPath, MAX_ATTACHMENT_BYTES } from './attachment-links.js';
 
-function imageType(bytes: Buffer, filename: string) {
+function attachmentMimeType(bytes: Buffer, filename: string) {
   const ext = path.extname(filename).toLowerCase();
   if (ext === '.png' && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return 'image/png';
   if (['.jpg', '.jpeg'].includes(ext) && bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255) return 'image/jpeg';
   if (ext === '.gif' && /^GIF8[79]a$/.test(bytes.subarray(0, 6).toString('ascii'))) return 'image/gif';
   if (ext === '.webp' && bytes.subarray(0, 4).toString('ascii') === 'RIFF' && bytes.subarray(8, 12).toString('ascii') === 'WEBP') return 'image/webp';
+  if (ext === '.bmp' && bytes.subarray(0, 2).toString('ascii') === 'BM') return 'image/bmp';
+  if (ext === '.avif' && bytes.subarray(4, 8).toString('ascii') === 'ftyp' && bytes.subarray(8, 16).toString('ascii').includes('avif')) return 'image/avif';
+  if (['.mp4', '.m4v', '.mov'].includes(ext) && bytes.subarray(4, 8).toString('ascii') === 'ftyp') return ext === '.mov' ? 'video/quicktime' : 'video/mp4';
+  if (ext === '.webm' && bytes.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3]))) return 'video/webm';
+  if (ext === '.ogv' && bytes.subarray(0, 4).toString('ascii') === 'OggS') return 'video/ogg';
+  if (ext === '.mkv' && bytes.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3]))) return 'video/x-matroska';
   return 'application/octet-stream';
 }
 
@@ -30,7 +36,7 @@ export async function uploadAttachment(store: IssueStore, id: string, revision: 
   const file = path.join(directory, filename);
   const href = `attachments/${encodeURIComponent(filename)}`;
   const label = name.replace(/[\\[\]`!*_<>]/g, '\\$&');
-  const mimeType = imageType(bytes, name);
+  const mimeType = attachmentMimeType(bytes, name);
   const markdown = `${mimeType.startsWith('image/') ? '!' : ''}[${label}](${href})`;
   await fs.writeFile(file, bytes, { flag: 'wx' });
   try {
@@ -61,6 +67,6 @@ export async function readAttachment(store: IssueStore, id: string, href: string
     const bytes = await handle.readFile();
     if (bytes.length > MAX_ATTACHMENT_BYTES) throw new IssueError('FILE_TOO_LARGE', '附件超过 10 MB，未读取');
     const name = path.extname(ref.label).toLowerCase() === path.extname(file).toLowerCase() && !/[/\\\x00-\x1f]/.test(ref.label) ? ref.label : path.basename(file).replace(/^[\da-f-]{36}-/i, '');
-    return { path: ref.href, name, mimeType: imageType(bytes, file), size: bytes.length, data: bytes.toString('base64') };
+    return { path: ref.href, name, mimeType: attachmentMimeType(bytes, file), size: bytes.length, data: bytes.toString('base64') };
   } finally { await handle.close(); }
 }
