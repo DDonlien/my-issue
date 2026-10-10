@@ -35,7 +35,7 @@ export function DispatchPanel({ root, id, busy, connected, hasDraft, run, onSave
     return chats.map(chat => <SelectItem key={chat.id} value={`thread:${chat.id}`} title={chat.title} className="dispatch-target-item"><span>{chat.title}</span></SelectItem>);
   }
   return <div className="dispatch-box">
-    <Button disabled={busy || !connected} onClick={() => setOpen(!open)}>分发到对话<ArrowUpRight size={14} /></Button>
+    <Button className="dispatch-trigger" variant="outline" size="sm" disabled={busy || !connected} aria-expanded={open} onClick={() => setOpen(!open)}>分发<ArrowUpRight size={14} /></Button>
     {open && <div className="dispatch-options">
       <Label htmlFor="dispatch-target">目标</Label>
       <Select value={target} onValueChange={setTarget} disabled={busy}>

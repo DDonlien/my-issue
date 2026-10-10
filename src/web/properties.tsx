@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Check, Plus, X } from 'lucide-react';
 import { parseDocument, stringify } from 'yaml';
 import type { Board } from '../core.js';
 import { CONVERSATION_PROPERTIES } from '../conversation-links.js';
 import { Button } from './components/ui/button.js';
 import { Input } from './components/ui/input.js';
+import { Label } from './components/ui/label.js';
+import { Textarea } from './components/ui/textarea.js';
 
 export interface PropertyDraftRow { id: string; key: string; value: string }
 
@@ -173,4 +175,95 @@ export function PropertyValue({ value, board, onSelect, ancestors = [] }: { valu
 export function PropertyList({ properties, board, onSelect }: { properties: Record<string, unknown>; board: Board; onSelect: (id: string) => void }) {
   const mapped = [board.schema.parentKey, board.schema.dependenciesKey, ...(board.schema.name.source === 'property' ? [board.schema.name.key] : [])];
   return <dl className="property-list">{Object.entries(properties).filter(([key]) => key !== board.schema.statusKey && (!CONVERSATION_PROPERTIES.includes(key) || mapped.includes(key))).map(([key, value]) => <div className="property" key={key}><dt>{key}</dt><dd><PropertyValue value={value} board={board} onSelect={onSelect} /></dd></div>)}</dl>;
+}
+
+function propertyText(value: unknown) { return stringify(value).trimEnd(); }
+function parsePropertyText(key: string, text: string) {
+  if (!text.trim()) return '';
+  const doc = parseDocument(text, { uniqueKeys: true });
+  if (doc.errors.length) throw new Error(`属性“${key}”：${doc.errors[0].message}`);
+  return doc.toJS({ maxAliasCount: 30 });
+}
+
+export function EditablePropertyList({ properties, board, disabled, onDirty, onSave, onRemove }: {
+  properties: Record<string, unknown>;
+  board: Board;
+  disabled: boolean;
+  onDirty: (dirty: boolean) => void;
+  onSave: (key: string, value: unknown) => Promise<boolean>;
+  onRemove: (key: string) => Promise<boolean>;
+}) {
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [newRows, setNewRows] = useState<PropertyDraftRow[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const mapped = [board.schema.parentKey, board.schema.dependenciesKey, ...(board.schema.name.source === 'property' ? [board.schema.name.key] : [])];
+  const entries = Object.entries(properties).filter(([key]) => key !== board.schema.statusKey && (!CONVERSATION_PROPERTIES.includes(key) || mapped.includes(key)));
+  useEffect(() => {
+    const changedExisting = entries.some(([key, value]) => Object.hasOwn(drafts, key) && drafts[key] !== propertyText(value));
+    const changedNew = newRows.some(row => !!row.key.trim() || !!row.value.trim());
+    onDirty(changedExisting || changedNew);
+  }, [drafts, newRows, properties, onDirty]);
+
+  function addProperty() {
+    const row = createPropertyRow();
+    setNewRows(current => [...current, row]);
+    setFocusId(row.id);
+  }
+  async function saveExisting(key: string, value: unknown) {
+    try {
+      const parsed = parsePropertyText(key, drafts[key] ?? propertyText(value));
+      if (await onSave(key, parsed)) {
+        setDrafts(current => { const next = { ...current }; delete next[key]; return next; });
+        setErrors(current => { const next = { ...current }; delete next[key]; return next; });
+      }
+    } catch (error) {
+      setErrors(current => ({ ...current, [key]: error instanceof Error ? error.message : String(error) }));
+    }
+  }
+  async function removeExisting(key: string) {
+    if (await onRemove(key)) {
+      setDrafts(current => { const next = { ...current }; delete next[key]; return next; });
+      setErrors(current => { const next = { ...current }; delete next[key]; return next; });
+    }
+  }
+  async function saveNew(row: PropertyDraftRow) {
+    const key = row.key.trim();
+    if (!key) { setErrors(current => ({ ...current, [row.id]: '请填写属性名' })); return; }
+    if (key === board.schema.statusKey || Object.hasOwn(properties, key) || newRows.some(item => item.id !== row.id && item.key.trim() === key)) {
+      setErrors(current => ({ ...current, [row.id]: '属性名已存在或由状态单独管理' })); return;
+    }
+    try {
+      const value = parsePropertyText(key, row.value);
+      if (await onSave(key, value)) {
+        setNewRows(current => current.filter(item => item.id !== row.id));
+        setErrors(current => { const next = { ...current }; delete next[row.id]; return next; });
+      }
+    } catch (error) {
+      setErrors(current => ({ ...current, [row.id]: error instanceof Error ? error.message : String(error) }));
+    }
+  }
+
+  return <div className="editable-properties">
+    <dl className="property-list property-edit-list">{entries.map(([key, value]) => {
+      const text = drafts[key] ?? propertyText(value);
+      const changed = text !== propertyText(value);
+      const inputId = `property-value-${encodeURIComponent(key)}`;
+      return <div className="property property-edit-row" key={key}>
+        <dt><Label htmlFor={inputId}>{key}</Label></dt>
+        <dd><Textarea id={inputId} className="property-value-input code-input" aria-label={`属性值：${key}`} rows={typeof value === 'object' && value !== null ? Math.min(5, Math.max(2, text.split('\n').length)) : 1} disabled={disabled} value={text} onChange={event => setDrafts(current => ({ ...current, [key]: event.target.value }))} />
+          <div className="property-row-actions"><Button type="button" size="icon-sm" variant="ghost" title={`删除属性 ${key}`} aria-label={`删除属性 ${key}`} disabled={disabled} onClick={() => void removeExisting(key)}><X /></Button>{changed && <Button type="button" size="icon-sm" variant="ghost" title={`保存属性 ${key}`} aria-label={`保存属性 ${key}`} disabled={disabled} onClick={() => void saveExisting(key, value)}><Check /></Button>}</div>
+          {errors[key] && <p className="property-error" role="alert">{errors[key]}</p>}
+        </dd>
+      </div>;
+    })}</dl>
+    {newRows.map(row => <div className="property property-edit-row property-new-row" key={row.id}>
+      <dt><Input autoFocus={focusId === row.id} aria-label="新属性名" placeholder="属性名" value={row.key} disabled={disabled} onChange={event => setNewRows(current => current.map(item => item.id === row.id ? { ...item, key: event.target.value } : item))} /></dt>
+      <dd><Textarea className="property-value-input code-input" aria-label={`新属性值${row.key ? `：${row.key}` : ''}`} rows={row.value.includes('\n') ? Math.min(5, Math.max(2, row.value.split('\n').length)) : 1} placeholder="值" value={row.value} disabled={disabled} onChange={event => setNewRows(current => current.map(item => item.id === row.id ? { ...item, value: event.target.value } : item))} />
+        <div className="property-row-actions"><Button type="button" size="icon-sm" variant="ghost" title="移除新属性" aria-label="移除新属性" disabled={disabled} onClick={() => setNewRows(current => current.filter(item => item.id !== row.id))}><X /></Button><Button type="button" size="icon-sm" variant="ghost" title="保存新属性" aria-label="保存新属性" disabled={disabled || !row.key.trim()} onClick={() => void saveNew(row)}><Check /></Button></div>
+        {errors[row.id] && <p className="property-error" role="alert">{errors[row.id]}</p>}
+      </dd>
+    </div>)}
+    <Button type="button" variant="ghost" size="sm" className="add-property" disabled={disabled} onClick={addProperty}><Plus size={14} />添加属性</Button>
+  </div>;
 }

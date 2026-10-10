@@ -21,7 +21,7 @@ export function CommentMetadata({ comment, properties, disabled, onOpen, onEditi
 }
 
 export function IssueComments({ comments, ...actions }: { comments: Comment[] } & ConversationActions) {
-  return <div className="comments">{comments.map(comment => {
+  return <div className="comments">{comments.slice().reverse().map(comment => {
     const who = comment.heading.split(' · ')[1] ?? '评论';
     return <div className="comment" key={comment.id}>
       <Avatar className="size-8"><AvatarFallback>{who.slice(0, 1).toUpperCase()}</AvatarFallback></Avatar>
