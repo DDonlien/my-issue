@@ -49,6 +49,14 @@ npm run package:plugin
 
 页面入口固定为 `ui://myissue/board-v2.html`，不随发布版本改变，同时保留 `board-v1.html` 兼容地址。如果对话侧栏停在加载图标，而日志报告 `Resource ... not found`，通常是新版工具目录与旧对话进程错配，需重启桌面应用后再打开。
 
+## 独立页面与宿主界面
+
+myIssue 已声明全局独立入口和 `fullscreen` 显示模式。“独立入口”表示可以直接打开看板；ChatGPT 仍负责外层标题栏、关联对话与系统输入框。[官方全屏说明](https://developers.openai.com/plugins/concepts/ui-guidelines)明确说明全屏插件会保留系统输入框。
+
+当前公开的入口、显示模式和插件清单没有强制隐藏外层标题栏或右侧对话的设置。Figma 的空顶栏不能仅靠复制 `global` / `fullscreen` 配置获得：2026-10-10 检查本机宿主代码，顶栏还取决于按连接器 ID 或本地 MCP 服务名判断的宿主配置。Figma 是远程官方连接器，myIssue 是本地 MCP；Figma 当前是否命中隐藏名单尚未取得运行时证据。
+
+工作区的整页、分屏及面板显示由 ChatGPT 布局控件管理。macOS 的 `⌘⇧F` 可进入或退出整页视图，见[官方快捷键](https://learn.chatgpt.com/docs/reference/commands)。这与插件的 `fullscreen` 显示模式是两个控制层；对 myIssue 的实际效果及状态保持仍需原生页面确认。
+
 ## 外观与重点色
 
 页面消费 MCP Apps `hostContext.styles.variables` 的背景、文字、边框、字体和圆角变量，并响应宿主主题更新。主按钮使用 ChatGPT 常见的黑/白反色，输入框焦点继承 `--color-ring-primary`，链接继承 `--color-text-info`。撤回的变量会清除，避免切换主题后残留旧配色。
