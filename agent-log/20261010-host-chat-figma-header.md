@@ -34,3 +34,7 @@
 ## Git
 
 本次交付仅限定上述三个文档文件。提交、推送和远端读回在交付时执行并报告；调查产物留在被忽略的 _builds/host-chat-investigation/，不提交宿主源码。
+
+- 文档提交 dbe441e22d89eeb280f72de73d940d20642b3f6e 已推送 origin/main，远端 SHA 读回一致。首次推送遇到 LibreSSL SSL_ERROR_SYSCALL，按单次 HTTP/1.1 传输重试成功，未修改全局 Git 配置。
+- 用最新 revision 追加一条 Codex / gpt-6 调查结果评论，然后重新读取并转为 in_review。再次读回确认名称、原截图引用和既有评论均保留；调查结论待验收，自动隐藏仍未实现。
+- 完成记录在此独立补记，后续 Git 提交只含本日志。
