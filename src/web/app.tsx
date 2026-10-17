@@ -426,8 +426,10 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
       </div>
     </article>
     <aside className="detail-aside">
-      <ConversationSection properties={issue.properties} disabled={busy || changed || !!comment.trim()} onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} onEditing={setLinkingConversation} onLink={link} />
-      <DispatchPanel root={board.root} id={issue.id} busy={busy} connected={connected} hasDraft={changed || !!comment.trim()} run={run} onSaved={onSaved} notify={notify} />
+      <div className="detail-actions">
+        <ConversationSection properties={issue.properties} disabled={busy || changed || !!comment.trim()} onOpen={bridge.preview ? undefined : url => run(() => bridge.openConversation(url))} onEditing={setLinkingConversation} onLink={link} />
+        <DispatchPanel root={board.root} id={issue.id} busy={busy} connected={connected} hasDraft={changed || !!comment.trim()} run={run} onSaved={onSaved} notify={notify} />
+      </div>
     </aside>
     </div>
   </div></AttachmentProvider>;

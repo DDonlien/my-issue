@@ -23,10 +23,12 @@
 .conversation-link:focus-visible { outline: 2px solid var(--focus, var(--ring)); outline-offset: 2px; }
 .conversation-list { display: flex; flex-direction: column; gap: 5px; margin: 8px 0; }
 .conversation-list .conversation-link { max-width: 100%; font-size: 12px; }
-.current-conversation { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line, var(--border)); }
-.current-conversation h3 { font-size: 13px; margin: 0 0 8px; font-weight: 600; }
+.detail-actions { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.current-conversation { min-width: 0; margin: 0; padding: 0; border: 0; }
+.current-conversation h3 { font-size: 13px; margin: 0 0 6px; font-weight: 600; }
 .current-conversation-controls { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .current-conversation-controls > .conversation-link { flex: 1; font-size: 12px; }
+.dispatch-unavailable { margin: 8px 0 0; color: var(--muted-foreground, var(--muted-fg)); font-size: 12px; line-height: 1.55; }
 .comment-conversation { display: inline-flex; align-items: center; gap: 2px; max-width: min(200px, 100%); min-width: 0; }
 .comment-conversation > .conversation-link { min-width: 0; }
 .conversation-edit { flex-shrink: 0; color: var(--muted-foreground); }

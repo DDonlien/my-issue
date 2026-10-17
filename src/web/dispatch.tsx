@@ -14,21 +14,31 @@ export function DispatchPanel({ root, id, busy, connected, hasDraft, run, onSave
   const [target, setTarget] = useState('new');
   const [instruction, setInstruction] = useState('');
   const [conversations, setConversations] = useState<CodexConversation[]>([]);
+  const [canSendToExisting, setCanSendToExisting] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [refresh, setRefresh] = useState(0);
   useEffect(() => {
     if (!open || !connected) return;
     let cancelled = false;
-    setLoading(true); setError(''); setConversations([]);
+    setLoading(true); setError(''); setConversations([]); setCanSendToExisting(null);
     bridge.call('list_codex_conversations').then(data => {
       if (!Array.isArray(data.conversations)) throw new Error('Codex 对话列表无效');
-      if (!cancelled) setConversations(data.conversations);
+      if (!cancelled) { setConversations(data.conversations); setCanSendToExisting(data.canSend !== false); }
     }).catch(error => { if (!cancelled) setError(error.message); }).finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [open, connected, root, id, refresh]);
   const selected = conversations.find(chat => target === `thread:${chat.id}`);
   const available = target === 'new' || target === 'active' ? bridge.canDispatch(target) : !!selected?.canSend && !loading;
+  const unavailableReason = !loading && (hasDraft
+    ? '请先保存修改或追加评论，再分发最新内容。'
+    : target === 'new' || target === 'active'
+      ? !bridge.canDispatch(target) ? `当前宿主没有提供向${target === 'new' ? '新' : '当前'}对话发送消息的能力。` : ''
+      : selected && !selected.canSend
+        ? canSendToExisting === false
+          ? 'Codex 桌面未开放对话控制接口，因此只能读取已有对话，不能发送到其中。'
+          : '这个对话当前不接受定向发送。'
+        : '');
   const project = conversations.filter(chat => chat.cwd === root);
   const other = conversations.filter(chat => chat.cwd !== root);
   function options(chats: CodexConversation[]) {
@@ -49,6 +59,7 @@ export function DispatchPanel({ root, id, busy, connected, hasDraft, run, onSave
         </SelectContent>
       </Select>
       {error && <div className="dispatch-retry"><Button variant="ghost" size="sm" onClick={() => setRefresh(value => value + 1)}>重新读取对话</Button></div>}
+      {unavailableReason && <p className="dispatch-unavailable" role="status">{unavailableReason}</p>}
       <Textarea rows={3} aria-label="分发指令" placeholder="补充这次对话要做的事（可选）" value={instruction} onChange={event => setInstruction(event.target.value)} disabled={busy} />
       <Button disabled={busy || !available || hasDraft} onClick={() => run(async () => {
         if (hasDraft) throw new Error('请先保存修改或追加评论，再分发最新内容');
