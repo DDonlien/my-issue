@@ -22,10 +22,12 @@
 - `npm run check`：通过。
 - `npm run package:plugin`：通过；生成 `dist/myissue-0.1.13.zip`，ZIP 共 10 个文件，清单版本为 0.1.13，SHA-256 `e87d0e65ad5ab21c38730f637a5862467341309acf8798b560095d7d9f8916b3`。
 - `git diff --check`：通过。
-- 未运行自动测试，未向任何 Codex 对话发送消息；原生桌面交互仍待用户验收。插件包尚未安装或推送到 Marketplace。
+- 未运行自动测试，未向任何 Codex 对话发送消息；原生桌面交互仍待用户验收。
 
 ## Git 与 Issue
 
 - 起始分支 `main` 与 `origin/main` 同步，工作区干净。
-- 当前尚未提交或推送；原 Issue 已追加结果评论并设为 `in_review`（待验收），随后重读确认状态、截图描述和评论均保留。
+- 实现提交 `f5467c4753a12cc061fc191214c9067b8e46fd47` 已存在于本地 `main` 和 `origin/main`；`git ls-remote` 读回一致，无额外代码提交需要推送。
+- 已刷新 GitHub Marketplace `myissue-local` 并从该来源安装 `myissue@myissue-local` 0.1.13，状态为已启用。移除旧的 `myissue@myissue-local-current` 0.1.12，避免重复插件。
+- 原 Issue 保持 `in_review`（待验收）；已追加安装/推送补记并重读核实状态和描述。
 - 本次无法获得完整模型变体，Issue 评论将使用 `unknown`。
