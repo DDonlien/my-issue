@@ -1,5 +1,6 @@
 @import "tailwindcss" source(none);
 @import "tw-animate-css";
+@import "./properties.css";
 @source "./**/*.tsx";
 
 @custom-variant dark {
@@ -106,17 +107,6 @@
   [data-slot="dialog-content"] { max-height: 90dvh; overflow: auto; border-radius: var(--border-radius-xl, 20px); }
   .dialog-form { display: flex; flex-direction: column; gap: 20px; }
   .field { display: flex; flex-direction: column; gap: 8px; }
-  .property-row-editor { display: flex; flex-direction: column; gap: 6px; }
-  .property-row-list { display: flex; flex-direction: column; gap: 8px; }
-  .property-row { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) auto; align-items: center; gap: 8px; }
-  .property-row > input { min-width: 0; }
-  .property-key-field { position: relative; min-width: 0; }
-  .property-name-options { position: absolute; z-index: 40; top: calc(100% + 4px); left: 0; width: max(100%, 240px); max-width: min(320px, calc(100vw - 48px)); max-height: min(260px, 40dvh); overflow: auto; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: linear-gradient(var(--popover), var(--popover)), light-dark(#fff, #303030); box-shadow: 0 10px 28px color-mix(in srgb, var(--foreground) 14%, transparent); }
-  .property-name-option { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 0; border-radius: 6px; text-align: left; font-size: 13px; color: var(--foreground); background: transparent; }
-  .property-name-option > span:first-child { min-width: 0; overflow-wrap: anywhere; }
-  .property-name-option[aria-selected="true"], .property-name-option:hover { background: var(--accent); }
-  .property-name-empty { padding: 9px 10px; font-size: 12px; color: var(--muted-fg); }
-  .property-row-footer { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .folder-field { position: relative; }
   .folder-field > svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted-fg); }
   .folder-field input { padding-left: 38px; }
@@ -197,7 +187,6 @@
   .issue-name { display: block; width: 100%; height: auto; min-height: 0; font-size: 26px; font-weight: 600; letter-spacing: -.5px; border: 0; box-shadow: none; border-radius: 4px; padding: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   .detail-meta { display: flex; align-items: center; gap: 14px; margin: 14px 0 28px; color: var(--muted-fg); font-size: 12px; flex-wrap: wrap; }
   .detail-meta > span { display: flex; align-items: center; gap: 5px; }
-  .status-badge { border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
   .ready-badge { color: var(--success); }
   .content-heading { display: flex; align-items: center; justify-content: space-between; color: var(--muted-fg); font-size: 13px; margin-bottom: 12px; }
   .content-actions { display: flex; align-items: center; gap: 4px; }
@@ -251,20 +240,11 @@
   .comment-compose button { margin-left: auto; }
   .detail-aside { grid-column: 2; grid-row: 1; min-width: 0; background: var(--background); border-left: 1px solid var(--line); padding: 24px; overflow: auto; }
   .detail-properties { min-width: 0; margin-bottom: 28px; }
-  .properties-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .properties-heading h2 { font-size: 15px; font-weight: 600; margin: 0; }
-  .status-control { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-  .status-control label { color: var(--muted-fg); font-size: 13px; }
   .property { display: grid; grid-template-columns: minmax(65px, .75fr) minmax(0, 1.25fr); gap: 12px; margin: 16px 0; font-size: 13px; line-height: 1.6; }
   .property dt { color: var(--muted-fg); overflow-wrap: anywhere; }
   .property dd { margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
   .property-list { margin: 0; }
-  .property-edit-row dd { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 4px; }
-  .property-value-input { min-height: 34px !important; max-height: 150px; resize: vertical; padding: 7px 9px !important; font-size: 12px !important; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
-  .property-row-actions { display: flex; align-items: center; gap: 1px; }
-  .property-row-actions button { color: var(--muted-fg); }
   .property-error { grid-column: 1 / -1; margin: 5px 0 0; color: var(--danger); font-size: 11px; white-space: pre-wrap; }
-  .property-new-row dt input { height: 34px; font-size: 12px; }
   .property-array { margin: 0; padding-left: 16px; list-style: disc; }
   .property-array li + li { margin-top: 5px; }
   .property-object { margin: 0; }
@@ -274,7 +254,6 @@
   .property a, .property-link { color: var(--link); }
   .property-link { padding: 0; text-align: left; text-decoration: underline; overflow-wrap: anywhere; }
   .property-missing { color: var(--warning); }
-  .add-property { color: var(--muted-fg); }
   .properties-editor { min-height: 160px; }
   .detail-properties > .muted { margin-top: 8px; line-height: 1.8; }
   .dispatch-box { margin: 0; padding: 0; min-width: 0; }

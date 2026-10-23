@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Columns3, List, Search, Plus, MessageSquare, X, Folder, Circle, Check, FileText, SlidersHorizontal, ArrowLeft, CheckCircle2, Pencil, AlertCircle, Loader2 } from 'lucide-react';
 import { stringify } from 'yaml';
@@ -230,16 +230,10 @@ function preparePastedMedia(event: React.ClipboardEvent<HTMLTextAreaElement>, co
 }
 function CreateModal({ status, board, busy, run, close, created }: { status: string; board: Board; busy: boolean; run: Run; close: () => void; created: (issue: Issue) => Promise<void> }) {
   const [name, setName] = useState(''); const [content, setContent] = useState(''); const [rows, setRows] = useState<PropertyDraftRow[]>(() => createPropertyRows({ [board.schema.statusKey]: status }));
+  const [creatingPropertyDirty, setCreatingPropertyDirty] = useState(false);
   const [pending, setPending] = useState<PendingAttachment[]>([]); const [completed, setCompleted] = useState<Record<string, string>>({}); const [createdIssue, setCreatedIssue] = useState<Issue>(); const [pasteError, setPasteError] = useState(''); const [uploadError, setUploadError] = useState(''); const [descriptionDropActive, setDescriptionDropActive] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const descriptionInput = useRef<HTMLTextAreaElement>(null);
-  const propertySuggestions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const issue of board.issues) for (const key of Object.keys(issue.properties)) counts.set(key, (counts.get(key) ?? 0) + 1);
-    const schemaKeys = [board.schema.parentKey, board.schema.dependenciesKey, ...(board.schema.name.source === 'property' ? [board.schema.name.key] : [])];
-    for (const key of schemaKeys) if (key) counts.set(key, counts.get(key) ?? 0);
-    return [...counts.entries()].filter(([key]) => key !== board.schema.statusKey).sort(([keyA, countA], [keyB, countB]) => countB - countA || keyA.localeCompare(keyB)).map(([key]) => key);
-  }, [board.issues, board.schema]);
   function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
     setPasteError('');
     preparePastedMedia(event, content, setContent, files => setPending(current => [...current, ...files]), setPasteError);
@@ -252,6 +246,7 @@ function CreateModal({ status, board, busy, run, close, created }: { status: str
   }
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (creatingPropertyDirty) return;
     setUploadError('');
     void run(async () => {
       const properties = parsePropertyRows(rows);
@@ -294,7 +289,7 @@ function CreateModal({ status, board, busy, run, close, created }: { status: str
       await created(latest);
     });
   }
-  return <Dialog open onOpenChange={open => { if (!open) close(); }}><DialogContent className="create-dialog rounded-2xl" showCloseButton={false} onOpenAutoFocus={event => { event.preventDefault(); input.current?.focus(); }}><DialogHeader><DialogTitle>新建 Issue</DialogTitle><DialogDescription>写下需要完成的事，再补充描述和属性。</DialogDescription></DialogHeader><form className="dialog-form" onSubmit={submit}><div className="field"><Label htmlFor="create-name">名称</Label><Input ref={input} id="create-name" required disabled={busy || !!createdIssue} placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></div><div className="field"><Label htmlFor="create-content">描述 <span className="muted">可选 · Markdown，可粘贴图片或视频，也可拖入文件</span></Label><Textarea ref={descriptionInput} className={'description-drop-target' + (descriptionDropActive ? ' is-dragging' : '')} id="create-content" rows={5} disabled={busy || !!createdIssue} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} onPaste={handlePaste} onDragOver={event => { if ([...event.dataTransfer.types].includes('Files')) { event.preventDefault(); setDescriptionDropActive(true); } }} onDragLeave={() => setDescriptionDropActive(false)} onDrop={handleDescriptionDrop} /></div><div className="field"><Label>属性</Label><PropertyRowsEditor rows={rows} suggestions={propertySuggestions} disabled={busy || !!createdIssue} onChange={setRows} /></div>{pasteError && <p className="dialog-error" role="alert">{pasteError}</p>}{uploadError && <p className="dialog-error" role="alert">{uploadError}</p>}{createdIssue && <p className="muted" role="status">Issue 已创建；附件还未全部完成，继续操作不会重复创建。</p>}<DialogFooter><Button type="button" variant="outline" disabled={busy} onClick={() => { if (createdIssue) void created(createdIssue); else close(); }}>{createdIssue ? '打开已创建的 Issue' : '取消'}</Button><Button disabled={busy || !name.trim()}>{busy ? <Loader2 className="animate-spin" /> : createdIssue ? <Check /> : <Plus />}{createdIssue ? '继续并完成' : '创建 Issue'}</Button></DialogFooter></form></DialogContent></Dialog>;
+  return <Dialog open onOpenChange={open => { if (!open) close(); }}><DialogContent className="create-dialog rounded-2xl" showCloseButton={false} onOpenAutoFocus={event => { event.preventDefault(); input.current?.focus(); }}><DialogHeader><DialogTitle>新建 Issue</DialogTitle><DialogDescription>写下需要完成的事，再补充描述和属性。</DialogDescription></DialogHeader><form className="dialog-form" onSubmit={submit}><div className="field"><Label htmlFor="create-name">名称</Label><Input ref={input} id="create-name" required disabled={busy || !!createdIssue} placeholder="这件事需要做什么？" value={name} onChange={e => setName(e.target.value)} /></div><div className="field"><Label htmlFor="create-content">描述 <span className="muted">可选 · Markdown，可粘贴图片或视频，也可拖入文件</span></Label><Textarea ref={descriptionInput} className={'description-drop-target' + (descriptionDropActive ? ' is-dragging' : '')} id="create-content" rows={5} disabled={busy || !!createdIssue} placeholder="补充上下文、目标或具体要求…" value={content} onChange={e => setContent(e.target.value)} onPaste={handlePaste} onDragOver={event => { if ([...event.dataTransfer.types].includes('Files')) { event.preventDefault(); setDescriptionDropActive(true); } }} onDragLeave={() => setDescriptionDropActive(false)} onDrop={handleDescriptionDrop} /></div><div className="field"><Label>属性</Label><PropertyRowsEditor rows={rows} board={board} disabled={busy || !!createdIssue} onChange={setRows} onDirty={setCreatingPropertyDirty} /></div>{pasteError && <p className="dialog-error" role="alert">{pasteError}</p>}{uploadError && <p className="dialog-error" role="alert">{uploadError}</p>}{createdIssue && <p className="muted" role="status">Issue 已创建；附件还未全部完成，继续操作不会重复创建。</p>}<DialogFooter><Button type="button" variant="outline" disabled={busy} onClick={() => { if (createdIssue) void created(createdIssue); else close(); }}>{createdIssue ? '打开已创建的 Issue' : '取消'}</Button><Button disabled={busy || !name.trim() || creatingPropertyDirty} title={creatingPropertyDirty ? '请先完成属性编辑' : undefined}>{busy ? <Loader2 className="animate-spin" /> : createdIssue ? <Check /> : <Plus />}{createdIssue ? '继续并完成' : '创建 Issue'}</Button></DialogFooter></form></DialogContent></Dialog>;
 }
 function fileData(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -352,6 +347,15 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
     });
     return !!saved;
   }
+  async function renameProperty(key: string, nextKey: string): Promise<boolean> {
+    const saved = await run(async () => {
+      const data = await bridge.call('update_issue', { root: board.root, id: issue.id, revision: draftRevision, properties: { [nextKey]: issue.properties[key] }, removeProperties: [key] });
+      setBaseline(data.issue); setDraftRevision(data.issue.revision);
+      await onSaved(); notify(`属性“${key}”已重命名为“${nextKey}”`);
+      return true;
+    });
+    return !!saved;
+  }
   function uploadDescriptionFiles(files: PendingAttachment[]) {
     void run(async () => {
       let revision = draftRevision;
@@ -401,15 +405,14 @@ function Detail({ issue, board, username, busy, connected, onClose, onSelect, on
     if (failure) throw failure;
     return !!saved;
   }
-  const col = board.columns.find(c => c.value === issue.status);
   return <AttachmentProvider root={board.root} id={issue.id} revision={issue.revision}><div className="detail-layout"><div className="detail-body">
     <article className="detail-main">
       <div className="detail-nav"><Button variant="ghost" size="sm" className="text-button" onClick={onClose}><ArrowLeft size={14} />返回看板</Button><code>{issue.filename}</code><Button variant="ghost" size="sm" className="text-button" onClick={() => setSourceOpen(!sourceOpen)}><FileText size={14} />源文件</Button></div>
       <div className="detail-content">
       <IssueName value={name} onChange={setName} />
-      <div className="detail-meta"><span className="status-badge" style={{ color: col?.color }}><Circle size={13} />{col?.label}</span>{issue.ready && <span className="ready-badge"><CheckCircle2 size={12} />可开始</span>}<span><MessageSquare size={12} />{issue.comments.length} 条评论</span></div>
-      <section className="detail-properties" aria-label="Issue 属性"><div className="properties-heading"><h2>属性</h2></div><div className="status-control"><Label htmlFor="issue-status">状态</Label><Select value={issue.status} disabled={busy || changed} onValueChange={status => run(async () => { const saved = await bridge.call('update_issue', { root: board.root, id: issue.id, revision: draftRevision, properties: { [board.schema.statusKey]: status } }); setBaseline(saved.issue); setDraftRevision(saved.issue.revision); await onSaved(); notify('状态已保存'); })}><SelectTrigger id="issue-status" aria-label="Issue 状态"><SelectValue /></SelectTrigger><SelectContent position="popper">{board.columns.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent></Select></div>
-      <EditablePropertyList key={`${issue.id}:${propertyDraftReset}`} properties={issue.properties} board={board} disabled={busy || !connected} onDirty={setPropertyDraftDirty} onSave={saveProperty} onRemove={removeProperty} />
+      <div className="detail-meta">{issue.ready && <span className="ready-badge"><CheckCircle2 size={12} />可开始</span>}<span><MessageSquare size={12} />{issue.comments.length} 条评论</span></div>
+      <section className="detail-properties" aria-label="Issue 属性">
+      <EditablePropertyList key={`${issue.id}:${propertyDraftReset}`} properties={issue.properties} board={board} disabled={busy || !connected} onDirty={setPropertyDraftDirty} onSave={saveProperty} onRemove={removeProperty} onRename={renameProperty} onSelect={onSelect} />
       {!!issue.children?.length && <div className="derived"><span>子 Issue</span>{issue.children.map(child => <code key={child}>{child}</code>)}</div>}
       </section>
       {draftRevision !== issue.revision && changed && <div className="draft-warning"><AlertCircle size={14} />文件已更新。草稿保留，先查看源文件，再重新加载。<Button variant="ghost" size="sm" className="text-button" onClick={() => { if (window.confirm('丢弃草稿并载入最新文件？')) { setBaseline(issue); setName(issue.name); setContent(issue.description); setDraftRevision(issue.revision); setPropertyDraftDirty(false); setPropertyDraftReset(value => value + 1); } }}>载入最新</Button></div>}
