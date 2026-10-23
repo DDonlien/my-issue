@@ -5,7 +5,7 @@ myIssue 是项目内的 Markdown Issue 看板，也是可安装的 Codex 插件�
 ## 当前能力
 
 - 状态看板与列表，搜索名称、属性、自由内容和评论，状态筛选及可开始视图。
-- 创建真实文件，修改名称与自由 Markdown，编辑任意 YAML 属性，拖动卡片改变状态；新建时属性逐行编辑，可选择已有属性名或创建新属性。
+- 创建真实文件，修改名称与自由 Markdown，编辑任意 YAML 属性，拖动卡片改变状态；详情与新建共用 Notion 式属性行和各类型编辑下拉，支持选择已有字段、属性预设或自由输入新属性名。
 - 宽屏从看板打开详情时使用右侧抽屉，保留看板在后方；屏幕不足时详情独占页面。属性默认逐项可编辑并分别保存或删除；评论输入位于评论流顶部，评论按最新优先显示。
 - 描述可直接粘贴剪贴板中的图片和视频，也可在新建或详情页把文件拖入描述；附件保存到项目内，在描述和评论正文内预览图片、支持格式的视频、Markdown 和文本，其他文件显示下载卡片。
 - 标准 MCP Apps 全局独立入口和对话侧栏入口，以及 Issue composer mention 搜索。
@@ -188,10 +188,10 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 
 ## 文档
 
-- [`REQUIREMENTS.md`](REQUIREMENTS.md)：稳定需求 ID 与验收状态
+- [`issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md`](issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md)：稳定需求 ID 与验收状态
 - [`DESIGN.md`](DESIGN.md)：视觉与交互约束
 - [`ARCHITECTURE.md`](ARCHITECTURE.md)：共用核心与宿主适配边界
-- `agent-log/`：实施与验证记录
+- `issue/README.md`：实施与验证记录
 
 实现参考：[官方插件打包](https://developers.openai.com/plugins/build/plugins)、[独立侧栏及对话入口](https://developers.openai.com/plugins/build/extensions)、[MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)。
 
