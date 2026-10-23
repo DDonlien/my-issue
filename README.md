@@ -43,7 +43,7 @@ codex plugin list --marketplace myissue-local --json
 npm run package:plugin
 ```
 
-产物是 `dist/myissue-0.1.13.zip`。它用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
+产物是 `dist/myissue-0.1.14.zip`。0.1.14 窄屏详情隐藏底部对话关联与分发操作区，宽屏右侧操作栏保留。产物用于本地/团队安装；尚未提交或发布到公共插件目录。ZIP 解压后的目录就是插件根。团队可以把它放进自己的 Marketplace，或直接添加这个 Git 仓库的 Marketplace。
 
 已安装旧版时，重新执行安装命令更新，然后完全退出并重新启动 ChatGPT / Codex 桌面应用，见[官方本地插件更新流程](https://developers.openai.com/plugins/build/plugins)。仅关闭再打开 myIssue 页面不足以刷新旧对话保留的 MCP 服务进程。
 
@@ -132,11 +132,11 @@ parent: "[[issue-001]]"
 
 1. 从对话创建：调用 `create_issue`；名称、任意属性与内容写到同一项目的 `issues/`。
 2. 从对话开始：调用 `get_issue` 读取最新内容和评论，按用户授权处理，再用 `append_comment` 追加实际进展或结果。
-3. 从看板分发：打开详情 → 分发到对话 → 选择当前/新对话 → 发送并启动。准备阶段重新读取文件；发送不修改 Issue 状态，也不把派发等同于工作完成。
+3. 从宽屏详情右侧操作栏分发：打开详情 → 分发到对话 → 选择当前/新对话 → 发送并启动。窄屏全页详情隐藏底部操作区；准备阶段重新读取文件，发送不修改 Issue 状态，也不把派发等同于工作完成。
 
 MCP 工具：`open_board`、`list_projects`、`list_issues`、`get_issue`、`create_issue`、`update_issue`、`append_comment`、`prepare_dispatch`、`link_conversation`、`link_comment_conversation`、`upload_attachment`、`read_attachment`，以及 SDK 的 `search_mentions`。`browse_folder` 仅供页面的显式点击调用。Issue 工具接收绝对项目根目录；写入必须传入最近读取返回的 `revision`。
 
-对话分为两类。卡片底部和详情侧栏的“当前对话”只表示目前执行这个 Issue 的单个对话；每条 AI 评论旁有自己的来源链接与更换入口。切换当前对话不改变历史评论来源，新增评论也不会自动继承当前对话。关联使用标准弹窗，输入实际链接和名称；打开弹窗期间暂停自动刷新，冲突保留输入。
+对话分为两类。卡片底部和宽屏详情侧栏的“当前对话”只表示目前执行这个 Issue 的单个对话；窄屏详情隐藏底部操作区。每条 AI 评论旁有自己的来源链接与更换入口。切换当前对话不改变历史评论来源，新增评论也不会自动继承当前对话。关联使用标准弹窗，输入实际链接和名称；打开弹窗期间暂停自动刷新，冲突保留输入。
 
 关联保存为可选普通 YAML 属性，正文评论仍保持原结构：
 
