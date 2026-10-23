@@ -1,0 +1,778 @@
+{
+  "history_base": "7649f547f4ea8214825f55d0746338becf1aea33",
+  "versioncontrolid": "versioncontrolid",
+  "versioncontrolid_definition": "pending",
+  "sources": [
+    {
+      "path": "REQUIREMENTS.md",
+      "sha256": "b8b122343449e335ea005ecf36acdc6a853c5228de06f29b84f52432888591d9",
+      "bytes": 26633,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "2e8d1cd778de67f7d6a77c56b35a8096f93a0354"
+    },
+    {
+      "path": "agent-log/20260904-221230-utcp8-taobe-gpt-5.md",
+      "sha256": "7e5cc90835f24b45c6cea055bffb54abeeb5212b63322ad5c075aa48aef801c3",
+      "bytes": 2304,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "e17e30ad042714aeb1b7616cbc9eada24890542e"
+    },
+    {
+      "path": "agent-log/20261001-myissue-codex-plugin.md",
+      "sha256": "04521fc0519d74cfd2310a737b1d3858836da3f5d9ed970c655411fa434aa3a9",
+      "bytes": 4756,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "a830f5ee599215846be5c514f5925efbe12dec97"
+    },
+    {
+      "path": "agent-log/20261002-chatgpt-appearance.md",
+      "sha256": "3400428ea625275acf2215a69088f9534eb65a815444270c905f1e7083d98751",
+      "bytes": 4238,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "fc81e639e7e2d2108f544c4ab2940d486d43fcb7"
+    },
+    {
+      "path": "agent-log/20261002-project-picker.md",
+      "sha256": "23a2a883494d7b17d27ecb0cf2942679e021421ee2c8781a19e6b5c7b7992ed9",
+      "bytes": 4137,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "3dc10460945e3e6ea15232aef033b1763ee16360"
+    },
+    {
+      "path": "agent-log/20261002-sidebar-startup.md",
+      "sha256": "ba05ac20bfb05e6f530aff9ad42262cee00d7edde89e792403a4a81c1fe4a2f2",
+      "bytes": 3001,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "f38891cf121285b4132198ba260717b449309ab4"
+    },
+    {
+      "path": "agent-log/20261007-align-content-gutters.md",
+      "sha256": "e77d3fdf5b5511809f16a344698a5281cbcfb0274a4392bcb41047718ab887ad",
+      "bytes": 1064,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "494d9ec1d32b840c6cc0f554da8c29dfd1c90c3a"
+    },
+    {
+      "path": "agent-log/20261007-card-conversations.md",
+      "sha256": "63ea0c4d4a7655fdcecd9d57362a47040da9a4643a0a22e6bb6a45b00f185407",
+      "bytes": 4028,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "90c374442cef9667c2e4332afe52f31fd2cbb25b"
+    },
+    {
+      "path": "agent-log/20261007-detail-file-location.md",
+      "sha256": "b5169a23b82bf5c7b4fe9703674ae535cf6921fcc7f062f787e4b6cc7ad77960",
+      "bytes": 2332,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "f99dd6631933a05fce88050c5eb606b275a188fd"
+    },
+    {
+      "path": "agent-log/20261007-detail-title-comments.md",
+      "sha256": "2d31d7e6a2599e7a687f86a78ac97f05e09c4c7affd64ad2b4c8d31b59bea4f4",
+      "bytes": 4485,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "e261617b2dcd55c5823c38944cba782f93229f87"
+    },
+    {
+      "path": "agent-log/20261007-dispatch-conversations.md",
+      "sha256": "64c43844195189428f8c32d87f3c74fc4a81f0bf26ec89fa7de64340a40fd71a",
+      "bytes": 4718,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "7a78f40aa760499e0e9638da8a4aba00cf8d05c4"
+    },
+    {
+      "path": "agent-log/20261007-hidden-scrollbars.md",
+      "sha256": "568e75d171c27d5d7ae729c552702dd5efbd2be5439dc271834a36e596b4e5a2",
+      "bytes": 1838,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "029646c41af5dcc33698a31a442156416605d8f7"
+    },
+    {
+      "path": "agent-log/20261007-inline-attachments.md",
+      "sha256": "c9fe73e7c73e8a49e8193bcdbc4d0e5ca95b933219c6687d161101f4494ea596",
+      "bytes": 4048,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "e8fc8619bdfb817e29661d1c5f4c3f6ece652bfd"
+    },
+    {
+      "path": "agent-log/20261007-live-refresh.md",
+      "sha256": "0f1672b908322db477eea7526f06c2f2bdabf12f9d2bc8409922ed090fbbcc3e",
+      "bytes": 2618,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "c5bd6eeb13da9fd709a71c8de18170cb48f4e72a"
+    },
+    {
+      "path": "agent-log/20261007-native-ui-shared-projects.md",
+      "sha256": "f3d70a8544ee972f83756f0afda57ea6fd1524b158563078dda0233526794679",
+      "bytes": 5274,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "4417e47dbaeac40a1b2bd13b5f9d081c34ec2a8a"
+    },
+    {
+      "path": "agent-log/20261007-plugin-host-header.md",
+      "sha256": "5dd65453419e27ec0e60ab12bb48e87f3316ef3acb54986227fcc8567567802d",
+      "bytes": 2007,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "f14b018af541e731e473c8a5355c0450f26c691b"
+    },
+    {
+      "path": "agent-log/20261007-remove-board-footer.md",
+      "sha256": "5c99d159c7306c54656e5d49b51fb34a761fb17c696a69819925e62fee90d931",
+      "bytes": 1569,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "1703c60bd50ab58192bcd7e474392dc9b76c60f8"
+    },
+    {
+      "path": "agent-log/20261007-sidebar-attachments-properties.md",
+      "sha256": "2eee86810aa8f976453c4085a2373d8ba267f8aca43630faca58e5ce100bd900",
+      "bytes": 3102,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "b420fd903f862e0bd5f4618bf9d843025f2a885a"
+    },
+    {
+      "path": "agent-log/20261010-comment-conversations-models.md",
+      "sha256": "0d775915b9c7f13c4e90a4e76d657898c720ca4bf4654afa646d886a45fef6b7",
+      "bytes": 2366,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "d8948239cb2f7161d6e2ee8cb56bee68f9b58898"
+    },
+    {
+      "path": "agent-log/20261010-host-chat-figma-header.md",
+      "sha256": "7c4943136b279804b257708122d79e05a59d1ba920d58f92ea86a8fb3687f562",
+      "bytes": 4909,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "82c59f0d45ff4aa0515b72d618d70c43c9d66ba4"
+    },
+    {
+      "path": "agent-log/20261010-properties-position.md",
+      "sha256": "c1cfec8996c50924faf7b26c2a49c1d54fbb4b780a64ca09f5ffb5077cf35401",
+      "bytes": 2823,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "2c6be7ce9012f1de0d8cdc44d8c8bc60afa23426"
+    },
+    {
+      "path": "agent-log/20261011-031247-utcp8-taobe-gpt-5.md",
+      "sha256": "c7cd2d9a9a220412f7c9f04d4f966d4a8a9c3fe66380d056e9b287c481d00d2c",
+      "bytes": 1085,
+      "head": "7649f547f4ea8214825f55d0746338becf1aea33",
+      "tracked": true,
+      "status_before": "",
+      "blob": "782bf935f4cf100a349b5401ec89b7bec71c1232"
+    }
+  ],
+  "requirements": [
+    {
+      "path": "REQUIREMENTS.md",
+      "issues": [
+        "issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-013-API-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-016-API-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-HEADER-001-API-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-DETAIL-001-API-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-CONVERSATION-001-API-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-CONVERSATION-002-API-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-ATTACHMENT-INLINE-001-DOC-project-goal-versioncontrolid.md",
+        "issue/issue-CODEX-PLUGIN-DISPATCH-001-API-project-goal-versioncontrolid.md",
+        "issue/issue-0.1.0-PROTO-A-000-API-agent-harness-issue-protocol-versioncontrolid.md",
+        "issue/issue-0.1.0-PROTO-B-000-API-files-issue-graph-versioncontrolid.md",
+        "issue/issue-0.1.0-SCHEMA-A-000-API-issue-files-versioncontrolid.md",
+        "issue/issue-0.1.0-CLI-A-000-TOOL-controls-versioncontrolid.md",
+        "issue/issue-0.1.0-INTEGRATION-A-000-API-project-myissue-versioncontrolid.md",
+        "issue/issue-0.1.0-PM-A-000-PM-protocol-versioncontrolid.md",
+        "issue/issue-0.1.0-QA-A-000-QA-verification-protocol-controls-content-versioncontrolid.md",
+        "issue/issue-0.2.0-COLLAB-A-000-DOC-collaboration-issue-versioncontrolid.md",
+        "issue/issue-0.2.0-VIEW-A-000-API-protocol-versioncontrolid.md"
+      ],
+      "legacy_ids": [
+        "CODEX-PLUGIN-001",
+        "CODEX-PLUGIN-002",
+        "CODEX-PLUGIN-003",
+        "CODEX-PLUGIN-004",
+        "CODEX-PLUGIN-005",
+        "CODEX-PLUGIN-006",
+        "CODEX-PLUGIN-007",
+        "CODEX-PLUGIN-008",
+        "CODEX-PLUGIN-009",
+        "CODEX-PLUGIN-010",
+        "CODEX-PLUGIN-011",
+        "CODEX-PLUGIN-012",
+        "CODEX-PLUGIN-SCROLL-001",
+        "CODEX-PLUGIN-FOOTER-001",
+        "CODEX-PLUGIN-LIVE-001",
+        "CODEX-PLUGIN-013",
+        "CODEX-PLUGIN-014",
+        "CODEX-PLUGIN-015",
+        "CODEX-PLUGIN-016",
+        "CODEX-PLUGIN-017",
+        "CODEX-PLUGIN-018",
+        "CODEX-PLUGIN-HEADER-001",
+        "CODEX-PLUGIN-DETAIL-001",
+        "CODEX-PLUGIN-DETAIL-002",
+        "CODEX-PLUGIN-PROPERTIES-POSITION-001",
+        "CODEX-PLUGIN-CONVERSATION-001",
+        "CODEX-PLUGIN-CONVERSATION-002",
+        "CODEX-PLUGIN-COMMENT-MODEL-001",
+        "CODEX-PLUGIN-ATTACHMENT-INLINE-001",
+        "CODEX-PLUGIN-DISPATCH-001",
+        "CODEX-PLUGIN-DISPATCH-002",
+        "0.1.0-PROTO-A-000",
+        "0.1.0-PROTO-A-001",
+        "0.1.0-PROTO-A-002",
+        "0.1.0-PROTO-A-003",
+        "0.1.0-PROTO-A-004",
+        "0.1.0-PROTO-A-005",
+        "0.1.0-PROTO-B-000",
+        "0.1.0-PROTO-B-001",
+        "0.1.0-PROTO-B-002",
+        "issue-001",
+        "0.1.0-PROTO-B-003",
+        "0.1.0-PROTO-B-004",
+        "0.1.0-PROTO-B-005",
+        "0.1.0-PROTO-B-006",
+        "0.1.0-PROTO-B-007",
+        "0.1.0-SCHEMA-A-000",
+        "0.1.0-SCHEMA-A-001",
+        "0.1.0-SCHEMA-A-002",
+        "0.1.0-SCHEMA-A-003",
+        "0.1.0-SCHEMA-A-004",
+        "0.1.0-SCHEMA-A-005",
+        "0.1.0-SCHEMA-A-006",
+        "0.1.0-SCHEMA-A-007",
+        "0.1.0-SCHEMA-A-008",
+        "0.1.0-CLI-A-000",
+        "0.1.0-CLI-A-001",
+        "0.1.0-CLI-A-002",
+        "0.1.0-CLI-A-003",
+        "0.1.0-CLI-A-004",
+        "0.1.0-CLI-A-005",
+        "0.1.0-CLI-A-006",
+        "0.1.0-CLI-A-007",
+        "0.1.0-INTEGRATION-A-000",
+        "0.1.0-INTEGRATION-A-001",
+        "0.1.0-INTEGRATION-A-002",
+        "0.1.0-INTEGRATION-A-003",
+        "0.1.0-INTEGRATION-A-004",
+        "0.1.0-PM-A-000",
+        "0.1.0-PM-A-001",
+        "0.1.0-PM-A-002",
+        "0.1.0-PM-A-003",
+        "0.1.0-PM-A-004",
+        "0.1.0-PM-A-005",
+        "0.1.0-PM-A-006",
+        "0.1.0-PM-A-007",
+        "0.1.0-QA-A-000",
+        "0.1.0-QA-A-001",
+        "0.1.0-QA-A-002",
+        "0.1.0-QA-A-003",
+        "0.1.0-QA-A-004",
+        "0.1.0-QA-A-005",
+        "0.1.0-QA-A-006",
+        "0.2.0-COLLAB-A-000",
+        "0.2.0-COLLAB-A-001",
+        "0.2.0-COLLAB-A-002",
+        "0.2.0-COLLAB-A-003",
+        "0.2.0-VIEW-A-000",
+        "0.2.0-VIEW-A-001",
+        "0.2.0-VIEW-A-002",
+        "0.2.0-VIEW-A-003"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "path": "agent-log/20261007-dispatch-conversations.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-native-ui-shared-projects.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-hidden-scrollbars.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261002-sidebar-startup.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20260904-221230-utcp8-taobe-gpt-5.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-detail-file-location.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261010-host-chat-figma-header.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-detail-title-comments.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261002-chatgpt-appearance.md",
+      "role": "historical-evidence",
+      "issues": [
+        "CODEX-PLUGIN-010"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-align-content-gutters.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261001-myissue-codex-plugin.md",
+      "role": "historical-evidence",
+      "issues": [
+        "CODEX-PLUGIN-001"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-sidebar-attachments-properties.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261002-project-picker.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261010-properties-position.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-live-refresh.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261011-031247-utcp8-taobe-gpt-5.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-card-conversations.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-plugin-host-header.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-inline-attachments.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261010-comment-conversations-models.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    },
+    {
+      "path": "agent-log/20261007-remove-board-footer.md",
+      "role": "historical-evidence",
+      "issues": [
+        "DOC-migration-20261023"
+      ],
+      "matched_legacy_ids": []
+    }
+  ],
+  "issues": [
+    {
+      "id": "CODEX-PLUGIN-001",
+      "type": "DB",
+      "file": "issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md",
+      "title": "Phase - Codex 插件首版（2026-10-01 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-001",
+        "CODEX-PLUGIN-002",
+        "CODEX-PLUGIN-003",
+        "CODEX-PLUGIN-004",
+        "CODEX-PLUGIN-005",
+        "CODEX-PLUGIN-006",
+        "CODEX-PLUGIN-007",
+        "CODEX-PLUGIN-008",
+        "CODEX-PLUGIN-009"
+      ],
+      "state": "进行中（原文同时包含已完成与未完成项）"
+    },
+    {
+      "id": "CODEX-PLUGIN-010",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md",
+      "title": "Phase - ChatGPT 外观与主题（2026-10-02 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-010",
+        "CODEX-PLUGIN-011",
+        "CODEX-PLUGIN-012",
+        "CODEX-PLUGIN-SCROLL-001",
+        "CODEX-PLUGIN-FOOTER-001",
+        "CODEX-PLUGIN-LIVE-001"
+      ],
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+    },
+    {
+      "id": "CODEX-PLUGIN-013",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-013-API-project-goal-versioncontrolid.md",
+      "title": "Phase - 侧栏、附件与属性显示（2026-10-07 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-013",
+        "CODEX-PLUGIN-014",
+        "CODEX-PLUGIN-015"
+      ],
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+    },
+    {
+      "id": "CODEX-PLUGIN-016",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-016-API-project-goal-versioncontrolid.md",
+      "title": "Phase - 原生外观、标准组件与共享项目（2026-10-07 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-016",
+        "CODEX-PLUGIN-017",
+        "CODEX-PLUGIN-018"
+      ],
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+    },
+    {
+      "id": "CODEX-PLUGIN-HEADER-001",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-HEADER-001-API-project-goal-versioncontrolid.md",
+      "title": "Phase - 插件页面顶栏（2026-10-07 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-HEADER-001"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "CODEX-PLUGIN-DETAIL-001",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-DETAIL-001-API-project-goal-versioncontrolid.md",
+      "title": "Phase - 详情页显示与评论输入（2026-10-07 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-DETAIL-001",
+        "CODEX-PLUGIN-DETAIL-002",
+        "CODEX-PLUGIN-PROPERTIES-POSITION-001"
+      ],
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+    },
+    {
+      "id": "CODEX-PLUGIN-CONVERSATION-001",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-CONVERSATION-001-API-project-goal-versioncontrolid.md",
+      "title": "Phase - 卡片对话关联（2026-10-07 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-CONVERSATION-001"
+      ],
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+    },
+    {
+      "id": "CODEX-PLUGIN-CONVERSATION-002",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-CONVERSATION-002-API-project-goal-versioncontrolid.md",
+      "title": "Phase - 当前对话、评论来源与完整模型名（2026-10-10 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-CONVERSATION-002",
+        "CODEX-PLUGIN-COMMENT-MODEL-001"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "CODEX-PLUGIN-ATTACHMENT-INLINE-001",
+      "type": "DOC",
+      "file": "issue-CODEX-PLUGIN-ATTACHMENT-INLINE-001-DOC-project-goal-versioncontrolid.md",
+      "title": "Phase - 正文内附件（2026-10-07 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-ATTACHMENT-INLINE-001"
+      ],
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+    },
+    {
+      "id": "CODEX-PLUGIN-DISPATCH-001",
+      "type": "API",
+      "file": "issue-CODEX-PLUGIN-DISPATCH-001-API-project-goal-versioncontrolid.md",
+      "title": "Phase - 分发目标与精简界面（2026-10-07 确认）",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "CODEX-PLUGIN-DISPATCH-001",
+        "CODEX-PLUGIN-DISPATCH-002"
+      ],
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+    },
+    {
+      "id": "0.1.0-PROTO-A-000",
+      "type": "API",
+      "file": "issue-0.1.0-PROTO-A-000-API-agent-harness-issue-protocol-versioncontrolid.md",
+      "title": "protocol/main: 建立可脱离 Agent 与 Harness 的 Issue 协议",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.1.0-PROTO-A-000",
+        "0.1.0-PROTO-A-001",
+        "0.1.0-PROTO-A-002",
+        "0.1.0-PROTO-A-003",
+        "0.1.0-PROTO-A-004",
+        "0.1.0-PROTO-A-005"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.1.0-PROTO-B-000",
+      "type": "API",
+      "file": "issue-0.1.0-PROTO-B-000-API-files-issue-graph-versioncontrolid.md",
+      "title": "protocol/main: 用扁平文件表达任意深度的 Issue Graph",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.1.0-PROTO-B-000",
+        "0.1.0-PROTO-B-001",
+        "0.1.0-PROTO-B-002",
+        "issue-001",
+        "0.1.0-PROTO-B-003",
+        "0.1.0-PROTO-B-004",
+        "0.1.0-PROTO-B-005",
+        "0.1.0-PROTO-B-006",
+        "0.1.0-PROTO-B-007"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.1.0-SCHEMA-A-000",
+      "type": "API",
+      "file": "issue-0.1.0-SCHEMA-A-000-API-issue-files-versioncontrolid.md",
+      "title": "protocol/main: 定义最小且可读的 Issue 文件",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.1.0-SCHEMA-A-000",
+        "0.1.0-SCHEMA-A-001",
+        "0.1.0-SCHEMA-A-002",
+        "0.1.0-SCHEMA-A-003",
+        "0.1.0-SCHEMA-A-004",
+        "0.1.0-SCHEMA-A-005",
+        "0.1.0-SCHEMA-A-006",
+        "0.1.0-SCHEMA-A-007",
+        "0.1.0-SCHEMA-A-008"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.1.0-CLI-A-000",
+      "type": "TOOL",
+      "file": "issue-0.1.0-CLI-A-000-TOOL-controls-versioncontrolid.md",
+      "title": "cli/main: 提供薄而确定的结构化操作入口",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.1.0-CLI-A-000",
+        "0.1.0-CLI-A-001",
+        "0.1.0-CLI-A-002",
+        "0.1.0-CLI-A-003",
+        "0.1.0-CLI-A-004",
+        "0.1.0-CLI-A-005",
+        "0.1.0-CLI-A-006",
+        "0.1.0-CLI-A-007"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.1.0-INTEGRATION-A-000",
+      "type": "API",
+      "file": "issue-0.1.0-INTEGRATION-A-000-API-project-myissue-versioncontrolid.md",
+      "title": "integration/main: 让现有项目逐步采用 myIssue",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.1.0-INTEGRATION-A-000",
+        "0.1.0-INTEGRATION-A-001",
+        "0.1.0-INTEGRATION-A-002",
+        "0.1.0-INTEGRATION-A-003",
+        "0.1.0-INTEGRATION-A-004"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.1.0-PM-A-000",
+      "type": "PM",
+      "file": "issue-0.1.0-PM-A-000-PM-protocol-versioncontrolid.md",
+      "title": "protocol/main: 关闭协议冻结前的关键待决策项",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.1.0-PM-A-000",
+        "0.1.0-PM-A-001",
+        "0.1.0-PM-A-002",
+        "0.1.0-PM-A-003",
+        "0.1.0-PM-A-004",
+        "0.1.0-PM-A-005",
+        "0.1.0-PM-A-006",
+        "0.1.0-PM-A-007"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.1.0-QA-A-000",
+      "type": "QA",
+      "file": "issue-0.1.0-QA-A-000-QA-verification-protocol-controls-content-versioncontrolid.md",
+      "title": "validation/main: 验证协议可恢复、可互操作且不损坏内容",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.1.0-QA-A-000",
+        "0.1.0-QA-A-001",
+        "0.1.0-QA-A-002",
+        "0.1.0-QA-A-003",
+        "0.1.0-QA-A-004",
+        "0.1.0-QA-A-005",
+        "0.1.0-QA-A-006"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.2.0-COLLAB-A-000",
+      "type": "DOC",
+      "file": "issue-0.2.0-COLLAB-A-000-DOC-collaboration-issue-versioncontrolid.md",
+      "title": "collaboration/main: 支持多个执行者协作同一 Issue 集合",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.2.0-COLLAB-A-000",
+        "0.2.0-COLLAB-A-001",
+        "0.2.0-COLLAB-A-002",
+        "0.2.0-COLLAB-A-003"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    },
+    {
+      "id": "0.2.0-VIEW-A-000",
+      "type": "API",
+      "file": "issue-0.2.0-VIEW-A-000-API-protocol-versioncontrolid.md",
+      "title": "presentation/main: 在协议之上提供可替换视图",
+      "source": "REQUIREMENTS.md",
+      "legacy_ids": [
+        "0.2.0-VIEW-A-000",
+        "0.2.0-VIEW-A-001",
+        "0.2.0-VIEW-A-002",
+        "0.2.0-VIEW-A-003"
+      ],
+      "state": "待处理（原文未完成项保持未勾选）"
+    }
+  ],
+  "note": "Original states retained; historical log evidence does not complete current tasks."
+}

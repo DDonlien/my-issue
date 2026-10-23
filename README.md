@@ -188,10 +188,10 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 
 ## 文档
 
-- [`REQUIREMENTS.md`](REQUIREMENTS.md)：稳定需求 ID 与验收状态
+- [`issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md`](issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md)：稳定需求 ID 与验收状态
 - [`DESIGN.md`](DESIGN.md)：视觉与交互约束
 - [`ARCHITECTURE.md`](ARCHITECTURE.md)：共用核心与宿主适配边界
-- `agent-log/`：实施与验证记录
+- `issue/README.md`：实施与验证记录
 
 实现参考：[官方插件打包](https://developers.openai.com/plugins/build/plugins)、[独立侧栏及对话入口](https://developers.openai.com/plugins/build/extensions)、[MCP Apps UI](https://developers.openai.com/plugins/build/chatgpt-ui)。
 
