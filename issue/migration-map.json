@@ -1,7 +1,7 @@
 {
   "history_base": "7649f547f4ea8214825f55d0746338becf1aea33",
-  "versioncontrolid": "versioncontrolid",
-  "versioncontrolid_definition": "pending",
+  "versioncontrolid": null,
+  "versioncontrolid_definition": "task implementation Git commit hash or final submitted Perforce changelist",
   "sources": [
     {
       "path": "REQUIREMENTS.md",
@@ -206,25 +206,35 @@
     {
       "path": "REQUIREMENTS.md",
       "issues": [
-        "issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-013-API-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-016-API-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-HEADER-001-API-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-DETAIL-001-API-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-CONVERSATION-001-API-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-CONVERSATION-002-API-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-ATTACHMENT-INLINE-001-DOC-project-goal-versioncontrolid.md",
-        "issue/issue-CODEX-PLUGIN-DISPATCH-001-API-project-goal-versioncontrolid.md",
-        "issue/issue-0.1.0-PROTO-A-000-API-agent-harness-issue-protocol-versioncontrolid.md",
-        "issue/issue-0.1.0-PROTO-B-000-API-files-issue-graph-versioncontrolid.md",
-        "issue/issue-0.1.0-SCHEMA-A-000-API-issue-files-versioncontrolid.md",
-        "issue/issue-0.1.0-CLI-A-000-TOOL-controls-versioncontrolid.md",
-        "issue/issue-0.1.0-INTEGRATION-A-000-API-project-myissue-versioncontrolid.md",
-        "issue/issue-0.1.0-PM-A-000-PM-protocol-versioncontrolid.md",
-        "issue/issue-0.1.0-QA-A-000-QA-verification-protocol-controls-content-versioncontrolid.md",
-        "issue/issue-0.2.0-COLLAB-A-000-DOC-collaboration-issue-versioncontrolid.md",
-        "issue/issue-0.2.0-VIEW-A-000-API-protocol-versioncontrolid.md"
+        "issue/issue_提供可安装的myIssue插件清单与分发包.md",
+        "issue/issue_提供宿主独立侧栏与对话内myIssue入口.md",
+        "issue/issue_从真实Markdown文件驱动myIssue看板与安全读写.md",
+        "issue/issue_在myIssue与当前或新对话间传递Issue上下文.md",
+        "issue/issue_采用ChatGPT中性外观并精简看板页面.md",
+        "issue/issue_保持旧页面资源地址兼容并修复侧栏升级启动.md",
+        "issue/issue_通过系统文件夹选择器与桌面项目列表切换项目.md",
+        "issue/issue_用差异检测心跳同步文件变化并刷新可见页面.md",
+        "issue/issue_在侧栏单选全部Issue与可开始视图.md",
+        "issue/issue_在Issue详情选择并上传受限附件.md",
+        "issue/issue_完整渲染任意属性并打开URL与Issue关联.md",
+        "issue/issue_继承宿主浅深色主题并移除左侧导航.md",
+        "issue/issue_让同一用户的myIssue面板共享项目配置.md",
+        "issue/issue_隐藏独立myIssue页面的宿主额外标题栏.md",
+        "issue/issue_自适应显示Issue长名称并保持评论输入布局.md",
+        "issue/issue_调整详情属性区顺序并移除冗余文件位置说明.md",
+        "issue/issue_在卡片显示可直接跳转的任务对话链接.md",
+        "issue/issue_区分当前执行对话与AI评论来源并记录完整模型名.md",
+        "issue/issue_将附件入口与媒体预览合并到Issue描述区.md",
+        "issue/issue_读取真实Codex对话作为分发目标并精简分发说明.md",
+        "issue/issue_交付可脱离Agent与Harness的Markdown-Issue协议.md",
+        "issue/issue_用扁平Markdown文件和关系表达任意深度Issue图.md",
+        "issue/issue_定义包含Properties标题正文与Comments的最小Issue文件.md",
+        "issue/issue_提供供人类脚本与Agent共用的最小CLI.md",
+        "issue/issue_让现有项目渐进采用myIssue并保留Git历史.md",
+        "issue/issue_冻结Issue协议Schema与关键边界决策.md",
+        "issue/issue_验证Issue协议恢复互操作与内容保真.md",
+        "issue/issue_支持多个执行者协作同一Issue集合.md",
+        "issue/issue_提供可替换的Issue图浏览与操作视图.md"
       ],
       "legacy_ids": [
         "CODEX-PLUGIN-001",
@@ -495,7 +505,7 @@
     {
       "id": "CODEX-PLUGIN-001",
       "type": "DB",
-      "file": "issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md",
+      "file": "issue_提供可安装的myIssue插件清单与分发包.md",
       "title": "Phase - Codex 插件首版（2026-10-01 确认）",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
@@ -509,12 +519,57 @@
         "CODEX-PLUGIN-008",
         "CODEX-PLUGIN-009"
       ],
-      "state": "进行中（原文同时包含已完成与未完成项）"
+      "state": "进行中（原文同时包含已完成与未完成项）",
+      "files": [
+        "issue_提供可安装的myIssue插件清单与分发包.md",
+        "issue_提供宿主独立侧栏与对话内myIssue入口.md",
+        "issue_从真实Markdown文件驱动myIssue看板与安全读写.md",
+        "issue_在myIssue与当前或新对话间传递Issue上下文.md"
+      ],
+      "split_tasks": [
+        {
+          "file": "issue_提供可安装的myIssue插件清单与分发包.md",
+          "title": "提供可安装的myIssue插件清单与分发包",
+          "source_task_ids": [
+            "CODEX-PLUGIN-001",
+            "CODEX-PLUGIN-009"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_提供宿主独立侧栏与对话内myIssue入口.md",
+          "title": "提供宿主独立侧栏与对话内myIssue入口",
+          "source_task_ids": [
+            "CODEX-PLUGIN-002"
+          ],
+          "state": "待处理（本任务原文未完成项保持未勾选；取消、阻塞和延后标记照录）。"
+        },
+        {
+          "file": "issue_从真实Markdown文件驱动myIssue看板与安全读写.md",
+          "title": "从真实Markdown文件驱动myIssue看板与安全读写",
+          "source_task_ids": [
+            "CODEX-PLUGIN-003",
+            "CODEX-PLUGIN-004",
+            "CODEX-PLUGIN-006",
+            "CODEX-PLUGIN-007",
+            "CODEX-PLUGIN-008"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_在myIssue与当前或新对话间传递Issue上下文.md",
+          "title": "在myIssue与当前或新对话间传递Issue上下文",
+          "source_task_ids": [
+            "CODEX-PLUGIN-005"
+          ],
+          "state": "待处理（本任务原文未完成项保持未勾选；取消、阻塞和延后标记照录）。"
+        }
+      ]
     },
     {
       "id": "CODEX-PLUGIN-010",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md",
+      "file": "issue_采用ChatGPT中性外观并精简看板页面.md",
       "title": "Phase - ChatGPT 外观与主题（2026-10-02 确认）",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
@@ -525,12 +580,54 @@
         "CODEX-PLUGIN-FOOTER-001",
         "CODEX-PLUGIN-LIVE-001"
       ],
-      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）",
+      "files": [
+        "issue_采用ChatGPT中性外观并精简看板页面.md",
+        "issue_保持旧页面资源地址兼容并修复侧栏升级启动.md",
+        "issue_通过系统文件夹选择器与桌面项目列表切换项目.md",
+        "issue_用差异检测心跳同步文件变化并刷新可见页面.md"
+      ],
+      "split_tasks": [
+        {
+          "file": "issue_采用ChatGPT中性外观并精简看板页面.md",
+          "title": "采用ChatGPT中性外观并精简看板页面",
+          "source_task_ids": [
+            "CODEX-PLUGIN-010",
+            "CODEX-PLUGIN-SCROLL-001",
+            "CODEX-PLUGIN-FOOTER-001"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_保持旧页面资源地址兼容并修复侧栏升级启动.md",
+          "title": "保持旧页面资源地址兼容并修复侧栏升级启动",
+          "source_task_ids": [
+            "CODEX-PLUGIN-011"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_通过系统文件夹选择器与桌面项目列表切换项目.md",
+          "title": "通过系统文件夹选择器与桌面项目列表切换项目",
+          "source_task_ids": [
+            "CODEX-PLUGIN-012"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_用差异检测心跳同步文件变化并刷新可见页面.md",
+          "title": "用差异检测心跳同步文件变化并刷新可见页面",
+          "source_task_ids": [
+            "CODEX-PLUGIN-LIVE-001"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        }
+      ]
     },
     {
       "id": "CODEX-PLUGIN-013",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-013-API-project-goal-versioncontrolid.md",
+      "file": "issue_在侧栏单选全部Issue与可开始视图.md",
       "title": "Phase - 侧栏、附件与属性显示（2026-10-07 确认）",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
@@ -538,12 +635,43 @@
         "CODEX-PLUGIN-014",
         "CODEX-PLUGIN-015"
       ],
-      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）",
+      "files": [
+        "issue_在侧栏单选全部Issue与可开始视图.md",
+        "issue_在Issue详情选择并上传受限附件.md",
+        "issue_完整渲染任意属性并打开URL与Issue关联.md"
+      ],
+      "split_tasks": [
+        {
+          "file": "issue_在侧栏单选全部Issue与可开始视图.md",
+          "title": "在侧栏单选全部Issue与可开始视图",
+          "source_task_ids": [
+            "CODEX-PLUGIN-013"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_在Issue详情选择并上传受限附件.md",
+          "title": "在Issue详情选择并上传受限附件",
+          "source_task_ids": [
+            "CODEX-PLUGIN-014"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_完整渲染任意属性并打开URL与Issue关联.md",
+          "title": "完整渲染任意属性并打开URL与Issue关联",
+          "source_task_ids": [
+            "CODEX-PLUGIN-015"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        }
+      ]
     },
     {
       "id": "CODEX-PLUGIN-016",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-016-API-project-goal-versioncontrolid.md",
+      "file": "issue_继承宿主浅深色主题并移除左侧导航.md",
       "title": "Phase - 原生外观、标准组件与共享项目（2026-10-07 确认）",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
@@ -551,13 +679,36 @@
         "CODEX-PLUGIN-017",
         "CODEX-PLUGIN-018"
       ],
-      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）",
+      "files": [
+        "issue_继承宿主浅深色主题并移除左侧导航.md",
+        "issue_让同一用户的myIssue面板共享项目配置.md"
+      ],
+      "split_tasks": [
+        {
+          "file": "issue_继承宿主浅深色主题并移除左侧导航.md",
+          "title": "继承宿主浅深色主题并移除左侧导航",
+          "source_task_ids": [
+            "CODEX-PLUGIN-016",
+            "CODEX-PLUGIN-017"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_让同一用户的myIssue面板共享项目配置.md",
+          "title": "让同一用户的myIssue面板共享项目配置",
+          "source_task_ids": [
+            "CODEX-PLUGIN-018"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        }
+      ]
     },
     {
       "id": "CODEX-PLUGIN-HEADER-001",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-HEADER-001-API-project-goal-versioncontrolid.md",
-      "title": "Phase - 插件页面顶栏（2026-10-07 确认）",
+      "file": "issue_隐藏独立myIssue页面的宿主额外标题栏.md",
+      "title": "隐藏独立myIssue页面的宿主额外标题栏",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "CODEX-PLUGIN-HEADER-001"
@@ -567,7 +718,7 @@
     {
       "id": "CODEX-PLUGIN-DETAIL-001",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-DETAIL-001-API-project-goal-versioncontrolid.md",
+      "file": "issue_自适应显示Issue长名称并保持评论输入布局.md",
       "title": "Phase - 详情页显示与评论输入（2026-10-07 确认）",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
@@ -575,13 +726,36 @@
         "CODEX-PLUGIN-DETAIL-002",
         "CODEX-PLUGIN-PROPERTIES-POSITION-001"
       ],
-      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）"
+      "state": "已完成（沿用原需求记录；本轮未重新执行产品验收）",
+      "files": [
+        "issue_自适应显示Issue长名称并保持评论输入布局.md",
+        "issue_调整详情属性区顺序并移除冗余文件位置说明.md"
+      ],
+      "split_tasks": [
+        {
+          "file": "issue_自适应显示Issue长名称并保持评论输入布局.md",
+          "title": "自适应显示Issue长名称并保持评论输入布局",
+          "source_task_ids": [
+            "CODEX-PLUGIN-DETAIL-001"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        },
+        {
+          "file": "issue_调整详情属性区顺序并移除冗余文件位置说明.md",
+          "title": "调整详情属性区顺序并移除冗余文件位置说明",
+          "source_task_ids": [
+            "CODEX-PLUGIN-DETAIL-002",
+            "CODEX-PLUGIN-PROPERTIES-POSITION-001"
+          ],
+          "state": "已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。"
+        }
+      ]
     },
     {
       "id": "CODEX-PLUGIN-CONVERSATION-001",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-CONVERSATION-001-API-project-goal-versioncontrolid.md",
-      "title": "Phase - 卡片对话关联（2026-10-07 确认）",
+      "file": "issue_在卡片显示可直接跳转的任务对话链接.md",
+      "title": "在卡片显示可直接跳转的任务对话链接",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "CODEX-PLUGIN-CONVERSATION-001"
@@ -591,8 +765,8 @@
     {
       "id": "CODEX-PLUGIN-CONVERSATION-002",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-CONVERSATION-002-API-project-goal-versioncontrolid.md",
-      "title": "Phase - 当前对话、评论来源与完整模型名（2026-10-10 确认）",
+      "file": "issue_区分当前执行对话与AI评论来源并记录完整模型名.md",
+      "title": "区分当前执行对话与AI评论来源并记录完整模型名",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "CODEX-PLUGIN-CONVERSATION-002",
@@ -603,8 +777,8 @@
     {
       "id": "CODEX-PLUGIN-ATTACHMENT-INLINE-001",
       "type": "DOC",
-      "file": "issue-CODEX-PLUGIN-ATTACHMENT-INLINE-001-DOC-project-goal-versioncontrolid.md",
-      "title": "Phase - 正文内附件（2026-10-07 确认）",
+      "file": "issue_将附件入口与媒体预览合并到Issue描述区.md",
+      "title": "将附件入口与媒体预览合并到Issue描述区",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "CODEX-PLUGIN-ATTACHMENT-INLINE-001"
@@ -614,8 +788,8 @@
     {
       "id": "CODEX-PLUGIN-DISPATCH-001",
       "type": "API",
-      "file": "issue-CODEX-PLUGIN-DISPATCH-001-API-project-goal-versioncontrolid.md",
-      "title": "Phase - 分发目标与精简界面（2026-10-07 确认）",
+      "file": "issue_读取真实Codex对话作为分发目标并精简分发说明.md",
+      "title": "读取真实Codex对话作为分发目标并精简分发说明",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "CODEX-PLUGIN-DISPATCH-001",
@@ -626,8 +800,8 @@
     {
       "id": "0.1.0-PROTO-A-000",
       "type": "API",
-      "file": "issue-0.1.0-PROTO-A-000-API-agent-harness-issue-protocol-versioncontrolid.md",
-      "title": "protocol/main: 建立可脱离 Agent 与 Harness 的 Issue 协议",
+      "file": "issue_交付可脱离Agent与Harness的Markdown-Issue协议.md",
+      "title": "交付可脱离Agent与Harness的Markdown-Issue协议",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.1.0-PROTO-A-000",
@@ -642,8 +816,8 @@
     {
       "id": "0.1.0-PROTO-B-000",
       "type": "API",
-      "file": "issue-0.1.0-PROTO-B-000-API-files-issue-graph-versioncontrolid.md",
-      "title": "protocol/main: 用扁平文件表达任意深度的 Issue Graph",
+      "file": "issue_用扁平Markdown文件和关系表达任意深度Issue图.md",
+      "title": "用扁平Markdown文件和关系表达任意深度Issue图",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.1.0-PROTO-B-000",
@@ -661,8 +835,8 @@
     {
       "id": "0.1.0-SCHEMA-A-000",
       "type": "API",
-      "file": "issue-0.1.0-SCHEMA-A-000-API-issue-files-versioncontrolid.md",
-      "title": "protocol/main: 定义最小且可读的 Issue 文件",
+      "file": "issue_定义包含Properties标题正文与Comments的最小Issue文件.md",
+      "title": "定义包含Properties标题正文与Comments的最小Issue文件",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.1.0-SCHEMA-A-000",
@@ -680,8 +854,8 @@
     {
       "id": "0.1.0-CLI-A-000",
       "type": "TOOL",
-      "file": "issue-0.1.0-CLI-A-000-TOOL-controls-versioncontrolid.md",
-      "title": "cli/main: 提供薄而确定的结构化操作入口",
+      "file": "issue_提供供人类脚本与Agent共用的最小CLI.md",
+      "title": "提供供人类脚本与Agent共用的最小CLI",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.1.0-CLI-A-000",
@@ -698,8 +872,8 @@
     {
       "id": "0.1.0-INTEGRATION-A-000",
       "type": "API",
-      "file": "issue-0.1.0-INTEGRATION-A-000-API-project-myissue-versioncontrolid.md",
-      "title": "integration/main: 让现有项目逐步采用 myIssue",
+      "file": "issue_让现有项目渐进采用myIssue并保留Git历史.md",
+      "title": "让现有项目渐进采用myIssue并保留Git历史",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.1.0-INTEGRATION-A-000",
@@ -713,8 +887,8 @@
     {
       "id": "0.1.0-PM-A-000",
       "type": "PM",
-      "file": "issue-0.1.0-PM-A-000-PM-protocol-versioncontrolid.md",
-      "title": "protocol/main: 关闭协议冻结前的关键待决策项",
+      "file": "issue_冻结Issue协议Schema与关键边界决策.md",
+      "title": "冻结Issue协议Schema与关键边界决策",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.1.0-PM-A-000",
@@ -731,8 +905,8 @@
     {
       "id": "0.1.0-QA-A-000",
       "type": "QA",
-      "file": "issue-0.1.0-QA-A-000-QA-verification-protocol-controls-content-versioncontrolid.md",
-      "title": "validation/main: 验证协议可恢复、可互操作且不损坏内容",
+      "file": "issue_验证Issue协议恢复互操作与内容保真.md",
+      "title": "验证Issue协议恢复互操作与内容保真",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.1.0-QA-A-000",
@@ -748,8 +922,8 @@
     {
       "id": "0.2.0-COLLAB-A-000",
       "type": "DOC",
-      "file": "issue-0.2.0-COLLAB-A-000-DOC-collaboration-issue-versioncontrolid.md",
-      "title": "collaboration/main: 支持多个执行者协作同一 Issue 集合",
+      "file": "issue_支持多个执行者协作同一Issue集合.md",
+      "title": "支持多个执行者协作同一Issue集合",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.2.0-COLLAB-A-000",
@@ -762,8 +936,8 @@
     {
       "id": "0.2.0-VIEW-A-000",
       "type": "API",
-      "file": "issue-0.2.0-VIEW-A-000-API-protocol-versioncontrolid.md",
-      "title": "presentation/main: 在协议之上提供可替换视图",
+      "file": "issue_提供可替换的Issue图浏览与操作视图.md",
+      "title": "提供可替换的Issue图浏览与操作视图",
       "source": "REQUIREMENTS.md",
       "legacy_ids": [
         "0.2.0-VIEW-A-000",
@@ -774,5 +948,99 @@
       "state": "待处理（原文未完成项保持未勾选）"
     }
   ],
-  "note": "Original states retained; historical log evidence does not complete current tasks."
+  "note": "Original states retained; historical log evidence does not complete current tasks.",
+  "versioncontrolid_status": "unverified implementation versions explicitly recorded per issue and omitted from filenames",
+  "naming_corrections": [
+    {
+      "time": "2026-10-24 06:07:34 UTC",
+      "old_to_current_files": {
+        "issue/issue-template.md": "issue/issue_template.md"
+      },
+      "new_format": "issue-specific-task-description[-verified-implementation-version].md",
+      "batch": "final-underscore-rules"
+    },
+    {
+      "time": "2026-10-24 06:30:10 UTC",
+      "old_to_current_files": {
+        "issue/issue-DOC-migration-20261023-DOC-migrate-project-workflow-versioncontrolid.md": "issue/issue_迁移项目任务与协作记录_c149fc82.md"
+      },
+      "new_format": "issue-specific-task-description[-verified-implementation-version].md",
+      "batch": "native-document-records"
+    },
+    {
+      "time": "2026-10-24 07:06:34 UTC",
+      "batch": "group-f-2",
+      "old_to_current_files": {
+        "issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md": [
+          "issue/issue_提供可安装的myIssue插件清单与分发包.md",
+          "issue/issue_提供宿主独立侧栏与对话内myIssue入口.md",
+          "issue/issue_从真实Markdown文件驱动myIssue看板与安全读写.md",
+          "issue/issue_在myIssue与当前或新对话间传递Issue上下文.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md": [
+          "issue/issue_采用ChatGPT中性外观并精简看板页面.md",
+          "issue/issue_保持旧页面资源地址兼容并修复侧栏升级启动.md",
+          "issue/issue_通过系统文件夹选择器与桌面项目列表切换项目.md",
+          "issue/issue_用差异检测心跳同步文件变化并刷新可见页面.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-013-API-project-goal-versioncontrolid.md": [
+          "issue/issue_在侧栏单选全部Issue与可开始视图.md",
+          "issue/issue_在Issue详情选择并上传受限附件.md",
+          "issue/issue_完整渲染任意属性并打开URL与Issue关联.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-016-API-project-goal-versioncontrolid.md": [
+          "issue/issue_继承宿主浅深色主题并移除左侧导航.md",
+          "issue/issue_让同一用户的myIssue面板共享项目配置.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-HEADER-001-API-project-goal-versioncontrolid.md": [
+          "issue/issue_隐藏独立myIssue页面的宿主额外标题栏.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-DETAIL-001-API-project-goal-versioncontrolid.md": [
+          "issue/issue_自适应显示Issue长名称并保持评论输入布局.md",
+          "issue/issue_调整详情属性区顺序并移除冗余文件位置说明.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-CONVERSATION-001-API-project-goal-versioncontrolid.md": [
+          "issue/issue_在卡片显示可直接跳转的任务对话链接.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-CONVERSATION-002-API-project-goal-versioncontrolid.md": [
+          "issue/issue_区分当前执行对话与AI评论来源并记录完整模型名.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-ATTACHMENT-INLINE-001-DOC-project-goal-versioncontrolid.md": [
+          "issue/issue_将附件入口与媒体预览合并到Issue描述区.md"
+        ],
+        "issue/issue-CODEX-PLUGIN-DISPATCH-001-API-project-goal-versioncontrolid.md": [
+          "issue/issue_读取真实Codex对话作为分发目标并精简分发说明.md"
+        ],
+        "issue/issue-0.1.0-PROTO-A-000-API-agent-harness-issue-protocol-versioncontrolid.md": [
+          "issue/issue_交付可脱离Agent与Harness的Markdown-Issue协议.md"
+        ],
+        "issue/issue-0.1.0-PROTO-B-000-API-files-issue-graph-versioncontrolid.md": [
+          "issue/issue_用扁平Markdown文件和关系表达任意深度Issue图.md"
+        ],
+        "issue/issue-0.1.0-SCHEMA-A-000-API-issue-files-versioncontrolid.md": [
+          "issue/issue_定义包含Properties标题正文与Comments的最小Issue文件.md"
+        ],
+        "issue/issue-0.1.0-CLI-A-000-TOOL-controls-versioncontrolid.md": [
+          "issue/issue_提供供人类脚本与Agent共用的最小CLI.md"
+        ],
+        "issue/issue-0.1.0-INTEGRATION-A-000-API-project-myissue-versioncontrolid.md": [
+          "issue/issue_让现有项目渐进采用myIssue并保留Git历史.md"
+        ],
+        "issue/issue-0.1.0-PM-A-000-PM-protocol-versioncontrolid.md": [
+          "issue/issue_冻结Issue协议Schema与关键边界决策.md"
+        ],
+        "issue/issue-0.1.0-QA-A-000-QA-verification-protocol-controls-content-versioncontrolid.md": [
+          "issue/issue_验证Issue协议恢复互操作与内容保真.md"
+        ],
+        "issue/issue-0.2.0-COLLAB-A-000-DOC-collaboration-issue-versioncontrolid.md": [
+          "issue/issue_支持多个执行者协作同一Issue集合.md"
+        ],
+        "issue/issue-0.2.0-VIEW-A-000-API-protocol-versioncontrolid.md": [
+          "issue/issue_提供可替换的Issue图浏览与操作视图.md"
+        ]
+      },
+      "format": "issue_任务描述[_实际版本编号].md",
+      "history_policy": "source Comments kept once in primary task; siblings link to primary"
+    }
+  ]
 }
