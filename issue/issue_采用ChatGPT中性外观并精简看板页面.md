@@ -1,31 +1,33 @@
-# Phase - ChatGPT 外观与主题（2026-10-02 确认）
+# 采用ChatGPT中性外观并精简看板页面
 
 - ID：`CODEX-PLUGIN-010`。
 - 类型：`API`。
-- 状态：已完成（沿用原需求记录；本轮未重新执行产品验收）。
-- 版本管理标识：`versioncontrolid`（含义待定义，不推断为 commit、branch 或 change）。
+- 状态：已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。
+- 版本管理：Git。
+- 实施提交：未核实（现有记录未提供可直接对应本任务的实际实施提交；来源快照、当前 HEAD 与文档迁移提交不代替任务实施版本）。
 - 来源：`REQUIREMENTS.md` @ `268e46933a376860f446dd7e98eab189612eeb21`；标题路径：任务清单 / Phase - ChatGPT 外观与主题（2026-10-02 确认）。
 - 原稳定 ID：`CODEX-PLUGIN-010`, `CODEX-PLUGIN-011`, `CODEX-PLUGIN-012`, `CODEX-PLUGIN-SCROLL-001`, `CODEX-PLUGIN-FOOTER-001`, `CODEX-PLUGIN-LIVE-001`；不改写或重编号这些既有 ID。
+- 来源汇总状态：已完成（沿用原需求记录；本轮未重新执行产品验收）。
+- 原迁移记录 ID：`CODEX-PLUGIN-010`。
+- 本文件原任务 ID：`CODEX-PLUGIN-010`、`CODEX-PLUGIN-SCROLL-001`、`CODEX-PLUGIN-FOOTER-001`。
+- 原需求标题：Phase - ChatGPT 外观与主题（2026-10-02 确认）。
+- 原迁移文件：`issue/issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md`（重命名前路径，仅用于历史追溯）。
+- 同源任务：[保持旧页面资源地址兼容并修复侧栏升级启动](issue_%E4%BF%9D%E6%8C%81%E6%97%A7%E9%A1%B5%E9%9D%A2%E8%B5%84%E6%BA%90%E5%9C%B0%E5%9D%80%E5%85%BC%E5%AE%B9%E5%B9%B6%E4%BF%AE%E5%A4%8D%E4%BE%A7%E6%A0%8F%E5%8D%87%E7%BA%A7%E5%90%AF%E5%8A%A8.md)、[通过系统文件夹选择器与桌面项目列表切换项目](issue_%E9%80%9A%E8%BF%87%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6%E5%A4%B9%E9%80%89%E6%8B%A9%E5%99%A8%E4%B8%8E%E6%A1%8C%E9%9D%A2%E9%A1%B9%E7%9B%AE%E5%88%97%E8%A1%A8%E5%88%87%E6%8D%A2%E9%A1%B9%E7%9B%AE.md)、[用差异检测心跳同步文件变化并刷新可见页面](issue_%E7%94%A8%E5%B7%AE%E5%BC%82%E6%A3%80%E6%B5%8B%E5%BF%83%E8%B7%B3%E5%90%8C%E6%AD%A5%E6%96%87%E4%BB%B6%E5%8F%98%E5%8C%96%E5%B9%B6%E5%88%B7%E6%96%B0%E5%8F%AF%E8%A7%81%E9%A1%B5%E9%9D%A2.md)。
 
 ## 当前需求与范围
-
 - [x] [CODEX-PLUGIN-010] 项目选择弹窗、输入框、按钮、侧栏和页面使用 ChatGPT 的中性配色、字体与圆角逻辑。优先使用 MCP Apps 宿主语义颜色变量并响应主题变更；宿主明确的浅色/深色优先于系统偏好，未提供时跟随系统。重点色只继承宿主提供的焦点/交互变量，不硬编码用户截图的橙色或读取宿主私有设置。已完成隔离 SDK 宿主与浏览器验证；当前 ChatGPT 用户自定义重点色是否实际下发仍未验收。
-- [x] [CODEX-PLUGIN-011] 修复升级后的对话侧栏启动：页面资源地址保持稳定，兼容已经发布的旧地址；安装更新后明确提示重启桌面应用，以清除旧对话保留的 MCP 进程。工具目录中的入口地址及兼容地址都必须能够通过实际 MCP 读取。2026-10-02 日志确认旧对话请求 board-v2.html，而保留的 0.1.0 进程只提供 board-v1.html。0.1.2 已安装，独立 Codex app-server 实际读取两个地址成功；重启桌面应用后的原生侧栏显示仍按 CODEX-PLUGIN-002 单独验收。
-- [x] [CODEX-PLUGIN-012] 项目选择窗提供可点击的系统文件夹选择器，取消不切换项目；同时读取桌面已添加的本地项目并保留其名称，打开弹窗时刷新列表。通过公开 Codex app-server project/list 获取主要本地根目录，不把没有本地目录的云项目当作文件项目；不可用时保留手动路径和已打开项目。新增项目不自动打开或写入 Issue。弹窗背景必须不透明，宿主半透明颜色应在不透明底色上合成；保持宿主主题与焦点色。2026-10-02 已实现 macOS 文件夹选择器，协议测试与实际 SDK 浏览器点击通过，已安装服务读取 37 个本地项目；系统选择器实际返回目录。0.1.3 原生页面的刷新后显示仍按 CODEX-PLUGIN-002 单独验收。
-
 - [x] [CODEX-PLUGIN-SCROLL-001] 页面所有滚动区域隐藏横向和纵向滚动条，保留滚轮、触控板和键盘滚动；不通过关闭 overflow 裁掉超出区域的内容。2026-10-07 确认并实现；Web 页面实际横向滚动通过，根页面、侧栏和看板的两种隐藏规则生效，overflow 保持 auto。
 
 - [x] [CODEX-PLUGIN-FOOTER-001] 移除看板和列表主区域底部的说明栏及占用空间，不显示名称/属性/评论、同步状态、拖动和轮询说明。2026-10-07 确认并实现；移除共用 footer 节点及全部专用样式，Web 刷新后 footer 节点数为 0。
 
-- [x] [CODEX-PLUGIN-LIVE-001] 移除主区手动刷新按钮，使用 2 秒心跳读取文件并比较数据差异，只有变化才更新界面；页面重新可见或获得焦点时立即检查。心跳请求不重叠，错误后后续心跳可重试；未保存草稿、打开的对话框和本页操作期间暂停，迟到的响应不得覆盖草稿、切换后的项目或刚保存的结果。2026-10-07 实现；新增四项自动测试通过，实际 Web 页面外修改名称/状态、删除和新增文件均自动同步。
 
-首版工程决定：Node.js 22+ / TypeScript，共用文件核心；默认 YAML frontmatter、H1 名称、可选 `## Description`、追加式 `## Comments`。新评论使用带时区 ISO 8601 时间与 `· author · human/model`；旧评论原文保留。默认状态 backlog/todo/in_progress/in_review/done/blocked/cancelled 可配置；不识别的状态仍独立展示。ID 使用文件名 `issue-<UUID>.md`，不改已有文件名或 ID。`REQUIREMENTS.md` 暂继续独立保存。仅由宿主对话能力执行分发，不托管 Agent Runtime；原“不启动 Agent”边界不限制用户本次确认的对话启动动作。许可证仍待用户选择。
 
 ## 检查与验收边界
 
 以上勾选与结果沿用迁移前的当前需求文档；历史记录中的实现、测试、编译、视觉与用户验收彼此独立。本次只迁移文档并检查结构 / 引用，没有重新执行产品构建或用户验收，也没有凭历史日志新增完成勾选。
 
 ## Comments
+
 
 ### 2026-10-23 17:44:33 UTC — Agent（文档迁移）
 
@@ -59,3 +61,7 @@
 - IAB 记录两条 MutationObserver 观察目标异常。产品 UI bundle 与隔离宿主源码均未调用 MutationObserver，主题与键盘验证正常；没有将浏览器自动化记录等同于原生 ChatGPT 控制台验收。
 - 本机更新安装成功，读取 installed=true / enabled=true / version=0.1.1。安装缓存 HTML 与当前构建 SHA-256 一致。新 Codex app-server 实际加载 9 个工具，toolsError=null，资源为 ui://myissue/board-v2.html，全局/对话入口元数据保留。
 - 包已生成 dist/myissue-0.1.1.zip。截图 _builds/verification/myissue-chatgpt-theme.jpg 为隔离验证预览，非原生 ChatGPT 画面。
+
+### 2026-10-24 07:06:34 UTC — Agent（纠正迁移命名）
+
+根据用户确认的原语言与下划线命名规则整理本记录；类型与原 ID 保留在 properties，原始勾选、取消／延后标记及验收边界照录。 本源文档按独立目标拆为 4 份，原始 Comments 完整留在本主记录。 未核实本任务实际实施提交，省略文件名版本后缀；未执行代码、构建或用户验收，未提交或推送。

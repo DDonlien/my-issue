@@ -180,7 +180,7 @@ MYISSUE_ROOT=/absolute/project/root npm run dev
 
 ## 文档
 
-- [`issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md`](issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md)：稳定需求 ID 与验收状态
+- [提供可安装的myIssue插件清单与分发包](issue/issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E5%AE%89%E8%A3%85%E7%9A%84myIssue%E6%8F%92%E4%BB%B6%E6%B8%85%E5%8D%95%E4%B8%8E%E5%88%86%E5%8F%91%E5%8C%85.md)、[提供宿主独立侧栏与对话内myIssue入口](issue/issue_%E6%8F%90%E4%BE%9B%E5%AE%BF%E4%B8%BB%E7%8B%AC%E7%AB%8B%E4%BE%A7%E6%A0%8F%E4%B8%8E%E5%AF%B9%E8%AF%9D%E5%86%85myIssue%E5%85%A5%E5%8F%A3.md)、[从真实Markdown文件驱动myIssue看板与安全读写](issue/issue_%E4%BB%8E%E7%9C%9F%E5%AE%9EMarkdown%E6%96%87%E4%BB%B6%E9%A9%B1%E5%8A%A8myIssue%E7%9C%8B%E6%9D%BF%E4%B8%8E%E5%AE%89%E5%85%A8%E8%AF%BB%E5%86%99.md)、[在myIssue与当前或新对话间传递Issue上下文](issue/issue_%E5%9C%A8myIssue%E4%B8%8E%E5%BD%93%E5%89%8D%E6%88%96%E6%96%B0%E5%AF%B9%E8%AF%9D%E9%97%B4%E4%BC%A0%E9%80%92Issue%E4%B8%8A%E4%B8%8B%E6%96%87.md)：稳定需求 ID 与验收状态
 - [`DESIGN.md`](DESIGN.md)：视觉与交互约束
 - [`ARCHITECTURE.md`](ARCHITECTURE.md)：共用核心与宿主适配边界
 - `issue/README.md`：实施与验证记录

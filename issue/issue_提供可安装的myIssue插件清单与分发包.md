@@ -1,29 +1,30 @@
-# Phase - Codex 插件首版（2026-10-01 确认）
+# 提供可安装的myIssue插件清单与分发包
 
 - ID：`CODEX-PLUGIN-001`。
 - 类型：`DB`。
-- 状态：进行中（原文同时包含已完成与未完成项）。
-- 版本管理标识：`versioncontrolid`（含义待定义，不推断为 commit、branch 或 change）。
+- 状态：已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。
+- 版本管理：Git。
+- 实施提交：未核实（现有记录未提供可直接对应本任务的实际实施提交；来源快照、当前 HEAD 与文档迁移提交不代替任务实施版本）。
 - 来源：`REQUIREMENTS.md` @ `268e46933a376860f446dd7e98eab189612eeb21`；标题路径：任务清单 / Phase - Codex 插件首版（2026-10-01 确认）。
 - 原稳定 ID：`CODEX-PLUGIN-001`, `CODEX-PLUGIN-002`, `CODEX-PLUGIN-003`, `CODEX-PLUGIN-004`, `CODEX-PLUGIN-005`, `CODEX-PLUGIN-006`, `CODEX-PLUGIN-007`, `CODEX-PLUGIN-008`, `CODEX-PLUGIN-009`；不改写或重编号这些既有 ID。
+- 来源汇总状态：进行中（原文同时包含已完成与未完成项）。
+- 原迁移记录 ID：`CODEX-PLUGIN-001`。
+- 本文件原任务 ID：`CODEX-PLUGIN-001`、`CODEX-PLUGIN-009`。
+- 原需求标题：Phase - Codex 插件首版（2026-10-01 确认）。
+- 原迁移文件：`issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md`（重命名前路径，仅用于历史追溯）。
+- 同源任务：[提供宿主独立侧栏与对话内myIssue入口](issue_%E6%8F%90%E4%BE%9B%E5%AE%BF%E4%B8%BB%E7%8B%AC%E7%AB%8B%E4%BE%A7%E6%A0%8F%E4%B8%8E%E5%AF%B9%E8%AF%9D%E5%86%85myIssue%E5%85%A5%E5%8F%A3.md)、[从真实Markdown文件驱动myIssue看板与安全读写](issue_%E4%BB%8E%E7%9C%9F%E5%AE%9EMarkdown%E6%96%87%E4%BB%B6%E9%A9%B1%E5%8A%A8myIssue%E7%9C%8B%E6%9D%BF%E4%B8%8E%E5%AE%89%E5%85%A8%E8%AF%BB%E5%86%99.md)、[在myIssue与当前或新对话间传递Issue上下文](issue_%E5%9C%A8myIssue%E4%B8%8E%E5%BD%93%E5%89%8D%E6%88%96%E6%96%B0%E5%AF%B9%E8%AF%9D%E9%97%B4%E4%BC%A0%E9%80%92Issue%E4%B8%8A%E4%B8%8B%E6%96%87.md)。
 
 ## 当前需求与范围
-
 - [x] [CODEX-PLUGIN-001] 提供标准插件清单、Marketplace、安装命令和可分发包，实际检查本机安装状态。
-- [ ] [CODEX-PLUGIN-002] 提供 MCP Apps 全局独立侧栏入口及对话内入口，使用官方 OpenAI UI entrypoints；平台是否展示必须单独人工验收。已实现并由 Codex app-server 读取元数据；2026-10-02 用户截图已确认全局页面显示，对话侧栏入口仍未人工验收。
-- [x] [CODEX-PLUGIN-003] 采用 Multica 风格状态列、卡片与详情面板，语义只围绕名称、自由属性、追加式评论；名称下自由 Markdown 内容兼容既有 Description。
-- [x] [CODEX-PLUGIN-004] 创建、读取、修改名称与任意 YAML 属性、追加评论、搜索、筛选、看板/列表切换、拖动状态均操作真实文件。
-- [ ] [CODEX-PLUGIN-005] 从看板显式发送 Issue 上下文到当前或新对话；从对话通过插件工具创建/读取/更新 Issue 或打开看板。发送成功才显示成功，宿主缺少能力时明确显示不可用。
-- [x] [CODEX-PLUGIN-006] 项目根目录 `issues/*.md` 是稳定且唯一的事实来源；不引入 Issue 数据库。
-- [x] [CODEX-PLUGIN-007] 通过项目级 `.myissue.json` 配置名称来源、属性字段映射、章节名和状态列；未知属性与未知状态必须保留。结构无法解析时只报告，不自动迁移或覆盖。
-- [x] [CODEX-PLUGIN-008] 写入检查文件版本，插件进程之间串行写入并原子替换；保留既有评论与不相关正文。普通编辑器不参与锁协议，检测到外部修改即要求重新加载。
 - [x] [CODEX-PLUGIN-009] 分别验收文件测试、MCP 协议、真实页面交互、插件安装和宿主独立入口，不混淆已实现与已验证。
+
 
 ## 检查与验收边界
 
 以上勾选与结果沿用迁移前的当前需求文档；历史记录中的实现、测试、编译、视觉与用户验收彼此独立。本次只迁移文档并检查结构 / 引用，没有重新执行产品构建或用户验收，也没有凭历史日志新增完成勾选。
 
 ## Comments
+
 
 ### 2026-10-23 17:44:33 UTC — Agent（文档迁移）
 
@@ -66,3 +67,7 @@
 - 包：`dist/myissue-0.1.0.zip`，根目录清单齐全。未上传公共插件目录。
 - Skill：quick_validate 通过。
 - 截图：`_builds/verification/myissue-board.jpg`；截图及验收文件不提交。
+
+### 2026-10-24 07:06:34 UTC — Agent（纠正迁移命名）
+
+根据用户确认的原语言与下划线命名规则整理本记录；类型与原 ID 保留在 properties，原始勾选、取消／延后标记及验收边界照录。 本源文档按独立目标拆为 4 份，原始 Comments 完整留在本主记录。 未核实本任务实际实施提交，省略文件名版本后缀；未执行代码、构建或用户验收，未提交或推送。
