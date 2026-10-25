@@ -1,18 +1,21 @@
-# 采用ChatGPT中性外观并精简看板页面
+---
+title: 采用ChatGPT中性外观并精简看板页面
+id: CODEX-PLUGIN-010
+type: API
+status: 已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。
+版本管理: Git。
+来源: '`REQUIREMENTS.md` @ `7649f547f4ea8214825f55d0746338becf1aea33`；标题路径：任务清单 / Phase - ChatGPT 外观与主题（2026-10-02 确认）。'
+原稳定 ID: '`CODEX-PLUGIN-010`, `CODEX-PLUGIN-011`, `CODEX-PLUGIN-012`, `CODEX-PLUGIN-SCROLL-001`, `CODEX-PLUGIN-FOOTER-001`, `CODEX-PLUGIN-LIVE-001`；不改写或重编号这些既有 ID。'
+来源汇总状态: 已完成（沿用原需求记录；本轮未重新执行产品验收）。
+原迁移记录 ID: '`CODEX-PLUGIN-010`。'
+本文件原任务 ID: '`CODEX-PLUGIN-010`、`CODEX-PLUGIN-SCROLL-001`、`CODEX-PLUGIN-FOOTER-001`。'
+原需求标题: Phase - ChatGPT 外观与主题（2026-10-02 确认）。
+原迁移文件: '`issue/issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md`（重命名前路径，仅用于历史追溯）。'
+同源任务: '[保持旧页面资源地址兼容并修复侧栏升级启动](issue_%E4%BF%9D%E6%8C%81%E6%97%A7%E9%A1%B5%E9%9D%A2%E8%B5%84%E6%BA%90%E5%9C%B0%E5%9D%80%E5%85%BC%E5%AE%B9%E5%B9%B6%E4%BF%AE%E5%A4%8D%E4%BE%A7%E6%A0%8F%E5%8D%87%E7%BA%A7%E5%90%AF%E5%8A%A8.md)、[通过系统文件夹选择器与桌面项目列表切换项目](issue_%E9%80%9A%E8%BF%87%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6%E5%A4%B9%E9%80%89%E6%8B%A9%E5%99%A8%E4%B8%8E%E6%A1%8C%E9%9D%A2%E9%A1%B9%E7%9B%AE%E5%88%97%E8%A1%A8%E5%88%87%E6%8D%A2%E9%A1%B9%E7%9B%AE.md)、[用差异检测心跳同步文件变化并刷新可见页面](issue_%E7%94%A8%E5%B7%AE%E5%BC%82%E6%A3%80%E6%B5%8B%E5%BF%83%E8%B7%B3%E5%90%8C%E6%AD%A5%E6%96%87%E4%BB%B6%E5%8F%98%E5%8C%96%E5%B9%B6%E5%88%B7%E6%96%B0%E5%8F%AF%E8%A7%81%E9%A1%B5%E9%9D%A2.md)。'
+updated-time: '2026-10-24T16:22:34+00:00'
+---
 
-- ID：`CODEX-PLUGIN-010`。
-- 类型：`API`。
-- 状态：已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。
-- 版本管理：Git。
-- 实施提交：未核实（现有记录未提供可直接对应本任务的实际实施提交；来源快照、当前 HEAD 与文档迁移提交不代替任务实施版本）。
-- 来源：`REQUIREMENTS.md` @ `7649f547f4ea8214825f55d0746338becf1aea33`；标题路径：任务清单 / Phase - ChatGPT 外观与主题（2026-10-02 确认）。
-- 原稳定 ID：`CODEX-PLUGIN-010`, `CODEX-PLUGIN-011`, `CODEX-PLUGIN-012`, `CODEX-PLUGIN-SCROLL-001`, `CODEX-PLUGIN-FOOTER-001`, `CODEX-PLUGIN-LIVE-001`；不改写或重编号这些既有 ID。
-- 来源汇总状态：已完成（沿用原需求记录；本轮未重新执行产品验收）。
-- 原迁移记录 ID：`CODEX-PLUGIN-010`。
-- 本文件原任务 ID：`CODEX-PLUGIN-010`、`CODEX-PLUGIN-SCROLL-001`、`CODEX-PLUGIN-FOOTER-001`。
-- 原需求标题：Phase - ChatGPT 外观与主题（2026-10-02 确认）。
-- 原迁移文件：`issue/issue-CODEX-PLUGIN-010-API-project-goal-versioncontrolid.md`（重命名前路径，仅用于历史追溯）。
-- 同源任务：[保持旧页面资源地址兼容并修复侧栏升级启动](issue_%E4%BF%9D%E6%8C%81%E6%97%A7%E9%A1%B5%E9%9D%A2%E8%B5%84%E6%BA%90%E5%9C%B0%E5%9D%80%E5%85%BC%E5%AE%B9%E5%B9%B6%E4%BF%AE%E5%A4%8D%E4%BE%A7%E6%A0%8F%E5%8D%87%E7%BA%A7%E5%90%AF%E5%8A%A8.md)、[通过系统文件夹选择器与桌面项目列表切换项目](issue_%E9%80%9A%E8%BF%87%E7%B3%BB%E7%BB%9F%E6%96%87%E4%BB%B6%E5%A4%B9%E9%80%89%E6%8B%A9%E5%99%A8%E4%B8%8E%E6%A1%8C%E9%9D%A2%E9%A1%B9%E7%9B%AE%E5%88%97%E8%A1%A8%E5%88%87%E6%8D%A2%E9%A1%B9%E7%9B%AE.md)、[用差异检测心跳同步文件变化并刷新可见页面](issue_%E7%94%A8%E5%B7%AE%E5%BC%82%E6%A3%80%E6%B5%8B%E5%BF%83%E8%B7%B3%E5%90%8C%E6%AD%A5%E6%96%87%E4%BB%B6%E5%8F%98%E5%8C%96%E5%B9%B6%E5%88%B7%E6%96%B0%E5%8F%AF%E8%A7%81%E9%A1%B5%E9%9D%A2.md)。
+# Description
 
 ## 当前需求与范围
 - [x] [CODEX-PLUGIN-010] 项目选择弹窗、输入框、按钮、侧栏和页面使用 ChatGPT 的中性配色、字体与圆角逻辑。优先使用 MCP Apps 宿主语义颜色变量并响应主题变更；宿主明确的浅色/深色优先于系统偏好，未提供时跟随系统。重点色只继承宿主提供的焦点/交互变量，不硬编码用户截图的橙色或读取宿主私有设置。已完成隔离 SDK 宿主与浏览器验证；当前 ChatGPT 用户自定义重点色是否实际下发仍未验收。
@@ -26,14 +29,19 @@
 
 以上勾选与结果沿用迁移前的当前需求文档；历史记录中的实现、测试、编译、视觉与用户验收彼此独立。本次只迁移文档并检查结构 / 引用，没有重新执行产品构建或用户验收，也没有凭历史日志新增完成勾选。
 
-## Comments
+# Comments
 
+## 20261023-174433_Agent
 
-### 2026-10-23 17:44:33 UTC — Agent（文档迁移）
+原记录标题：2026-10-23 17:44:33 UTC — Agent（文档迁移）
 
 按原有功能 / 工作目标标题拆分需求，保留原 ID、勾选、依赖、最新补充及来源。没有稳定根 ID或旧 ID 在不同上下文重用时，采用由来源路径和标题确定的迁移 Issue ID，原 ID 仍在正文保留。完整旧内容可从来源版本读取；独有未提交内容的版本化副本见迁移映射。
 
-### 20261002-chatgpt-appearance.md — 历史证据迁移
+原记录未提供完整 Agent / 模型详情及原执行会话链接，未补造。
+
+## 历史记录-时间未记录
+
+原记录标题：20261002-chatgpt-appearance.md — 历史证据迁移
 
 来源：`agent-log/20261002-chatgpt-appearance.md` @ `7649f547f4ea8214825f55d0746338becf1aea33`。日期 / 时区沿用原记录；以下摘录不自动改变当前完成状态。
 
@@ -62,6 +70,23 @@
 - 本机更新安装成功，读取 installed=true / enabled=true / version=0.1.1。安装缓存 HTML 与当前构建 SHA-256 一致。新 Codex app-server 实际加载 9 个工具，toolsError=null，资源为 ui://myissue/board-v2.html，全局/对话入口元数据保留。
 - 包已生成 dist/myissue-0.1.1.zip。截图 _builds/verification/myissue-chatgpt-theme.jpg 为隔离验证预览，非原生 ChatGPT 画面。
 
-### 2026-10-24 07:06:34 UTC — Agent（纠正迁移命名）
+原记录未提供完整 Agent / 模型详情及原执行会话链接，未补造。
+
+## 20261024-070634_Agent
+
+原记录标题：2026-10-24 07:06:34 UTC — Agent（纠正迁移命名）
 
 根据用户确认的原语言与下划线命名规则整理本记录；类型与原 ID 保留在 properties，原始勾选、取消／延后标记及验收边界照录。 本源文档按独立目标拆为 4 份，原始 Comments 完整留在本主记录。 未核实本任务实际实施提交，省略文件名版本后缀；未执行代码、构建或用户验收，未提交或推送。
+
+原记录未提供完整 Agent / 模型详情及原执行会话链接，未补造。
+
+## 20261024-162234_Codex
+
+按用户最新手写模板迁移属性和正文结构，保留任务语义、来源、原始状态及历史内容；本次未重新执行业务验收。
+
+原版本关联记录（照录来源，不将本次文档迁移提交当作业务实施提交）：
+- 实施提交：未核实（现有记录未提供可直接对应本任务的实际实施提交；来源快照、当前 HEAD 与文档迁移提交不代替任务实施版本）。
+
+本次执行环境未提供具体模型标识，未补造 Model-Detail。
+
+[本次文档迁移对话](codex://threads/01a157b3-610c-73b4-ae06-163c0f8490d3)
