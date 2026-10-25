@@ -1,9 +1,9 @@
 # Issue 入口
 
-本目录是当前工作副本的任务、检查与交接入口。旧需求的状态、ID 与来源保留在对应 Issue；历史 Comments 不自动更新当前完成度。实际实施版本只在核实后填写；尚无提交或未核实则省略文件名后缀，并在 property 说明。
+本目录是当前工作副本的任务、检查与交接入口。旧需求的状态、ID 与来源保留在对应 Issue；历史 Comments 不自动更新当前完成度。Issue 使用 Obsidian YAML frontmatter 和 Description / Comments 两个一级标题；文件名仅为 issue_原语言任务描述.md。真实 Git / P4 编号写入对应 Comment，recorded-version 仅记录可选内容发布版本。
 
 - [Issue 模板](issue_template.md)
-- [本轮迁移记录](issue_%E8%BF%81%E7%A7%BB%E9%A1%B9%E7%9B%AE%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%8D%8F%E4%BD%9C%E8%AE%B0%E5%BD%95_d1489058.md)
+- [本轮迁移记录](issue_%E8%BF%81%E7%A7%BB%E9%A1%B9%E7%9B%AE%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%8D%8F%E4%BD%9C%E8%AE%B0%E5%BD%95.md)
 - [旧路径与来源映射](migration-map.json)
 
 - [提供可安装的myIssue插件清单与分发包](issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E5%AE%89%E8%A3%85%E7%9A%84myIssue%E6%8F%92%E4%BB%B6%E6%B8%85%E5%8D%95%E4%B8%8E%E5%88%86%E5%8F%91%E5%8C%85.md)、[提供宿主独立侧栏与对话内myIssue入口](issue_%E6%8F%90%E4%BE%9B%E5%AE%BF%E4%B8%BB%E7%8B%AC%E7%AB%8B%E4%BE%A7%E6%A0%8F%E4%B8%8E%E5%AF%B9%E8%AF%9D%E5%86%85myIssue%E5%85%A5%E5%8F%A3.md)、[从真实Markdown文件驱动myIssue看板与安全读写](issue_%E4%BB%8E%E7%9C%9F%E5%AE%9EMarkdown%E6%96%87%E4%BB%B6%E9%A9%B1%E5%8A%A8myIssue%E7%9C%8B%E6%9D%BF%E4%B8%8E%E5%AE%89%E5%85%A8%E8%AF%BB%E5%86%99.md)、[在myIssue与当前或新对话间传递Issue上下文](issue_%E5%9C%A8myIssue%E4%B8%8E%E5%BD%93%E5%89%8D%E6%88%96%E6%96%B0%E5%AF%B9%E8%AF%9D%E9%97%B4%E4%BC%A0%E9%80%92Issue%E4%B8%8A%E4%B8%8B%E6%96%87.md) — `CODEX-PLUGIN-001`；进行中（原文同时包含已完成与未完成项）；原路径 `REQUIREMENTS.md`。
@@ -48,4 +48,4 @@
 
 - [presentation/main: 在协议之上提供可替换视图](issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E6%9B%BF%E6%8D%A2%E7%9A%84Issue%E5%9B%BE%E6%B5%8F%E8%A7%88%E4%B8%8E%E6%93%8D%E4%BD%9C%E8%A7%86%E5%9B%BE.md) — `0.2.0-VIEW-A-000`；待处理（原文未完成项保持未勾选）；原路径 `REQUIREMENTS.md`。
 
-- [既有 Issue：issue-MYI-UI-20261024-01-UI-notion-properties-versioncontrolid](issue-MYI-UI-20261024-01-UI-notion-properties-versioncontrolid.md)。
+- [既有 Issue：issue-MYI-UI-20261024-01-UI-notion-properties-versioncontrolid](issue_属性区与下拉统一为 Notion 样式.md)。
