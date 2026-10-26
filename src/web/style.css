@@ -115,29 +115,26 @@
   .muted { color: var(--muted-fg); font-size: 12px; font-weight: 400; }
   .code-input { font: 12px/1.7 var(--font-mono, ui-monospace, SFMono-Regular, monospace); }
 
-  .page-heading { display: flex; align-items: center; justify-content: space-between; padding: 22px var(--workspace-gutter); gap: 12px; }
-  .page-heading h1 { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 24px; letter-spacing: -.5px; font-weight: 600; }
-  .page-heading h1 [data-slot="badge"] { font-size: 12px; color: var(--muted-fg); }
   .board-view { display: flex; flex: 1; min-height: 0; flex-direction: column; }
   .board-workspace { min-height: 0; flex: 1; gap: 0; }
-  .toolbar { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--workspace-gutter) 20px; gap: 16px; flex-wrap: wrap; }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; padding: 22px var(--workspace-gutter) 20px; gap: 16px; flex-wrap: wrap; }
   .toolbar-views { display: flex; align-items: center; gap: 12px; }
   .toolbar-right { display: flex; align-items: center; gap: 12px; }
   .search { position: relative; color: var(--muted-fg); width: clamp(160px, 22vw, 280px); }
   .search > svg { position: absolute; top: 50%; left: 11px; transform: translateY(-50%); pointer-events: none; }
   .search input { padding-left: 34px; }
   .board-panel, .list-panel { min-height: 0; overflow: auto; }
-  .board-panel { display: flex; }
+  .board-panel { display: flex; flex: 1; overflow: hidden; }
   .board-panel[data-state="inactive"] { display: none; }
-  .board { display: flex; align-items: stretch; flex: 1; gap: 16px; overflow-x: auto; padding: 0 var(--workspace-gutter) 16px; min-height: 200px; }
-  .column { flex: 1 0 260px; max-width: 320px; border-radius: var(--radius); background: linear-gradient(var(--soft), var(--soft)), var(--background); border: 1px solid transparent; min-height: 220px; }
+  .board { display: flex; align-items: stretch; flex: 1; min-width: 0; min-height: 0; gap: 16px; overflow-x: auto; overflow-y: hidden; padding: 0 var(--workspace-gutter) 16px; }
+  .column { display: flex; flex: 1 0 260px; flex-direction: column; max-width: 320px; min-height: 0; overflow: hidden; border-radius: var(--radius); background: linear-gradient(var(--soft), var(--soft)), var(--background); border: 1px solid transparent; }
   .column.drop-target { border-color: var(--column-color); background: color-mix(in srgb, var(--column-color) 8%, var(--background)); }
-  .column-heading { display: flex; align-items: center; gap: 8px; padding: 12px 12px 10px; font-size: 13px; }
+  .column-heading { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; padding: 12px 12px 10px; font-size: 13px; }
   .column-heading strong { font-weight: 500; }
   .column-heading button { margin-left: auto; }
   .status-dot { width: 9px; height: 9px; border: 1.8px solid var(--column-color); border-radius: 100%; }
   .count { color: var(--muted-fg); font-size: 12px; }
-  .cards { padding: 0 8px 10px; }
+  .cards { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 8px 10px; }
   .issue-card { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: linear-gradient(var(--card), var(--card)), var(--background); border-radius: var(--radius); padding: 16px; margin-bottom: 8px; transition: border-color .15s, box-shadow .15s; cursor: grab; }
   .issue-card:hover { border-color: var(--input-line); box-shadow: 0 2px 8px #00000008; }
   .issue-card.dragging { opacity: .35; }
@@ -296,9 +293,7 @@
     .main { --workspace-gutter: 16px; }
     .topbar { padding: 0 10px; height: 56px; min-height: 56px; }
     .project-trigger { font-size: 16px; }
-    .page-heading { padding-block: 18px; }
-    .page-heading h1 { font-size: 22px; }
-    .toolbar { padding-bottom: 18px; gap: 12px; }
+    .toolbar { padding-block: 18px; gap: 12px; }
     .toolbar-views { gap: 8px; }
     .toolbar-right { flex: 1 1 100%; gap: 8px; }
     .search { flex: 1; width: auto; min-width: 0; }

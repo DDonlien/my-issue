@@ -49,3 +49,9 @@
 - [presentation/main: 在协议之上提供可替换视图](issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E6%9B%BF%E6%8D%A2%E7%9A%84Issue%E5%9B%BE%E6%B5%8F%E8%A7%88%E4%B8%8E%E6%93%8D%E4%BD%9C%E8%A7%86%E5%9B%BE.md) — `0.2.0-VIEW-A-000`；待处理（原文未完成项保持未勾选）；原路径 `REQUIREMENTS.md`。
 
 - [既有 Issue：issue-MYI-UI-20261024-01-UI-notion-properties-versioncontrolid](issue_属性区与下拉统一为 Notion 样式.md)。
+- [移除看板标题行并将新建按钮并入工具栏](issue_移除看板标题行并将新建按钮并入工具栏.md) — 看板顶部布局调整。
+
+## 执行记录
+
+- 2026-10-26：实现 [看板列固定高度，卡片裁切并在列内上下滚动](issue_看板列固定高度，卡片裁切并在列内上下滚动.md)。`npm run check` 和 `npm run build` 通过；未运行测试或进行宿主视觉验收，等待用户验收。
+- 2026-10-26：实现 [移除看板标题行并将新建按钮并入工具栏](issue_移除看板标题行并将新建按钮并入工具栏.md)。`npm run build` 通过；未运行自动测试或进行宿主视觉验收，等待用户验收。
