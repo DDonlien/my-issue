@@ -8,7 +8,7 @@ status: 待处理（原文未完成项保持未勾选）。
 原稳定 ID: '`0.1.0-SCHEMA-A-000`, `0.1.0-SCHEMA-A-001`, `0.1.0-SCHEMA-A-002`, `0.1.0-SCHEMA-A-003`, `0.1.0-SCHEMA-A-004`, `0.1.0-SCHEMA-A-005`, `0.1.0-SCHEMA-A-006`, `0.1.0-SCHEMA-A-007`, `0.1.0-SCHEMA-A-008`；不改写或重编号这些既有 ID。'
 原需求标题: 'protocol/main: 定义最小且可读的 Issue 文件。'
 原迁移文件: '`issue/issue-0.1.0-SCHEMA-A-000-API-issue-files-versioncontrolid.md`（重命名前路径，仅用于历史追溯）。'
-updated-time: '2026-10-24T16:22:34+00:00'
+updated-time: '2026-10-26T20:56:32+08:00'
 ---
 
 # Description
@@ -53,6 +53,12 @@ depends_on:
 停止当前方案，改为评估 SQLite migration。
 ```
 
+## 模板默认时间与父任务属性
+
+`issue/issue_template.md` 增加三个默认留空的可选属性：`start-time`（开始时间）、`completed-time`（完成时间）和 `parent`（父任务）。时间使用 ISO 8601；父任务沿用已有 `parent` 关系，使用带引号的 `[[文件名或既有 id]]`，至多一个。
+
+这是模板属性扩展，既有 Issue 无需迁移，不自动回填历史时间或父任务。未填写时保持 YAML 空值；关系填写无效时沿用现有校验并报告错误，不覆盖原文件。本次不增加自动计时、状态联动或界面行为。
+
 ## 检查与验收边界
 
 以上勾选与结果沿用迁移前的当前需求文档；历史记录中的实现、测试、编译、视觉与用户验收彼此独立。本次只迁移文档并检查结构 / 引用，没有重新执行产品构建或用户验收，也没有凭历史日志新增完成勾选。
@@ -85,3 +91,15 @@ depends_on:
 本次执行环境未提供具体模型标识，未补造 Model-Detail。
 
 [本次文档迁移对话](codex://threads/01a157b3-610c-73b4-ae06-163c0f8490d3)
+
+## 20261026-205725_Codex_Unknown
+
+用户原始请求：myissue本地有吗，没有从GitHub拉下来，然后模板ticket里加上仨属性，开始时间，完成时间，父任务。
+
+已从 `DDonlien/my-issue` 克隆到 `D:\Projects\GitHub\Personal\my-issue`，在唯一模板 `issue_template.md` 的 frontmatter 添加默认留空的 `start-time`、`completed-time` 和 `parent`，补充 ISO 8601 时间及单父任务 wikilink 写法。原有属性、正文结构和历史 Comments 保留；既有 Issue 不批量迁移。
+
+静态检查通过：恰好新增三个空属性、无重复键、原有属性保留、一级标题仍为 Description / Comments，模板原有 Comments 内容未改；`git diff --check` 通过。本次仅修改模板与相关文档，未运行应用测试、构建或界面验收。未提交或推送。
+
+当前环境未提供可核实的具体模型版本，Model-Detail 使用 Unknown，不补造版本。
+
+[本次执行对话](codex://threads/01a17842-e93c-7a82-8947-3b1915817620)
