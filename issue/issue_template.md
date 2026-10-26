@@ -3,8 +3,11 @@ type: template
 status: active
 importance: p0
 emergency: p0
-updated-time: 2026-10-24T01:01:00
+updated-time: 2026-10-26T20:56:32+08:00
 created-time: 2026-10-24T01:01:00
+start-time:
+completed-time:
+parent:
 recorded-version:
 tags:
 ---
@@ -21,6 +24,10 @@ Description 内描述具体对象、要实现的行为、范围与当前阻塞�
 每一个 issue 文件本身需要有完整的、兼容 obisidian 的属性内容，去记录所有属性
 
 我们预定义了一些属性条目，但自然的，像 obsidian 一样，这些内容可以添加；template 中使用的这些就是默认的属性
+
+- `start-time`：开始时间，填写任务实际开始的 ISO 8601 时间，例如 `2026-10-26T20:00:00+08:00`；尚未开始时留空。
+- `completed-time`：完成时间，填写任务实际完成的 ISO 8601 时间；尚未完成时留空。
+- `parent`：父任务，至多一个，沿用现有关系字段，例如 `parent: "[[issue_父任务描述]]"`（文件名不带 `.md`，也可使用既有 id）；没有父任务时留空。
 
 `recorded-version` 是可选属性，记录实际与该 issue 有关的内容发布版本，不一定存在；它不是 Git / P4 编号。
 

@@ -49,3 +49,12 @@
 - [presentation/main: 在协议之上提供可替换视图](issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E6%9B%BF%E6%8D%A2%E7%9A%84Issue%E5%9B%BE%E6%B5%8F%E8%A7%88%E4%B8%8E%E6%93%8D%E4%BD%9C%E8%A7%86%E5%9B%BE.md) — `0.2.0-VIEW-A-000`；待处理（原文未完成项保持未勾选）；原路径 `REQUIREMENTS.md`。
 
 - [既有 Issue：issue-MYI-UI-20261024-01-UI-notion-properties-versioncontrolid](issue_属性区与下拉统一为 Notion 样式.md)。
+
+## 20261026-205725_Codex_Unknown
+
+- 原始请求：myissue本地有吗，没有从GitHub拉下来，然后模板ticket里加上仨属性，开始时间，完成时间，父任务。
+- 决策与改动：本地常用项目目录未找到仓库，已克隆 `DDonlien/my-issue` 到 `D:\Projects\GitHub\Personal\my-issue`；在唯一模板新增默认留空的 `start-time`、`completed-time`、`parent`，沿用 ISO 8601 与现有父任务关系，不迁移既有 Issue。需求及执行记录归入[最小 Issue 文件](issue_定义包含Properties标题正文与Comments的最小Issue文件.md)。
+- 验证：模板属性、空值、重复键、两个一级标题与原有 Comments 内容的静态检查通过；`git diff --check` 通过。未运行应用测试、构建或界面验收。
+- 交付：未 Git commit，未 push。具体模型版本不可用，使用 Unknown。
+
+[本次执行对话](codex://threads/01a17842-e93c-7a82-8947-3b1915817620)
