@@ -43,3 +43,12 @@
 - [collaboration/main: 支持多个执行者协作同一 Issue 集合](issue_%E6%94%AF%E6%8C%81%E5%A4%9A%E4%B8%AA%E6%89%A7%E8%A1%8C%E8%80%85%E5%8D%8F%E4%BD%9C%E5%90%8C%E4%B8%80Issue%E9%9B%86%E5%90%88.md) — `0.2.0-COLLAB-A-000`；待处理（原文未完成项保持未勾选）；原路径 `REQUIREMENTS.md`。
 
 - [presentation/main: 在协议之上提供可替换视图](issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E6%9B%BF%E6%8D%A2%E7%9A%84Issue%E5%9B%BE%E6%B5%8F%E8%A7%88%E4%B8%8E%E6%93%8D%E4%BD%9C%E8%A7%86%E5%9B%BE.md) — `0.2.0-VIEW-A-000`；待处理（原文未完成项保持未勾选）；原路径 `REQUIREMENTS.md`。
+
+## 20261028-082048_Codex_GPT-UNKNOWN-UNKNOWN-UNKNOWN-UNKNOWN
+
+- 原始请求：定义功能 / 事务任务，以最终用户可直接或间接感知结果为唯一分类界限；自动匹配 Issue，尊重项目外部追踪和人工修正。
+- 改动与决策：更新通用 AGENTS、模板说明和[本次规范任务](issue_定义功能与事务任务及双向追踪协作规范.md)，保留项目既有字段和工作流，不默认启用外部表格。
+- 验证：相关规则、YAML、两项一级标题、链接和 scoped diff 轻量检查；未运行产品代码、GUI、构建或外部追踪写入。
+- 交付：本条记录时本次提交尚未生成，提交 / 推送按实际回读记入交付报告；不填旧 HEAD 代替实施提交。Agent 为 Codex、厂牌 GPT；本次其余模型维度不可核实，使用 UNKNOWN。
+
+> [对应执行对话](codex://threads/01a172bc-a59e-74ad-9553-ff4370c9a0f0)
