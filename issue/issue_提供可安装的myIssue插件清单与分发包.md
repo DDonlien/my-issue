@@ -18,7 +18,7 @@ updated-time: '2026-10-24T16:22:34+00:00'
 # Description
 
 ## 当前需求与范围
-- [x] [CODEX-PLUGIN-001] 提供标准插件清单、Marketplace、安装命令和可分发包，实际检查本机安装状态。
+- [x] [CODEX-PLUGIN-001] 提供标准插件清单、Marketplace、安装命令和可分发包，实际检查本机安装状态；插件支持项目根目录下的 `Issue/` 或 `issues/`，新项目默认使用 `issues/`。
 - [x] [CODEX-PLUGIN-009] 分别验收文件测试、MCP 协议、真实页面交互、插件安装和宿主独立入口，不混淆已实现与已验证。
 
 

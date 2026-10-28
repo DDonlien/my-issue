@@ -44,7 +44,7 @@ export async function send(prompt: string, target: 'active' | 'new') {
 }
 export async function context(root: string, id: string) {
   if (!app) return;
-  await app.updateModelContext({ content: [{ type: 'text', text: `myIssue 当前选择：${root}/issues/${id}.md。需要操作时请先通过 get_issue 读取最新内容。` }] });
+  await app.updateModelContext({ content: [{ type: 'text', text: `myIssue 当前选择的 Issue：${id}。项目根目录：${root}。需要操作时请先通过 get_issue 读取最新内容。` }] });
 }
 export async function download(file: { name: string; mimeType: string; data: string }) {
   if (!app) throw new Error('宿主尚未连接');

@@ -19,7 +19,7 @@ updated-time: '2026-10-24T16:22:34+00:00'
 # Description
 
 ## 当前需求与范围
-- [ ] [CODEX-PLUGIN-002] 提供 MCP Apps 全局独立侧栏入口及对话内入口，使用官方 OpenAI UI entrypoints；平台是否展示必须单独人工验收。已实现并由 Codex app-server 读取元数据；2026-10-02 用户截图已确认全局页面显示，对话侧栏入口仍未人工验收。
+- [ ] [CODEX-PLUGIN-002] 提供 MCP Apps 全局独立侧栏入口及对话内入口，使用官方 OpenAI UI entrypoints；打开项目时接受根目录下的 `Issue/` 或 `issues/` 文件夹，且不要求迁移原有目录。平台是否展示必须单独人工验收。已实现并由 Codex app-server 读取元数据；2026-10-02 用户截图已确认全局页面显示，对话侧栏入口仍未人工验收。
 
 ## 检查与验收边界
 

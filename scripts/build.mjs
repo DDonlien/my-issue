@@ -41,7 +41,7 @@ const manifest = {
   name: 'myissue', version, description: 'Local Markdown issue boards with editable properties, shared comments and conversation dispatch.',
   author: { name: 'DDonlien', url: 'https://github.com/DDonlien' }, repository: 'https://github.com/DDonlien/my-issue',
   keywords: ['issues', 'markdown', 'kanban', 'local'], skills: './skills/', mcpServers: './.mcp.json',
-  interface: { displayName: 'myIssue', shortDescription: '项目里的 Issue，对话里的工作', longDescription: '从项目根目录 issues/*.md 读取看板。编辑名称和任意属性、追加人类与 Agent 评论，在宿主支持时发送到当前或新对话。支持全局和对话侧栏入口。', developerName: 'DDonlien', category: 'Productivity', capabilities: ['Interactive', 'Write'], brandColor: '#424242', composerIcon: './assets/icon.svg', logo: './assets/icon.svg', defaultPrompt: ['打开这个项目的 myIssue 看板', '把这段对话整理成一个 Issue', '读取 Issue 和最新评论，开始处理'] },
+  interface: { displayName: 'myIssue', shortDescription: '项目里的 Issue，对话里的工作', longDescription: '从项目根目录 Issue/ 或 issues/ 读取看板，新项目默认使用 issues/。编辑名称和任意属性、追加人类与 Agent 评论，在宿主支持时发送到当前或新对话。支持全局和对话侧栏入口。', developerName: 'DDonlien', category: 'Productivity', capabilities: ['Interactive', 'Write'], brandColor: '#424242', composerIcon: './assets/icon.svg', logo: './assets/icon.svg', defaultPrompt: ['打开这个项目的 myIssue 看板', '把这段对话整理成一个 Issue', '读取 Issue 和最新评论，开始处理'] },
 };
 await writeFile(path.join(plugin, '.codex-plugin/plugin.json'), JSON.stringify(manifest, null, 2) + '\n');
 // The portable manifest enables Codex's plugin-root path resolution for stdio.

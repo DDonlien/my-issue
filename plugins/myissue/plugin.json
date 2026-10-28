@@ -12,7 +12,7 @@
       "interface": {
         "displayName": "myIssue",
         "shortDescription": "项目里的 Issue，对话里的工作",
-        "longDescription": "从项目根目录 issues/*.md 读取看板。编辑名称和任意属性、追加人类与 Agent 评论，在宿主支持时发送到当前或新对话。支持全局和对话侧栏入口。",
+        "longDescription": "从项目根目录 Issue/ 或 issues/ 读取看板，新项目默认使用 issues/。编辑名称和任意属性、追加人类与 Agent 评论，在宿主支持时发送到当前或新对话。支持全局和对话侧栏入口。",
         "developerName": "DDonlien",
         "category": "Productivity",
         "capabilities": [

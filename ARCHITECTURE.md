@@ -2,7 +2,7 @@
 
 ## 共用文件核心
 
-`issues/*.md` 与 `.myissue.json` → `src/core.ts` → `src/service.ts` → `src/server.ts` → MCP Apps 看板与对话。
+项目根目录下唯一存在的 `Issue/*.md` 或 `issues/*.md` 与 `.myissue.json` → `src/core.ts` → `src/service.ts` → `src/server.ts` → MCP Apps 看板与对话。新项目默认创建 `issues/`；两个目录同时存在时明确报错。
 
 核心与 GUI、Agent、Codex 解耦。`core.ts` 拥有解析、未知属性保留、选定属性补丁、评论追加、版本检查、锁和关系推导。`service.ts` 定义所有 mutation 的输入；MCP 与本地预览复用同一实现。
 
@@ -29,7 +29,7 @@
 
 ## 项目内附件
 
-`attachment-links.ts` 从普通 Markdown 图片/链接推导附件引用，`attachments.ts` 保存和读取真实文件；MCP 与预览均通过同一服务层。附件二进制保存在 `issues/attachments/`，Issue 仅保存相对链接，无附件数据库或必填字段。上传检查当前 revision，使用唯一文件名，Issue 写入失败清理本次文件；读取拒绝未引用路径、目录穿越和符号链接，限制 10 MB。浏览器不从任意相对路径加载资源，图片经工具读取后以临时 data URL 显示；宿主下载使用 ui/download-file。
+`attachment-links.ts` 从普通 Markdown 图片/链接推导附件引用，`attachments.ts` 保存和读取真实文件；MCP 与预览均通过同一服务层。附件二进制保存在当前 `Issue/` 或 `issues/` 目录的 `attachments/` 中，Issue 仅保存相对链接，无附件数据库或必填字段。上传检查当前 revision，使用唯一文件名，Issue 写入失败清理本次文件；读取拒绝未引用路径、目录穿越和符号链接，限制 10 MB。浏览器不从任意相对路径加载资源，图片经工具读取后以临时 data URL 显示；宿主下载使用 ui/download-file。
 
 ## 共享项目偏好
 

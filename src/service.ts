@@ -49,7 +49,7 @@ export async function execute(operation: Operation, args: unknown) {
     case 'create_issue': return { issue: await store.create(input.name, input.properties, input.description) };
     case 'update_issue': return { issue: await store.update(input.id, input.revision, { name: input.name, description: input.description, properties: input.properties, removeProperties: input.removeProperties }) };
     case 'append_comment': return appendCommentWithConversation(store, input as Parameters<typeof appendCommentWithConversation>[1]);
-    case 'prepare_dispatch': { const issue = await store.get(input.id); return { prompt: dispatchPrompt(store.root, issue, input.instruction ?? ''), issue, root: store.root }; }
+    case 'prepare_dispatch': { const issue = await store.get(input.id); return { prompt: dispatchPrompt(store.root, issue, input.instruction ?? '', await store.directory()), issue, root: store.root }; }
     case 'link_conversation': return linkConversation(store, input.id, input.revision, input.url, input.title);
     case 'link_comment_conversation': return linkCommentConversation(store, input.id, input.revision, input.commentId, input.url, input.title, input.model);
     case 'upload_attachment': return uploadAttachment(store, input.id, input.revision, input.name, input.data);

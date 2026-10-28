@@ -17,7 +17,7 @@ import { codexDispatch, dispatchToConversation, type CodexDispatch } from './dis
 // tool inventories and conversation-specific MCP processes can refresh separately.
 export const UI_URI = 'ui://myissue/board-v2.html';
 export function createServer(html: string, fallbackRoot?: string, preferencesFile?: string, desktop: { projects: (refresh?: boolean) => Promise<DesktopProject[]>; chooseFolder: () => Promise<string | undefined> } = { projects: desktopProjects, chooseFolder: chooseDesktopFolder }, legacyPreferencesFile?: string, dispatch: CodexDispatch = codexDispatch) {
-  const server = new McpServer({ name: 'myissue', version }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/issues/*.md are the only source of truth. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
+  const server = new McpServer({ name: 'myissue', version }, { instructions: 'myIssue is a local Markdown issue board. Files under project-root/Issue/*.md or project-root/issues/*.md are the only source of truth; use one folder, not both. New projects default to issues/. Use open_board for the UI. Always read the current revision before editing. Append comments; never rewrite history. Dispatch is an explicit user action performed by the host, not an Agent runtime owned by myIssue.' });
   const extensions = new OpenAIExtensions(server);
   const username = currentUsername();
   const knownRoots = new Set<string>(fallbackRoot ? [fallbackRoot] : []);
@@ -58,7 +58,7 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     }));
   }
   registerAppTool(server, 'open_board', {
-    title: 'myIssue', description: 'Open the independent myIssue board or an issue beside this conversation. Select the project root that contains issues/*.md.', inputSchema: inputs.open_board,
+    title: 'myIssue', description: 'Open the independent myIssue board or an issue beside this conversation. Select the project root that contains Issue/*.md or issues/*.md; use one folder, not both.', inputSchema: inputs.open_board,
     annotations: readAnnotations,
     _meta: { ui: { resourceUri: UI_URI, visibility: ['model', 'app'] }, 'openai/outputTemplate': UI_URI, 'openai/ui': { entrypoints: [{ type: 'global' }, { type: 'thread' }] } },
   }, wrap(async args => {
@@ -73,20 +73,20 @@ export function createServer(html: string, fallbackRoot?: string, preferencesFil
     if (!list.some(saved => saved.root === root)) list.push(project);
     return { ...data, projects: list.sort(projectOrder), username };
   }));
-  server.registerTool('list_projects', { description: 'Read the project configuration shared by all myIssue panels on this computer, saved desktop projects and host-shared folders. Cloud projects without a local directory cannot contain issues/*.md.', inputSchema: z.object({ refresh: z.boolean().optional() }), annotations: readAnnotations }, wrap(async args => projects(args.refresh ?? true)));
+  server.registerTool('list_projects', { description: 'Read the project configuration shared by all myIssue panels on this computer, saved desktop projects and host-shared folders. Cloud projects without a local directory cannot contain Issue/*.md or issues/*.md.', inputSchema: z.object({ refresh: z.boolean().optional() }), annotations: readAnnotations }, wrap(async args => projects(args.refresh ?? true)));
   server.registerTool('browse_folder', { title: '选择项目文件夹', description: 'Open the local system folder chooser after an explicit user click. Return a path without opening the board or changing issue files. Cancellation returns no path.', inputSchema: z.object({}), annotations: readAnnotations, _meta: { ui: { visibility: ['app'] } } }, wrap(async () => ({ root: await desktop.chooseFolder() })));
   server.registerTool('list_codex_conversations', { description: 'Read real local Codex conversation names and identifiers without resuming or sending messages. Availability of directed sends is determined by the existing host control connection.', inputSchema: z.object({}), annotations: readAnnotations, _meta: { ui: { visibility: ['app'] } } }, wrap(() => dispatch.list()));
   server.registerTool('dispatch_to_conversation', { description: 'Send the latest issue to the exact existing Codex conversation selected by an explicit user click. Requires the existing host control interface; never starts an independent agent. Preserve the target model, permissions and directory. Record association only after the host accepts the message.', inputSchema: inputs.prepare_dispatch.extend({ threadId: z.string().regex(/^[\w-]{1,128}$/) }), annotations: { ...writeAnnotations, openWorldHint: true }, _meta: { ui: { visibility: ['app'] } } }, wrap(args => dispatchToConversation(args, dispatch)));
   const descriptions: Record<Exclude<Operation, 'open_board'>, string> = {
     list_issues: 'Read the current Markdown files and derive the board, ready state and relation errors. Unknown properties and statuses remain visible.',
     get_issue: 'Read one issue by its filename stem and return the current content and revision.',
-    create_issue: 'Create a new issue in project-root/issues/*.md from this conversation. Name, arbitrary YAML properties and optional free Markdown content.',
+    create_issue: 'Create a new issue in the selected Issue/ or issues/ folder (new projects default to issues/). Name, arbitrary YAML properties and optional free Markdown content.',
     update_issue: 'Update an issue name, free content or selected YAML properties with revision checking. Existing comments remain immutable. Removing properties must be explicit.',
     append_comment: 'Append a human/Agent comment with the exact available model variant (e.g. gpt-6.1-sol), never just gpt-6. Use unknown if unavailable. Pass conversation to record this comment’s verified source, independently of the issue current conversation. Comment and source are saved atomically; existing comments never change.',
     prepare_dispatch: 'Read the latest issue and prepare context for a user-requested conversation dispatch. This tool alone does not send or start a conversation.',
     link_conversation: 'Set the single conversation currently executing this issue using a verified URL and title. Use the latest revision. Never guess from anonymous session IDs or recent chats. Writes optional current_conversation YAML; preserves historical comment sources and legacy associations. Does not send messages or manage sessions.',
     link_comment_conversation: 'Associate this exact comment’s verified source conversation using commentId from get_issue and the latest revision. Writes optional comment_conversations YAML without changing comment text or the issue current conversation. Optional model refines an incomplete historical label only after verifying the exact original writing turn and model. Never guess historical origins or versions.',
-    upload_attachment: 'Save a Base64-encoded file in issues/attachments and append its relative Markdown link to the issue description. Requires the latest revision. Preserves existing comments and unrelated properties. Maximum 10 MB per file.',
+    upload_attachment: 'Save a Base64-encoded file in the selected Issue/ or issues/ folder under attachments/ and append its relative Markdown link to the issue description. Requires the latest revision. Preserves existing comments and unrelated properties. Maximum 10 MB per file.',
     read_attachment: 'Read an attachment referenced by this issue description or comments. Only local attachments/ paths and regular files are allowed. Returns file metadata and Base64 data.',
   };
   for (const operation of Object.keys(descriptions) as Exclude<Operation, 'open_board'>[]) {

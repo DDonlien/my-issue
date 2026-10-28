@@ -1,13 +1,13 @@
 ---
 name: myissue
-description: Use myIssue to turn a conversation into project issues, open a Markdown Kanban board, read issue context, update properties, or append human and Agent comments. Issues live in the project root's issues folder.
+description: Use myIssue to turn a conversation into project issues, open a Markdown Kanban board, read issue context, update properties, or append human and Agent comments. Issues live in the project root's Issue or issues folder.
 ---
 
 # myIssue
 
-Use the myissue MCP tools for deterministic file operations. `issues/*.md` in the selected project root is the sole source of truth. Read the project's AGENTS.md before work.
+Use the myissue MCP tools for deterministic file operations. `Issue/*.md` or `issues/*.md` in the selected project root is the sole source of truth. Use one folder, not both; new projects default to `issues/`. Read the project's AGENTS.md before work.
 
-- To open the independent board or conversation panel, call `open_board` with the absolute project root and optional `issueId` (filename stem).
+- To open the independent board or conversation panel, call `open_board` with the absolute project root and optional `issueId` (filename stem). The project root must contain either `Issue/` or `issues/`; if both exist, resolve the directory ambiguity before continuing.
 - To create an issue from a conversation, use `create_issue` with a concise name, arbitrary properties and optional free Markdown description. Preserve the user's requirements. Do not silently dispatch it.
 - To start work from a conversation, call `get_issue`, read all comments and properties, then perform the user-authorized work in the host's normal project environment. myIssue does not own an Agent runtime.
 - Before each mutation, read the latest issue and use its returned `revision`. On CONFLICT, reread, reconcile with the new source and retry only the intended mutation.

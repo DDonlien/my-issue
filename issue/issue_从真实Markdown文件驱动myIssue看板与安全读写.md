@@ -2,7 +2,7 @@
 title: 从真实Markdown文件驱动myIssue看板与安全读写
 id: CODEX-PLUGIN-003
 type: DB
-status: 已完成（仅沿用本任务原始勾选；本轮未重新执行产品验收）。
+status: 进行中（目录兼容实现与插件构建完成；自动测试和真实目录读写验证未执行）。
 版本管理: Git。
 来源: '`REQUIREMENTS.md` @ `f4834f13242293ffb522ee78c2de0669d6c08ead`；标题路径：任务清单 / Phase - Codex 插件首版（2026-10-01 确认）。'
 原稳定 ID: '`CODEX-PLUGIN-001`, `CODEX-PLUGIN-002`, `CODEX-PLUGIN-003`, `CODEX-PLUGIN-004`, `CODEX-PLUGIN-005`, `CODEX-PLUGIN-006`, `CODEX-PLUGIN-007`, `CODEX-PLUGIN-008`, `CODEX-PLUGIN-009`；不改写或重编号这些既有 ID。'
@@ -13,7 +13,7 @@ status: 已完成（仅沿用本任务原始勾选；本轮未重新执行产品
 原迁移文件: '`issue/issue-CODEX-PLUGIN-001-DB-project-goal-versioncontrolid.md`（重命名前路径，仅用于历史追溯）。'
 同源任务: '[提供可安装的myIssue插件清单与分发包](issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E5%AE%89%E8%A3%85%E7%9A%84myIssue%E6%8F%92%E4%BB%B6%E6%B8%85%E5%8D%95%E4%B8%8E%E5%88%86%E5%8F%91%E5%8C%85.md)、[提供宿主独立侧栏与对话内myIssue入口](issue_%E6%8F%90%E4%BE%9B%E5%AE%BF%E4%B8%BB%E7%8B%AC%E7%AB%8B%E4%BE%A7%E6%A0%8F%E4%B8%8E%E5%AF%B9%E8%AF%9D%E5%86%85myIssue%E5%85%A5%E5%8F%A3.md)、[在myIssue与当前或新对话间传递Issue上下文](issue_%E5%9C%A8myIssue%E4%B8%8E%E5%BD%93%E5%89%8D%E6%88%96%E6%96%B0%E5%AF%B9%E8%AF%9D%E9%97%B4%E4%BC%A0%E9%80%92Issue%E4%B8%8A%E4%B8%8B%E6%96%87.md)。'
 共同约束与完整历史: '[提供可安装的myIssue插件清单与分发包](issue_%E6%8F%90%E4%BE%9B%E5%8F%AF%E5%AE%89%E8%A3%85%E7%9A%84myIssue%E6%8F%92%E4%BB%B6%E6%B8%85%E5%8D%95%E4%B8%8E%E5%88%86%E5%8F%91%E5%8C%85.md)（共享说明与源 Comments 保留在该主记录）。'
-updated-time: '2026-10-24T16:22:34+00:00'
+updated-time: '2026-10-28T16:51:44+08:00'
 ---
 
 # Description
@@ -21,7 +21,7 @@ updated-time: '2026-10-24T16:22:34+00:00'
 ## 当前需求与范围
 - [x] [CODEX-PLUGIN-003] 采用 Multica 风格状态列、卡片与详情面板，语义只围绕名称、自由属性、追加式评论；名称下自由 Markdown 内容兼容既有 Description。
 - [x] [CODEX-PLUGIN-004] 创建、读取、修改名称与任意 YAML 属性、追加评论、搜索、筛选、看板/列表切换、拖动状态均操作真实文件。
-- [x] [CODEX-PLUGIN-006] 项目根目录 `issues/*.md` 是稳定且唯一的事实来源；不引入 Issue 数据库。
+- [x] [CODEX-PLUGIN-006] 项目根目录下的 `Issue/*.md` 或 `issues/*.md` 是稳定且唯一的事实来源；每个项目只使用其中一个目录，新项目默认使用 `issues/`，不引入 Issue 数据库。
 - [x] [CODEX-PLUGIN-007] 通过项目级 `.myissue.json` 配置名称来源、属性字段映射、章节名和状态列；未知属性与未知状态必须保留。结构无法解析时只报告，不自动迁移或覆盖。
 - [x] [CODEX-PLUGIN-008] 写入检查文件版本，插件进程之间串行写入并原子替换；保留既有评论与不相关正文。普通编辑器不参与锁协议，检测到外部修改即要求重新加载。
 
@@ -49,3 +49,11 @@ updated-time: '2026-10-24T16:22:34+00:00'
 本次执行环境未提供具体模型标识，未补造 Model-Detail。
 
 [本次文档迁移对话](codex://threads/01a157b3-610c-73b4-ae06-163c0f8490d3)
+
+## 20261028-165144_Codex_GPT-UNKNOWN-UNKNOWN-UNKNOWN-UNKNOWN
+
+实现兼容读取项目根目录下的 `Issue/` 或 `issues/`，保留现有目录名；新项目默认创建 `issues/`。两个目录同时存在时明确报错，附件和分发上下文跟随实际目录。同步更新插件说明、MCP 描述、README 与架构文档。
+
+验证：`npm run build` 通过，`git diff --check` 通过。未运行自动化测试，也未在真实项目目录中执行运行时读写验收；等待后续验证。未提交、未推送。模型具体版本及参数不可从当前执行环境核实，记为 UNKNOWN。
+
+> [本次执行对话](codex://threads/01a181ae-daf5-7f52-84cd-c552bb50260e)
