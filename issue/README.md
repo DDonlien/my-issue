@@ -55,3 +55,12 @@
 
 - 2026-10-26：实现 [看板列固定高度，卡片裁切并在列内上下滚动](issue_看板列固定高度，卡片裁切并在列内上下滚动.md)。`npm run check` 和 `npm run build` 通过；未运行测试或进行宿主视觉验收，等待用户验收。
 - 2026-10-26：实现 [移除看板标题行并将新建按钮并入工具栏](issue_移除看板标题行并将新建按钮并入工具栏.md)。`npm run build` 通过；未运行自动测试或进行宿主视觉验收，等待用户验收。
+
+## 20261026-205725_Codex_Unknown
+
+- 原始请求：myissue本地有吗，没有从GitHub拉下来，然后模板ticket里加上仨属性，开始时间，完成时间，父任务。
+- 决策与改动：本地常用项目目录未找到仓库，已克隆 `DDonlien/my-issue` 到 `D:\Projects\GitHub\Personal\my-issue`；在唯一模板新增默认留空的 `start-time`、`completed-time`、`parent`，沿用 ISO 8601 与现有父任务关系，不迁移既有 Issue。需求及执行记录归入[最小 Issue 文件](issue_定义包含Properties标题正文与Comments的最小Issue文件.md)。
+- 验证：模板属性、空值、重复键、两个一级标题与原有 Comments 内容的静态检查通过；`git diff --check` 通过。未运行应用测试、构建或界面验收。
+- 交付：未 Git commit，未 push。具体模型版本不可用，使用 Unknown。
+
+[本次执行对话](codex://threads/01a17842-e93c-7a82-8947-3b1915817620)
